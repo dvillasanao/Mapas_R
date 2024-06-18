@@ -54,6 +54,7 @@ h3 {
 }
 </style>
 ```
+
 ```{=html}
 <style>
 .tile1-text {
@@ -69,6 +70,7 @@ h3 {
 }
 </style>
 ```
+
 ```{=html}
 <style>
 .tile2-text {
@@ -84,7 +86,6 @@ h3 {
 }
 </style>
 ```
-
 
 ```{=html}
 <style>
