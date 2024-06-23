@@ -147,9 +147,26 @@ require(viridisLite)    # Paleta de colores
 require(doMC)            # Foreach Parallel Adaptor for 'parallel'  
 registerDoMC(cores = 16)   # 
 memory.size()
-invisible(utils::memory.limit(size = 600000))
+invisible(utils::memory.limit(size = 60000000))
 #tinytex::install_tinytex()  # Esto instala un motor LaTeX completo
 ```
+
+```{r, echo = FALSE}
+archivo <- c("shape", "capas", "layer", "tbl")
+nivel <- c("estados", "municipios", "localidad", "ageb")
+for(i in 1:4){
+  for(j in 1:4){
+    assign(paste0(archivo[i], "_", nivel[j]), readRDS(file = paste0(here::here(), "/Output/", archivo[i], "_", nivel[j], ".RDS")))
+  }
+}
+
+load(file = paste0(here::here(), "/Output/IME_2020.RData"))
+load(file = paste0(here::here(), "/Output/IMM_2020.RData"))
+load(file = paste0(here::here(), "/Output/IML_2020.RData"))
+load(file = paste0(here::here(), "/Output/IMU_2020.RData"))
+load(file = paste0(here::here(), "/Output/ZM_2020.RData"))
+```
+
 
 # Objetivo
 
@@ -626,9 +643,11 @@ La función `fortify()` convierte un objeto S3 para convertir objetos diversos a
 ```{r capas_localidad, class.source = "fold-show"}
 capas_localidad <- shape_localidad %>%
                     sp::spChFIDs(., str_pad(shape_localidad@data$CVE_GEO, 9, "left", pad = "0")) %>%
-                     fortify(., id = c("CVE_GEO")) %>%
-                      left_join(., IML_2020 %>% dplyr::select(CVE_GEO, GM_2020), 
-                                  by = c("id" = "CVE_GEO")) 
+                     fortify(., id = c("CVE_GEO")) 
+
+capas_localidad <- capas_localidad %>% 
+                    left_join(., IML_2020 %>% dplyr::select(CVE_GEO, ENT, MUN, LOC, GM_2020), 
+                                   by = c("id" = "CVE_GEO")) 
 length(unique(capas_localidad$id))
 ```
 
@@ -740,11 +759,14 @@ Cuando es necesario cambiar los ID's de las características en los objetos `Spa
 La función `fortify()` convierte un objeto S3 para convertir objetos diversos a un data.frame para `ggplot2`. El data.frame resultante de la conversión de un objeto *spdf* es sumamente largo, tiene una fila por cada cambio en un polígono y un columna de grupo para separar cada polígono.
 
 ```{r capas_ageb, class.source = "fold-show"}
+## SE tarda mucho en correr
 capas_ageb <- shape_ageb %>%
                sp::spChFIDs(., str_pad(shape_ageb@data$CVE_GEO, 13, "left", pad = "0")) %>%
-                fortify(., id = "CVE_GEO") %>%
-                 left_join(., IMU_2020 %>% dplyr::select(CVE_GEO, GM_2020), 
-                             by = c("id" = "CVE_GEO"))
+                select(CVE_GEO) %>%
+                 filter(CVE_GEO %in% IMU_2020$CVE_GEO) %>%
+                  fortify(., id = "CVE_GEO") %>% 
+                spdplyr:::left_join.Spatial(., IMU_2020 %>% dplyr::select(CVE_GEO, GM_2020), 
+                                                   by = c("CVE_GEO")) 
 ```
 
 
@@ -784,12 +806,22 @@ tbl_ageb <- as_tibble(st_as_sf(shape_ageb)) %>%
 ```{r capas_zm, class.source = "fold-show"}
 capas_zm <- shape_ageb %>%
              sp::spChFIDs(., str_pad(shape_ageb@data$CVE_GEO, 13, "left", pad = "0")) %>%
-              fortify(., id = "CVE_GEO") %>%
-               right_join(., IMU_2020 %>% dplyr::select(CVE_GEO, ENT, NOM_ENT, MUN, NOM_MUN, LOC, NOM_LOC, GM_2020), 
-                           by = c("id" = "CVE_GEO")) %>% 
-                 mutate(CVE_MUN = paste0(ENT, MUN)) %>%
-                  right_join(., ZM_2020 %>% dplyr::select(CVE_MUN, CVE_ZM, NOM_ZM), 
-                              by = "CVE_MUN")
+              spdplyr:::inner_join.Spatial(., IMU_2020 %>% dplyr::select(CVE_GEO, ENT, NOM_ENT, MUN, NOM_MUN, LOC, NOM_LOC, GM_2020), 
+                                               by = c("CVE_GEO")) %>% 
+               mutate(CVE_MUN = paste0(ENT, MUN)) %>%
+                spdplyr:::inner_join.Spatial(., ZM_2020 %>% dplyr::select(CVE_MUN, CVE_ZM, NOM_ZM), 
+                                                 by = "CVE_MUN") %>%
+                 filter(CVE_ZM %in% "09.01")
+
+capas_zm_data <- capas_zm@data
+
+capas_zm_fortify  <- capas_zm %>%
+                       fortify(., id = "CVE_GEO")
+
+capas_zm <- capas_zm_fortify %>%
+             left_join(capas_zm_data, by = c("id" = "CVE_GEO"))
+
+rm(capas_zm_data, capas_zm_fortify)
 ```
 
 # Mapas por desagregación geográfica {.tile1-text .top1-tiles .tabset .tabset-pills}
@@ -1033,10 +1065,10 @@ Una de las bondades del paquete `ggmap`, permite hacer mediante el uso de herram
 p <- IMM_2020 %>% 
       mutate(GM_2020 = fct_relevel(.$GM_2020,"Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")) %>%
        ggplot() + 
-        geom_map(map = capas_municipio, 
+        geom_map(map = capas_municipios, 
                   aes(map_id = CVE_GEO, fill = GM_2020), 
                    color = 'transparent')  +
-         expand_limits(x = capas_municipio$long, y = capas_municipio$lat) + 
+         expand_limits(x = capas_municipios$long, y = capas_municipios$lat) + 
           theme_transparent() + 
            theme(plot.title = element_text(size = 20, hjust = 0.15, family = "Montserrat", face = "bold"), 
                   plot.caption = element_text(size = 10, hjust = 0.2, vjust = 1, family = "Montserrat"), 
@@ -1066,7 +1098,7 @@ La función `geom_polygon()` de la paquetería `ggplot2`, devuelve un objeto `gg
 require(RColorBrewer)
 
 p <- ggplot() + 
-      geom_polygon(capas_municipio,
+      geom_polygon(capas_municipios,
                     mapping = aes(x = long, 
                                   y = lat, 
                                   group = group, 
@@ -1270,7 +1302,7 @@ p[[i]] <- ggplot() +
                            color = "black", 
                             size = .5,
                              alpha = 1) +
-           geom_polygon(capas_municipio %>% filter(CVE_ENT == estados[i]),
+           geom_polygon(capas_municipios %>% filter(CVE_ENT == estados[i]),
                          mapping = aes(x = long, 
                                        y = lat, 
                                        group = group), 
@@ -1306,7 +1338,7 @@ p[[i]] <- ggplot() +
 for(j in 1:nrow(municipio)){
   
 q[[j]] <- ggplot() + 
-           geom_polygon(data = capas_municipio %>% filter(id == municipio$CVE_MUN[j]), 
+           geom_polygon(data = capas_municipios %>% filter(id == municipio$CVE_MUN[j]), 
                          mapping = aes(x = long, 
                                        y = lat, 
                                        group = group), 
@@ -1554,7 +1586,7 @@ p <-  ggplot() +
                        color = "black", 
                         size = .5,
                          alpha = 0.9) +
-       geom_polygon(capas_municipio %>% filter(id == tabla$CVE_MUN),
+       geom_polygon(capas_municipios %>% filter(id == tabla$CVE_MUN),
                      mapping = aes(x = long, 
                                    y = lat, 
                                    group = group), 
@@ -1672,11 +1704,11 @@ p[[6]]
 
 ```{r}
 saveRDS(shape_estados, file = paste0(here::here(), "/Output/shape_estados.RDS"))
-saveRDS(capas_estados, file = paste0(here::here(), "/Output/capa_estados.RDS"))
+saveRDS(capas_estados, file = paste0(here::here(), "/Output/capas_estados.RDS"))
 saveRDS(layer_estados, file = paste0(here::here(), "/Output/layer_estados.RDS"))
 saveRDS(tbl_estados, file = paste0(here::here(), "/Output/tbl_estados.RDS"))
 saveRDS(shape_municipios, file = paste0(here::here(), "/Output/shape_municipios.RDS"))
-saveRDS(capas_municipio, file = paste0(here::here(), "/Output/capas_municipio.RDS"))
+saveRDS(capas_municipio, file = paste0(here::here(), "/Output/capas_municipios.RDS"))
 saveRDS(layer_municipios, file = paste0(here::here(), "/Output/layer_municipios.RDS"))
 saveRDS(tbl_municipios, file = paste0(here::here(), "/Output/tbl_municipios.RDS"))
 saveRDS(shape_localidad, file = paste0(here::here(), "/Output/shape_localidad.RDS"))
@@ -1687,6 +1719,11 @@ saveRDS(shape_ageb, file = paste0(here::here(), "/Output/shape_ageb.RDS"))
 saveRDS(capas_ageb, file = paste0(here::here(), "/Output/capas_ageb.RDS"))
 saveRDS(layer_ageb, file = paste0(here::here(), "/Output/layer_ageb.RDS"))
 saveRDS(tbl_ageb, file = paste0(here::here(), "/Output/tbl_ageb.RDS"))
+save(IME_2020, file = paste0(here::here(), "/Output/IME_2020.Rdata"))
+save(IMM_2020, file = paste0(here::here(), "/Output/IMM_2020.Rdata"))
+save(IML_2020, file = paste0(here::here(), "/Output/IML_2020.Rdata"))
+save(IMU_2020, file = paste0(here::here(), "/Output/IMU_2020.Rdata"))
+save(ZM_2020, file = paste0(here::here(), "/Output/ZM_2020.RData"))
 ```
 
 
