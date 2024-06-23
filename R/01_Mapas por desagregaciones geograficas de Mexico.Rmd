@@ -850,11 +850,13 @@ p
 
 ## Entidad Federativa {.tabset .tabset-fade .tabset-pills}
 
-### `geom_map`
+### `geom_map` {.tabset .tabset-fade .tabset-pills}
 
 La función `ggmap()` devuelve un objeto `ggplot`. Puede usar este objeto `ggplot` resultante como lo haría con cualquier otro objeto ggplot (ejemplo, agregar geoms, cambiar tema). [GitHub: fresques/ggmap](https://github.com/fresques/ggmap)
 
 Una de las bondades del paquete `ggmap`, permite hacer mediante el uso de herramientas de *Google Maps* directamente desde `R`. Este paquete permite extraer un mapa base de *Google Maps* y algunos otros servidores de mapas, para que luego se puedan trazar y agregar puntos, polígonos, líneas y otros elementos usando funciones `ggplot2`. Este paquete usa la `API` de *Google Maps*. Otras funciones en el paquete `ggmap`, necesita una clave `API` de Google Maps para que funcione.
+
+#### Base  
 
 ```{r, class.source = "fold-hide"}
 # Paquete
@@ -885,6 +887,110 @@ p <- IME_2020 %>%
 #ggexport(p, width = 8, height = 5, res = 400, filename = path)
 
 p
+```
+
+
+#### Google API 
+
+Una de las bondades de utilizar ggmap es usar una colección de funciones para visualizar datos espaciales y modelos sobre mapas estáticos de varias fuentes en línea como *Google Maps*.  Incluye herramientas comunes a esas tareas, incluidas funciones de geolocalización y enrutamiento, además de que estéticamente se vean más profesionales.  
+Para obtener más funciones, consulte la documentación de [`ggmap`]( https://journal.r-project.org/archive/2013-1/kahle-wickham.pdf) o ([guias básicas de introducción a ggmap](https://www.nceas.ucsb.edu/sites/default/files/2020-04/ggmapCheatsheet.pdf), [Mapas estáticos con ggmap](http://www.riaat.ujat.mx/hablandoalaire/tutoriales/Tutorial_MapasEstaticos_ggmap.pdf)).     
+
+La idea central que impulsa `ggmap` es tomar una imagen de mapa descargada de la plataforma de Google Maps y, trazarla como una capa contextual usando el paquete `ggplot2` y posteriormente incluir capas de contenido adicionales de datos, estadísticas o modelos en la parte superior del mapa.   
+
+Pero para poder acceder a esta nube de datos, la función `get_map()` es una función contenedora para las funciones subyacentes `get_googlemap`, `get_openstreetmap`, `get_stamenmap` y `get_cloudmademap` que acepta una amplia gama de argumentos y devuelve un objeto ráster clasificado para trazar con **ggmap**.  Donde la característica importante de cualquier mapa es la ubicación `longitud/latitud`. 
+
+Si bien cada fuente de mapas tiene su propia interfaz de programación de aplicaciones web (`API`), en este caso, es necesario crear una cuenta en [`Google Cloud`](https://cloud.google.com/?hl=es) y generar una credencial para habilitar a las *API de Google*.   
+
+```{r, class.source = "fold-show", eval = FALSE}
+require(ggmap)
+register_google(key = "[your key]")
+```
+
+A menudo se necesita recopilar conjuntos de datos espaciales de diferentes fuentes y/o datos que cubran diferentes extensiones espaciales. Donde muchas veces los datos espaciales provienen de diferentes fuentes y cubren diferentes extensiones que a menudo se encuentran en diferentes sistemas de referencia de coordenadas (`CRS`), como es el caso del índice de marginación a nivel estatal que fue proyectado con los *shapefiles* proporcionados por el INEGI.    
+
+```{r,class.source = "fold-show"}
+## El sistema de referencia de coordenadas (INEGI)
+proj4string(shape_estados)
+```
+
+Haciendo uso de la función `spTransform()` del paquete `sp`, proporcionan la transformación entre datum(s) y conversión entre proyecciones (también conocidas como *proyección y/o reproyección*), de un sistema de referencia de coordenadas (`CRS`).      
+
+```{r}
+require(sp)
+
+shape_estados_T <- spTransform(shape_estados, CRSobj = CRS('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs')) %>%
+                    sp::spChFIDs(., str_pad(shape_estados@data$CVE_GEO, 2, "left", pad = "0")) %>%
+                     fortify(., id = "CVE_GEO") %>%
+                       left_join(., IME_2020 %>% dplyr::select(CVE_GEO, NOM_ENT, GM_2020),
+                                 by = c("id" = "CVE_GEO"))  
+```
+
+
+**Ejemplo.- Mapa a nivel estatal**  
+
+Antes de poder visualizar el mapa es importante elegir el sistema de coordenadas del sitio de representación. Dichas coordenadas pueden obtenerse del sistema información geográfico de los shapefiles (previamente transformado al Sistema Geodésico Mundial), ya que este proporciona las longitudes y latitudes o bien se puede geolocalizar el punto de interés con su ubicación geográfica y/o posicionarse directamente mediante Google Earth.    
+
+```{r, class.source = "fold-hide"}
+# Se buscan los límites del shape de estados  
+location <- c(left = min(shape_estados_T$long), 
+              bottom = min(shape_estados_T$lat),
+              right = max(shape_estados_T$long),
+              top = max(shape_estados_T$lat))
+
+p <- get_map(location = location, source = "google", maptype="roadmap", scale = 2) %>% 
+       ggmap() + 
+        geom_polygon(data = shape_estados_T, 
+                      mapping = aes(x = long, 
+                                     y = lat, 
+                                      group = group,
+                                       fill = fct_relevel(GM_2020,"Muy alto","Alto","Medio","Bajo","Muy bajo")),
+                        color = "dark grey",
+                         size = 0.5, 
+                          alpha = 0.7) +
+           expand_limits(x = shape_estados_T$long, 
+                         y = shape_estados_T$lat) + 
+             theme_transparent() + 
+              theme(plot.title = element_text(size = 17, hjust = 0.15, vjust = 0.5, family = "montserrat", face = "bold"),
+                     plot.caption = element_text(size = 9, hjust = 0.2, vjust = 1, family = "montserrat"),
+                      legend.key.size = unit(0.5, "cm"),
+                       legend.text = element_text(size = 8, family = "montserrat"), 
+                        legend.title = element_text(size = 10, hjust = 0.5, family = "montserrat", face = "bold"),
+                         legend.position = "right") +   
+                scale_fill_manual(values = usecol(pal_petrol, n = 5)) + 
+                 scale_color_manual(values = usecol(pal_petrol, n = 5)) + 
+                  guides(color = 'none') +
+        labs(title = "Índice de marginación a nivel estatal, 2020",
+              fill = stringr::str_wrap("Grado de marginación", 10),
+               caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
+
+path = paste0(here::here(),"/img/img_2020_ggmap_API.pdf")
+ggexport (p, width = 8, height = 5, res = 400, filename = path)
+print(p)
+```
+
+**Caso particular**  
+
+```{r, class.source = "fold-hide"}
+#Paquetes
+require(ggimage) # Utiliza la función geom_image
+require(grDevices) # Nos permite leer los archivos .svg 
+
+# Se genera un data frame de la ubicación a mapear
+location <- data.frame(lon = -100.445009, lat = 20.705260)
+
+get_googlemap(center = c(lon = -100.445009, lat = 20.705260), maptype = "satellite", zoom = 16) %>% 
+ ggmap(extent = "normal") +
+   geom_point(data = location, mapping = aes(x = -100.445009, 
+                                              y = 20.705260)) + 
+    geom_image(data = location, mapping = aes(image = "https://upload.wikimedia.org/wikipedia/commons/e/ed/Map_pin_icon.svg", 
+                                               x = lon, 
+                                                y = lat), 
+                size = 0.05) + 
+      theme_transparent() + 
+       scale_y_continuous(labels = scales::number_format(accuracy = 0.01, decimal.mark = '.')) +
+        scale_x_continuous(labels = scales::number_format(accuracy = 0.1, decimal.mark = '.')) +
+         labs(x = "", 
+               y = "")
 ```
 
 ### `geom_polygon`
@@ -1698,6 +1804,484 @@ if(i == 6){
 
 p[[6]]
 ```
+
+# Complementos {.top2-tiles .tile2-text .tabset  .tabset-pills}
+
+## Entidad{.tabset .tabset-fade .tabset-pills} 
+
+###  Etiquetas   
+
+Se utiliza la función `coordinates()` del paquete `sp` que permite localizar los centroides de cada estado. Permitiendo de esta manera encontrar la localización para las etiquetas de cada área geográfica y utilizando la función `geom_label_repel()` mediante los atributos `mapping = aes(x = Longitude, y = Latitude)` y de esta manera no permitir que las etiquetas del mapa se sobrelapen entre sí y se alejen de los puntos de datos generados por la función `coordinates()`.          
+   
+```{r}
+#Paquete
+require(ggrepel)
+require(viridisLite)
+
+# "coordinates()" extrae los centroides de los polígonos, en el orden indicado en shape@data
+centroids.df <- as.data.frame(coordinates(shape_estados)) %>%
+                  rename("Longitude" = "V1","Latitude" = "V2")
+
+p <- IME_2020 %>% 
+      cbind(., centroids.df) %>%
+       ggplot() + 
+        geom_polygon(data = capas_estados,
+                      mapping = aes(x = long, 
+                                    y = lat, 
+                                    group = group,
+                                    fill = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
+                       color = "dark grey",
+                        size = 0.5) +
+         geom_label_repel(aes(label = stringr::str_wrap(NOM_ENT, 15),
+                               x = Longitude,
+                                y = Latitude,
+                                 color = fct_relevel(GM_2020,"Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")), 
+                           force = 0.6,
+                            box.padding = 0.25,
+                             min.segment.length = 0.5,
+                              size = 3.5, 
+                               fill = "transparent",
+                                point.padding = 0.5,
+                                 segment.size = 0.7,
+                                  segment.colour= "dark grey",
+                                   label.size = 0,
+                                    alpha = 0.8) +
+           expand_limits(x = capas_estados$long,  
+                         y = capas_estados$lat) + 
+            theme_transparent() + 
+             theme(plot.title = element_text(size = 20, hjust = 0.15, family = "montserrat", face = "bold"),
+                    plot.caption = element_text(size = 9, hjust = 0.2, vjust = 1, family = "montserrat"), 
+                     legend.key.size = unit(0.5, "cm"),
+                      legend.text = element_text(size = 8, family = "montserrat"), 
+                       legend.title = element_text(size = 10, hjust = 0.5, family = "montserrat", face = "bold"),
+                        legend.position = c(0.9, 0.7)) + 
+               scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
+                scale_color_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
+                 guides(fill = guide_legend(override.aes = list(color = viridis(n = 5, option = "A", begin = 0.3, end = 0.8))),
+                         color = 'none') +
+         labs(title = "Índice de marginación a nivel estatal, 2020",
+               fill = stringr::str_wrap("Grado de marginación", 10),
+                caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
+
+#path = "Images/IME_2020_geom_polygon_etiquetas.pdf"
+#ggexport (p, width = 8, height = 5, res = 400, filename = path)
+
+p
+```
+
+### `Annotation_scale`  
+
+Usando las funciones `annotation_scale()` y `annotation_north_arrow()` del paquete `ggspatial` se puede agregar una barra de escala o bien una flecha de norte. El sistema de posicionamiento de estas características está controlado por el argumento de ubicación (ejemplo, location = "tl" ~ topleft). Usando los argumentos `pad_x` y `pad_y` se pueden hacer ajustes menores al posicionamiento de los iconos.     
+
+```{r}
+#Paquetes
+require(ggspatial)
+
+#Ejemplos
+#style = north_arrow_orienteering
+#style = north_arrow_fancy_orienteering
+#style = north_arrow_minimal
+#style = north_arrow_nautical
+
+p <- IME_2020 %>% 
+       ggplot() + 
+        geom_polygon(data = capas_estados,
+                      mapping = aes(x = long, 
+                                    y = lat, 
+                                    group = group,
+                                    fill = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
+                       color = "dark grey",
+                        size = 0.5) +
+         annotation_north_arrow(location = "tl", 
+                                 style = north_arrow_fancy_orienteering, 
+                                  pad_x = unit(0, "cm"), 
+                                   height = unit(1, "cm"),
+                                    width = unit(1, "cm")) +
+          annotation_scale(location = "bl", 
+                            plot_unit = "m" , 
+                             pad_y = unit(0, "cm"), 
+                              text_family = "montserrat") +
+           expand_limits(x = capas_estados$long,  
+                         y = capas_estados$lat) + 
+            theme_transparent() + 
+             theme(plot.title = element_text(size = 20, hjust = 0.15, family = "montserrat", face = "bold"),
+                    plot.caption = element_text(size = 9, hjust = 0.2, vjust = 1, family = "montserrat"), 
+                     legend.key.size = unit(0.5, "cm"),
+                      legend.text = element_text(size = 10, family = "montserrat"), 
+                       legend.title = element_text(size = 12, hjust = 0.5, family = "montserrat", face = "bold"),
+                        legend.position = c(0.8, 0.7)) + 
+              scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
+               scale_color_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
+                guides(fill = guide_legend(override.aes = list(color = viridis(n = 5, option = "A", begin = 0.3, end = 0.8))),
+                        color = 'none') +
+       labs(title = "Índice de marginación a nivel estatal, 2020",
+             fill = stringr::str_wrap("Grado de marginación", 10),
+               caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
+
+#path = "Images/IME_2020_annotation.pdf"
+#ggexport (p, width = 8, height = 5, res = 400, filename = path)
+
+p
+```
+
+
+## Municipios{.tabset .tabset-fade .tabset-pills} 
+
+### Etiquetas   
+
+Se utiliza la función `coordinates()` del paquete `sp` que permite localizar los centroides de cada muncipio. Permitiendo de esta manera encontrar la localización para las etiquetas de cada área geográfica y utilizando la función `geom_label_repel()` mediante los atributos `mapping = aes(x = Longitude, y = Latitude)` y de esta manera no permitir que las etiquetas del mapa se sobrelapen entre sí y se alejen de los puntos de datos generados por la función `coordinates()`.     
+
+
+```{r}
+capas_zm <- left_join(capas_municipios, 
+                       ZM_2020 %>% dplyr::select(-NOM_ENT, -NOM_MUN, -CVE_ENT), 
+                        by = c("id" = "CVE_MUN")) %>%
+             filter(CVE_ENT %in% c("09","13","15")) %>%
+              mutate(condicional = ifelse(CVE_ZM == "09.01", .$GM_2020, NA))
+
+# "coordinates()" extrae los centroides de los polígonos, en el orden indicado en shape@data
+centroids.df <- as.data.frame(coordinates(shape_estados)) %>%
+                  rename("Longitude" = "V1","Latitude" = "V2")
+
+tabla <- ZM_2020 %>%
+          filter(CVE_ZM == "09.01") %>%
+           dplyr::select(CVE_MUN) %>%
+            unique() %>% 
+             as.vector()
+
+p <- ggplot() + 
+      geom_polygon(data = capas_zm,
+                    mapping = aes(x = long, 
+                                  y = lat, 
+                                  group = group,
+                                  fill = fct_relevel(condicional, c("Muy alto","Alto","Medio","Bajo","Muy bajo"))),
+                     color = "dark grey",
+                      size = 0.3) +
+      geom_polygon(data = capas_estados %>% filter(id %in% c("09", "13", "15")),
+                    mapping = aes(x = long, 
+                                  y = lat, 
+                                  group = group),
+                     fill = 'transparent',
+                      color = "black",
+                       size = 0.8) +
+      geom_label_repel(data = data.frame(IME_2020, centroids.df) %>%
+                                filter(CVE_ENT %in% c("09","13","15")),
+                        mapping = aes(label = stringr::str_wrap(NOM_ENT, 15),
+                                      x = Longitude,
+                                      y = Latitude), 
+                         box.padding = 0.25,
+                          point.padding = 3,
+                           size = 5, 
+                            fill = "#EDEDED",
+                             color = "#000036",
+                              segment.colour= "dark grey",
+                               alpha = 0.8) +
+         coord_equal() + 
+          theme_transparent() + 
+           theme(plot.title = element_text(size = 14, hjust = 0.15, family = "montserrat", face = "bold"),
+                  plot.caption = element_text(size = 10, hjust = 0.2, vjust = 1, family = "montserrat"), 
+                   legend.key.size = unit(0.5, "cm"),
+                    legend.text = element_text(size = 8, family = "montserrat"), 
+                     legend.title = element_text(size = 10, hjust = 0.2, family = "montserrat", face = "bold")) +
+             scale_fill_manual(labels = c("Medio","Bajo","Muy bajo"),
+                               values = rev(usecol(pal = pal_petrol, n = 3)),
+                               na.translate = F) + 
+               guides(color = 'none') +
+       labs(title = "ZMVM: Zona Metropolitana del Valle de México, 2020",
+             fill = stringr::str_wrap("Grado de marginación", 10),
+              caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
+ 
+#path = "Images/IMM_2020_geom_polygon_etiquetas.pdf"
+#ggexport (p, width = 6, height = 5, res = 400, filename = path)
+
+p
+```
+
+
+```{r}
+# "coordinates()" extrae los centroides de los polígonos, en el orden indicado en shape@data
+centroids.df <- as.data.frame(coordinates(shape_municipios)) %>%
+                 rename("Longitude" = "V1","Latitude" = "V2") %>%
+                  mutate(CVE_ENT = shape_municipios@data$CVE_ENT,
+                         CVE_MUN = shape_municipios@data$CVE_GEO,
+                         NOM_MUN = shape_municipios@data$NOMGEO
+                         #NOM_MUN = iconv(shape_municipios@data$NOMGEO, from = "utf8", to = "latin9")
+                         )
+p <- NULL
+#for(i in 1:32){
+for(i in 7){
+# Se generan los límites de cada estados, en caso de que se requiera modificar alguno
+limites <- capas_municipios %>%
+            subset(CVE_ENT == estados[i]) %>%
+             summarise(min.x = min(.$long),
+                       max.x = max(.$long),
+                       min.y = min(.$lat),
+                       max.y = max(.$lat))
+
+# Se genera una muestra aleatoria   
+sample <- centroids.df %>%
+            filter(CVE_ENT == estados[i]) %>%
+             sample_n(., min(30, nrow(.)))
+
+q <- ggplot() + 
+      geom_polygon(data = capas_municipios %>% filter(CVE_ENT == estados[i]),
+                    mapping = aes(x = long, 
+                                  y = lat, 
+                                  group = group,
+                                  fill = fct_relevel(GM_2020, c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))),
+                     color = "dark grey",
+                      size = 0.3) +
+       geom_polygon(data = capas_estados %>% filter(id == estados[i]),
+                     mapping = aes(x = long, 
+                                   y = lat, 
+                                   group = group),
+                      fill = 'transparent',
+                       color = "black",
+                        size = 0.8) +
+        geom_label_repel(data = sample,
+                          mapping = aes(label = stringr::str_wrap(NOM_MUN, 15),
+                                        x = Longitude,
+                                        y = Latitude), 
+                           size = 3.5, 
+                            fill = "#EDEDED",
+                             color = "#000036",
+                              alpha = 0.8,
+                               force = 0.2,
+                                force_pull = 0.5,
+                                 direction = c("both"),
+                                  box.padding = 0.25,
+                                   point.padding = 0,
+                                    segment.colour= "dark grey",
+                                     segment.size = 1,
+                                      min.segment.length = 0.5) +
+           coord_equal() +
+           theme_transparent() + 
+            theme(plot.title = element_text(size = 14, hjust = 0.15, family = "montserrat", face = "bold"),
+                   plot.caption = element_text(size = 10, hjust = 0.2, vjust = 1, family = "montserrat"), 
+                    legend.key.size = unit(0.5, "cm"),
+                     legend.text = element_text(size = 8, family = "montserrat"), 
+                      legend.title = element_text(size = 10, hjust = 0.2, family = "montserrat", face = "bold")) +
+             scale_fill_manual(values = brewer.pal(n = 9, name = "Spectral"),
+                                na.translate = T) + 
+              guides(color = 'none') +
+        labs(title = paste(nom_ent [i]),
+              fill = stringr::str_wrap("Grado de marginación", 10),
+               caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
+
+if(i %in% c(1:5, 7:32)){
+  p[[i]] <- q  
+} else {
+  p[[i]] <- q + coord_cartesian(xlim = c(limites$min.x + 1060000, limites$max.x),
+                                ylim = c(limites$min.y, limites$max.y)) 
+  }
+}
+
+#path = "Images/IMM_2020_etiquetas por estado.pdf"
+#ggexport (list = p, width = 8, height = 5, res = 400, filename = path)
+
+p[[7]]
+```
+
+### 2010 - 2020      
+
+Son nueve indicadores simples, los que conforman el índice de marginación a nivel municipal. De los cuales se enfocan en cuatro dimensiones de exclusión social.  
+
+```{r,class.source = "fold-show"}
+Indicadores <- c('Porcentaje de población de 15 años o más analfabeta', 
+                 'Porcentaje de población de 15 años o más sin educación básica',
+                 'Porcentaje de ocupantes en viviendas sin drenaje ni excusado',
+                 'Porcentaje de ocupantes en viviendas sin energía eléctrica', 
+                 'Porcentaje de ocupantes en viviendas sin agua entubada', 
+                 'Porcentaje de ocupantes en viviendas con piso de tierra',
+                 'Porcentaje de población en localidades con menos de 5 000 habitantes', 
+                 'Porcentaje de viviendas con algún nivel de hacinamiento',
+                 'Porcentaje de población ocupada con ingresos de hasta 2 salarios mínimos')
+```
+
+**Se cargan las bases de datos de los indicadores simples del índice de marginación 2010-2020**   
+
+```{r, class.source = "fold-show"}
+tablas <- c("2010", "2015", "2020")  
+
+for(i in tablas){
+  assign(paste0("Ind_", i), read_xlsx(paste0(here::here(), "/Data/Indicadores_", i, ".xlsx"), sheet = "Indicadores") %>% 
+                              rename("ANIO" = "AÑO"))
+}
+
+### Se crea un data.frame (se incluyen todo los años)
+Ind <- do.call(dplyr::bind_rows, list(Ind_2010, Ind_2015, Ind_2020))
+```
+
+Utilizando la función `cut()` y `quantile` se dividen en cuantiles cada una de las variables simples de todos los años y de esta manera poder visualizar la evolución de los indicadores de rezago.   
+
+```{r, class.source = "fold-show"}
+Ind <-  Ind %>%
+         mutate_at(vars(7:15), 
+                   .funs = funs(cut(., breaks = quantile(unique(.), probs = seq(0, 1, 0.2)), include.lowest = TRUE, dig.lab = 2)),
+                    .names = "Q_{col}")
+```
+
+
+Para poder visualizar el mapa a nivel municipal dentro de conjunto de datos del Marco Geoestadístico Nacional [`MGN`], donde este conjunto abarca varias capas de datos vectoriales.   
+Se toma como referencia el `Marco Geoestadístico, 2010 Versión 4.3`, `Marco Geoestadístico, junio 2016` y `Marco Geoestadístico, 2020`, que es producto de la actualización de censos, conteos, encuestas y registros administrativos.    
+
+**Shape de municipios 2010**  
+
+```{r,results=FALSE,class.source = "fold-show"}
+shape_estados_2010 <- readOGR(dsn = paste0(here::here(), "/MGN 2010/32_Entidades_Federativas"),
+                               layer = "ESTADOS",
+                              )
+
+shape_municipios_2010 <- readOGR(dsn = paste0(here::here(), "/MGN 2010/32_Entidades_Federativas"),
+                                 layer = "MUNICIPIOS",
+                                )
+
+# Se crea un ID único o una Clave Geoestadística 
+shape_municipios_2010@data <- shape_municipios_2010@data %>%
+                                mutate(CVE_GEO = paste0(CVE_ENT, CVE_MUN))
+```
+
+**Shape municipio 2015**
+
+
+```{r,results=FALSE,class.source = "fold-show"}
+shape_estados_2015 <- readOGR(dsn = paste0(here::here(), "/MGN Junio 2016/conjunto_de_datos"),
+                               layer = "areas_geoestadisticas_estatales"
+                              )
+
+shape_municipios_2015 <- readOGR(dsn = paste0(here::here(), "/MGN Junio 2016/conjunto_de_datos"),
+                                  layer = "areas_geoestadisticas_municipales"
+                                )
+
+shape_municipios_2015@data <- shape_municipios_2015@data %>%
+                                mutate(CVE_GEO = paste0(CVE_ENT, CVE_MUN))
+```
+
+Se elimina al municipio `23011` Puerto Morelos del estado de  Quintana Roo, debido a que no tiene calculado el `IM 2015`.  
+
+```{r,class.source = "fold-show"}
+require(spdplyr)
+shape_municipios_2015 <- shape_municipios_2015 %>%
+                           spdplyr:::filter.Spatial(CVE_GEO != 23011)
+```
+
+**Se unen las bases de los indicadores simples a los shapes**  
+
+```{r,class.source = "fold-show"}
+capas_estados_2010 <- fortify(shape_estados_2010, id = "CVE_ENT") 
+capas_municipios_2010 <- dplyr::right_join(fortify(shape_municipios_2010, id = "CVE_GEO"), 
+                                            Ind %>% dplyr::select(-CVE_ENT, -NOM_ENT, -NOM_MUN) %>%
+                                             filter(ANIO == "2010") %>%
+                                              arrange(.$CVE_MUN) %>%
+                                               mutate(id = as.character(seq(0, to = (nrow(.) - 1)))),
+                                                by =  c("id")) 
+```
+
+```{r,class.source = "fold-show"}
+capas_estados_2015 <- fortify(shape_estados_2015, id = "CVE_ENT") 
+capas_municipios_2015 <- dplyr::right_join(fortify(shape_municipios_2015, id = "CVE_GEO"), 
+                                            Ind %>% dplyr::select(-CVE_ENT, -NOM_ENT, -NOM_MUN) %>%
+                                             filter(ANIO == "2015") %>%
+                                              arrange(.$CVE_MUN) %>%
+                                               mutate(id = as.character(seq(0, to = (nrow(.) - 1)))),
+                                                by =  c("id")) 
+```
+
+```{r,class.source = "fold-show"}
+capas_estados_2020 <- fortify(shape_estados, id = "CVE_ENT") 
+capas_municipios_2020 <- dplyr::right_join(fortify(shape_municipios, id = "CVE_GEO"), 
+                                            Ind %>% dplyr::select(-CVE_ENT, -NOM_ENT, -NOM_MUN) %>%
+                                             filter(ANIO == "2020") %>%
+                                              arrange(.$CVE_MUN) %>%
+                                               mutate(id = as.character(seq(0, to = (nrow(.) - 1)))),
+                                                by =  c("id")) 
+```
+
+**Utilizando dos capas**
+
+En este tipo de gráficos se utiliza la **capa de municipios** y la **capa de estados**. Para cada caso se usa la función `geom_polygon()` del paquete `ggplot2::` y así poder encontrar las delimitaciones de los municipios en su respectiva entidad.    
+
+```{r indicadores_simples}
+Variables <- colnames(capas_municipios_2010)
+
+p <- NULL
+for(i in tablas){
+#p[[i]] <- lapply(c(11:19), function(x){ 
+p[[i]] <- lapply(c(11), function(x){ 
+            ggplot() + 
+              geom_polygon(get(paste0("capas_municipios_", i)) ,
+                            mapping=aes(x = long, y = lat, group = group, fill = get(Variables[x])),
+                             color = "transparent", 
+                              size = 0.5,
+                               alpha = 0.9) +
+               geom_polygon(get(paste0("capas_estados_", i)),
+                             mapping = aes(x = long, y = lat, group = group),
+                              color = "dark grey",
+                               fill = "transparent",
+                                size = 0.5) +
+                  expand_limits(x = get(paste0("capas_estados_", i))$long, 
+                                  y = get(paste0("capas_estados_", i))$lat) + 
+                    coord_equal() +
+                     theme_void() + 
+                      theme(plot.title = element_text(size = 15, family = "montserrat"),
+                             plot.subtitle = element_text(size = 15, hjust = 0.08 , family = "montserrat"),
+                              plot.margin = margin(1, 1, 1, 1, "cm"),
+                               plot.caption = element_text(size = 10, hjust = 0.1, vjust = -1.5, family = "montserrat"), 
+                                axis.title.x = element_text(size = 8, family = "montserrat"),
+                                 axis.text.x = element_blank(),
+                                  axis.text.y = element_blank(), 
+                                   legend.text = element_text(size = 10, family = "montserrat"),
+                                    legend.key.size = unit(0.6, "cm"),
+                                     legend.position = c(0.8, 0.7)) + 
+                           scale_fill_manual(values = usecol(pal_petrol, n = 5)) +
+                             guides(color = FALSE) +
+            labs(subtitle = paste(i),
+                  x = "",
+                   y = "",
+                    fill = paste(Variables[x-9]))
+    }
+  )   
+}
+```
+
+**Mapas de los indicadores simples 2010-2020**    
+
+```{r mindsimples,fig.width=10, fig.height=10}
+# Titulo de los gráficos
+#for(i in 1:9){
+for(i in 1){
+legend <- get_legend(p[["2010"]][[i]] + theme(legend.position = c(0.5, 0.5),
+                                               legend.key.size = unit(1, "cm"),
+                                                legend.title = element_blank()))
+
+q <- ggarrange(p[["2010"]][[i]] + theme(plot.margin = margin(0.5, -1, -1, 0, "cm"),
+                                         legend.position = 'none'), 
+               p[["2015"]][[i]] + theme(plot.margin = margin(0.5, 0, -1, -1, "cm"),
+                                        legend.position = 'none'), 
+               p[["2020"]][[i]] + theme(plot.margin = margin(0.5, -1, 0, 0, "cm"),
+                                         legend.position = 'none'), 
+               legend, 
+               ncol = 2, nrow = 2, widths = c(0.5, 0.5, 3, 0.6), heights = c(0.5, 0.5, 3, 0.6))
+        
+#path = paste0("Images/Mapa_", colnames(Ind)[6 + i], ".pdf")
+#ggexport (annotate_figure(q, bottom =  text_grob(paste(stringr::str_wrap(Indicadores[i], 25, indent = 1, exdent = 1),"\n"),
+ #                                                family = "montserrat", 
+  #                                               face = "plain", 
+   #                                              size = 18
+    #                                             #hjust = 0,
+     #                                            #vjust = 0
+      #                                           )),
+       #   width = 10, height = 8, res = 400, filename = path)
+}
+
+img <- annotate_figure(q, bottom =  text_grob(paste(stringr::str_wrap(Indicadores[i], 25, indent = 1, exdent = 1),"\n"),
+                                              family = "montserrat", 
+                                              face = "plain", 
+                                              size = 20))
+img
+```
+
+
 
 
 # RDS Files 
