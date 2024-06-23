@@ -1683,6 +1683,10 @@ saveRDS(shape_localidad, file = paste0(here::here(), "/Output/shape_localidad.RD
 saveRDS(capas_localidad, file = paste0(here::here(), "/Output/capas_localidad.RDS"))
 saveRDS(layer_localidad, file = paste0(here::here(), "/Output/layer_localidad.RDS"))
 saveRDS(tbl_localidad, file = paste0(here::here(), "/Output/tbl_localidad.RDS"))
+saveRDS(shape_ageb, file = paste0(here::here(), "/Output/shape_ageb.RDS"))
+saveRDS(capas_ageb, file = paste0(here::here(), "/Output/capas_ageb.RDS"))
+saveRDS(layer_ageb, file = paste0(here::here(), "/Output/layer_ageb.RDS"))
+saveRDS(tbl_ageb, file = paste0(here::here(), "/Output/tbl_ageb.RDS"))
 ```
 
 
