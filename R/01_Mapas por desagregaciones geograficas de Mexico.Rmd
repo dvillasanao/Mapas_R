@@ -1,16 +1,16 @@
 ---
 title: "Mapas por desagregaciones geográficas de México"
-date: "`r format(Sys.time(), '%d-%m-%Y')`"
 author: "Diana Villasana Ocampo"
+date: "`r format(Sys.time(), '%d-%m-%Y')`"
 output:
-   html_document:
-      code_folding: hide
-      highlight: tango
-      theme: flatly
-      toc: true
-      toc_depth: 3
-      toc_float:
-        collapsed: yes
+  html_notebook:
+    code_folding: show
+    highlight: tango
+    theme: flatly
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: true
 ---
 
 \usepackage{color}
@@ -96,23 +96,30 @@ h3 {
 </style>
 ```
 
+<style>
+pre.sourceCode {
+  max-height: 300px;
+  overflow: auto;
+}
+</style>
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE, cache.lazy = FALSE, collapse = TRUE, 
-                      class.source = "fold-hide",
-                      eval = FALSE
+                      #class.source = "fold-hide",
+                      eval = TRUE
                       )
 ```
 
-```{r,echo=FALSE, eval=FALSE}
+```{r,echo = FALSE, eval = FALSE}
 rm(list = ls())
 ```
 
 ```{r, echo = FALSE}
+#Font Stlye
 require(showtext)
-# activar showtext
-showtext_auto()
-font_add_google("Montserrat", "montserrat")
+library(extrafont)
+windowsFonts()
 ```
 
 ```{r, echo = FALSE, results=FALSE}
@@ -138,9 +145,10 @@ require(tibble)
 require(unikn)          # Paleta de colores
 require(viridisLite)    # Paleta de colores 
 require(doMC)            # Foreach Parallel Adaptor for 'parallel'  
-registerDoMC(cores = 5)   # 
-#memory.size()
-#invisible(utils::memory.limit(size = 60000))
+registerDoMC(cores = 16)   # 
+memory.size()
+invisible(utils::memory.limit(size = 600000))
+#tinytex::install_tinytex()  # Esto instala un motor LaTeX completo
 ```
 
 # Objetivo
@@ -153,13 +161,15 @@ El Instituto Nacional de Estadística, Geografía e Informática (INEGI) tiene p
 
 Este producto integra información vectorial, tablas de atributos y catálogos. Muestra la división geoestadística del territorio nacional en sucesivos niveles del territorio. Esta división está dada por los llamados **límites estadísticos**, que pueden coincidir con los límites político-administrativos oficiales, los cuales tienen sustento legal.
 
-```{r,echo=FALSE}
+```{r,echo = FALSE}
 require(kableExtra)
 require(knitr)
 
-tabla <- data.frame(Division = c("Estatales", "Municipales", "Localidades rurales amanzanadas", "Localidades urbanas", "Localidades rurales amanzanadas y no amanzanadas", "Áreas geoestadísticas básicas rurales", "Áreas geoestadísticas básicas urbanas", "Manzanas urbanas y rurales (incluyendo caserío disperso)", "Territorio insular"),
+tabla <- data.frame(Division = c("Estatales", "Municipales", "Localidades rurales amanzanadas", "Localidades urbanas", "Localidades rurales amanzanadas y no amanzanadas", 
+                                 "Áreas geoestadísticas básicas rurales", "Áreas geoestadísticas básicas urbanas", 
+                                 "Manzanas urbanas y rurales (incluyendo caserío disperso)", "Territorio insular"),
                     Unidades_territoriales= c("32", "2 469","45 397","4 911", "295 779", "17 469", "63 982", "2 513 853", "350"),
-                    Datos_vectoriales = c(rep("Polígonos",4), "Puntos", rep("Polígonos",4))) 
+                    Datos_vectoriales = c(rep("Polígonos", 4), "Puntos", rep("Polígonos", 4))) 
 
 kable(tabla, 
        col.names = c("División", "Unidades territoriales", "Datos vectoriales"), 
@@ -167,7 +177,7 @@ kable(tabla,
          caption = c("Tabla: Subdivisiones territoriales básicas del INEGI.")) %>%
   kable_styling(position = "center",
                  bootstrap_options = c("condensed", "responsive", "bordered", "hover")) %>%
-   kable_classic(full_width = F, html_font = "montserrat") %>%
+   kable_classic(full_width = F, html_font = "Montserrat") %>%
     row_spec(0, color = "black", bold = TRUE) %>% 
      collapse_rows(columns = 1, valign = "middle") %>%
       pack_rows("AGEE", 1, 1, label_row_css = "background-color: #DFE5E5; font-size: 10px; color: #030557; padding: 3px 10px;") %>%
@@ -187,7 +197,8 @@ La [`Norma Técnica para el Sistema Geodésico Nacional`](https://www.inegi.org.
 A continuación se enlista los datos del sistema de coordenadas para la estandarización de la información:
 
 ```{r, echo= FALSE}
-tabla <- data.frame(Parametros = c("Cónica Conforme de Lambert (`CCL`)", "Dátum:","Elipsoide","Meridiano origen", "Latitud origen","Primer paralelo estándar", "Segundo paralelo estándar", "Falso Este","Falso Norte"), 
+tabla <- data.frame(Parametros = c("Cónica Conforme de Lambert (`CCL`)", "Dátum:", "Elipsoide", "Meridiano origen", 
+                                   "Latitud origen","Primer paralelo estándar", "Segundo paralelo estándar", "Falso Este","Falso Norte"), 
                     Datos = c("", "ITRF2008", "GRS80","102° 00' 00' W.", "12° 00' 00' N.", "17° 30' N", "29° 30'N", "2 500 000", "0"))
 
 kable(tabla, 
@@ -197,7 +208,7 @@ kable(tabla,
   kable_styling(position = "center",
                  bootstrap_options = c("condensed", "responsive", "bordered", "hover"), 
                   font_size = 10) %>%
-   kable_classic(full_width = F, html_font = "montserrat") %>%
+   kable_classic(full_width = F, html_font = "Montserrat") %>%
     row_spec(0, color = "white", background = "#050844", bold = TRUE) 
 ```
 
@@ -212,18 +223,18 @@ También el paquete `gdalUtils` permite reproyectar, transformar, reclasificar, 
 
 La función `ogrDrivers` permite visualizar los tipos de formatos que el paquete `rgdal` permite trabajar:
 
-```{r, echo=FALSE}
+```{r, echo = FALSE}
 kable(ogrDrivers(), 
         align = "c") %>%
   kable_styling(position = "center",
                  bootstrap_options = c("condensed", "responsive", "bordered", "hover"),
                   font_size = 10) %>%
-   kable_classic(full_width = TRUE, html_font = "montserrat") %>%
+   kable_classic(full_width = TRUE, html_font = "Montserrat") %>%
     row_spec(0, color = "black", bold = TRUE) %>%
      scroll_box(width = "100%", height = "300px")
 ```
 
-```{r, echo=FALSE}
+```{r, echo = FALSE}
 require(tidyverse)
 require(knitr)
 require(lubridate)
@@ -238,14 +249,18 @@ tribble(~Tema,                   ~Métodos                             , ~`Libre
         "Etiquetado de mapas"    , "Como texto"                       , "`ggplot2::geom_label`", 
         ""                       , "Ubicación en centroides"          , "`sp::coordinates()`", 
         ""                       , "Etiquetado parcial"               , "`ifelse() + ggreppel::geom_label_repel()`"
-        ) %>% kable(.,caption="Temas cubiertos en este documento.")
+        ) %>% kable(., caption = "Temas cubiertos en este documento.") %>%
+ kable_styling(position = "center",                
+                bootstrap_options = c("condensed", "responsive", "bordered", "hover"),
+                 font_size = 10) %>%
+  kable_classic(full_width = TRUE, html_font = "Montserrat")
 ```
 
 ## Base de datos
 
 ### Índice de marginación
 
-Para conocer las desigualdades territoriales, desde 1993 la Secretaría General del Consejo Nacional de Población (CONAPO) realiza un ejercicio que permite construir el Índice de marginación con base en los resultados censales, una medida que permite identificar las zonas y regiones con más carencias dentro del país. Este índice resume y permite diferenciar los estados, municipios, localidades y áreas geoestadísticas básicas del país según el impacto global de las carencias que padece la población como resultado de la falta de acceso a la educación, la residencia en viviendas inadecuadas, la percepción de ingresos monetarios insuficientes y las relacionadas con la residencia en localidades pequeñas.
+Para conocer las desigualdades territoriales, desde 1993 la Secretaría General del Consejo Nacional de Población (`CONAPO`) realiza un ejercicio que permite construir el Índice de marginación con base en los resultados censales, una medida que permite identificar las zonas y regiones con más carencias dentro del país. Este índice resume y permite diferenciar los estados, municipios, localidades y áreas geoestadísticas básicas del país según el impacto global de las carencias que padece la población como resultado de la falta de acceso a la educación, la residencia en viviendas inadecuadas, la percepción de ingresos monetarios insuficientes y las relacionadas con la residencia en localidades pequeñas.
 
 Hoy este índice se ha convertido en una de las principales herramientas analíticas y operativas para la definición y focalización de políticas públicas enfocadas al abatimiento de las carencias socioeconómicas de la población mexicana.
 
@@ -259,14 +274,14 @@ La base de datos del índice de marginación en los diferentes niveles de desagr
 
 ### .shp
 
-La función `readOGR` del paquete `rgdal`, extrae automáticamente la información utilizada por otros paquetes `SIG` de código abierto como QGIS y permite a R manejar una gama más amplia de formatos de datos espaciales. Esta función lee datos `OGR` y datos vectoriales, pero solamente permite manejar capas con características geométricas (no mezcla puntos, líneas o polígonos en una sola capa) y a su vez establecerá un sistema de referencia espacial si la capa tiene dichos metadatos.\
+La función `readOGR` del paquete `rgdal`, extrae automáticamente la información utilizada por otros paquetes `SIG` de código abierto como QGIS y permite a `R` manejar una gama más amplia de formatos de datos espaciales. Esta función lee datos `OGR` y datos vectoriales, pero solamente permite manejar capas con características geométricas (no mezcla puntos, líneas o polígonos en una sola capa) y a su vez establecerá un sistema de referencia espacial si la capa tiene dichos metadatos.\
 Para leer un archivo `shapefile`, se establecen los siguientes argumentos, como `dsn`, en donde se indica el directorio que contiene los shapes y `layer` que es el nombre explícito de la capa a trabajar y dichas capas deben de ir sin la extensión `.shp`.
 
-A continuación se lee el archivo .shp que contiene de manera integrada la división de el área geoestadística estatal `agee`.
+A continuación se lee el archivo `.shp` que contiene de manera integrada la división de el área geoestadística estatal `agee`.
 
 ```{r, class.source = "fold-show"}
 require(rgdal)
-shape_estados <- readOGR(dsn ="MGN 2020/conjunto_de_datos", 
+shape_estados <- readOGR(dsn = paste0(here::here(), "/MGN 2020/conjunto_de_datos"), 
                           layer = "00ent",
                            encoding = "UTF-8",
                             use_iconv = TRUE)
@@ -274,14 +289,14 @@ shape_estados <- readOGR(dsn ="MGN 2020/conjunto_de_datos",
 
 La función `rename()` del paquete `dplyr` permite cambiar el nombre de la columna de la clave geoestadística a nivel estatal dentro de la base de datos del shape.
 
-```{r,class.source = "fold-show"}
+```{r, class.source = "fold-show"}
 shape_estados@data <- shape_estados@data %>%
                        rename("CVE_GEO" = "CVEGEO")
 ```
 
 Un objeto `SpatialPolygons` se puede combinar con una data.frame para crear lo que se llama `SpatialPolygonsDataFrame`. La diferencia está en los atributos asociados con los polígonos. Un objeto `SpatialPolygonsDataFrame` tiene información adicional asociada a los polígonos (ejemplo, nombre de la entidad, población, etc.) mientras que `SpatialPolygons` contiene solo la información espacial (vértices) sobre el polígono.
 
-```{r,class.source = "fold-show"}
+```{r, class.source = "fold-show"}
 class(shape_estados)
 ```
 
@@ -289,7 +304,7 @@ Si el archivo no tuviera Sitema de Referencia de Coordenadas `CRS` asignado se d
 
 La función `proj4string()`representa el sistema de referencia de coordenadas utilizado en los datos.
 
-```{r,class.source = "fold-show"}
+```{r, class.source = "fold-show"}
 proj4string(shape_estados)
 ```
 
@@ -300,7 +315,7 @@ La base de datos del índice de marginación por estados se encuentra disponible
 Para poder trabajar con la base de datos del índice de marginación a nivel estatal, se elimina la fila que contiene los datos a nivel nacional con la función `::filter()` del paquete `dplyr` y por otro lado se cambia el nombre de la columna `CVE_ENT` que hace referencia a la clave geográfica del estado por `CVE_GEO` para fines prácticos.
 
 ```{r, class.source = "fold-show"}
-IME_2020 <- read_xlsx("Data/IME_2020.xlsx", sheet = "IME_2020") %>% 
+IME_2020 <- read_xlsx(paste0(here::here(), "/Data/IME_2020.xlsx"), sheet = "IME_2020") %>% 
              filter(NOM_ENT != "Nacional") %>% 
               mutate(CVE_GEO = CVE_ENT) %>% 
                as.data.frame()
@@ -308,12 +323,12 @@ IME_2020 <- read_xlsx("Data/IME_2020.xlsx", sheet = "IME_2020") %>%
 
 Ahora bien, para la realización de los *mapas cloropléticos* que muestran áreas geográficas divididas o regiones que están coloreadas en relación con una variable de interés. Para este documento se decide hacer uso del **grado de marginación** que permite englobar a las unidades geográficas que presentan las mismas condiciones de exclusión social en cinco categorías.
 
-```{r, echo=FALSE}
+```{r, echo = FALSE}
 require(kableExtra)
 require(knitr)
 
 tabla <- IME_2020 %>%
-          mutate(GM_2020 = fct_relevel(GM_2020, levels = c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))) %>%
+          mutate(GM_2020 = fct_relevel(GM_2020, c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))) %>%
            dplyr::select(GM_2020) %>%
             group_by(GM_2020) %>%
              summarise(N = n()) %>%
@@ -327,7 +342,7 @@ kable(tabla,
   kable_styling(position = "center",
                  bootstrap_options = c("condensed", "responsive", "bordered", "hover"),
                   font_size = 10) %>%
-   kable_classic(full_width = F, html_font = "montserrat") %>%
+   kable_classic(full_width = F, html_font = "Montserrat") %>%
     row_spec(0, color = "black", bold = TRUE) %>% 
       gsub("font-size: initial !important;", "font-size: 11pt !important;", .) %>%
         gsub("text-align: initial !important;", "text-align: justify !important;", .)
@@ -349,7 +364,7 @@ Cuando es necesario cambiar los ID's de las características en los objetos `Spa
 
 La función `fortify()` convierte un objeto S3 para convertir objetos diversos a un data.frame para `ggplot2`. El data.frame resultante de la conversión de un objeto *spdf* es sumamente largo, tiene una fila por cada cambio en un polígono y un columna de grupo para separar cada polígono.
 
-```{r capas_estados, class.source = "fold-show"}
+```{r capas_estados, class.source = "fold-show", results=FALSE}
 capas_estados <- shape_estados %>%
                   sp::spChFIDs(., str_pad(shape_estados@data$CVE_GEO, 2, "left", pad = "0")) %>%
                    fortify(., id = "CVE_GEO") %>%
@@ -362,7 +377,6 @@ capas_estados <- shape_estados %>%
 ##### $$SpatialPolygons \Rightarrow SpatialPolygons + Datos$$
 
 ```{r, class.source = "fold-show"}
-
 layer_estados <- merge(shape_estados,
                         IME_2020 %>%
                          dplyr::select(c(-CVE_ENT, -NOM_ENT)) %>%
@@ -390,7 +404,7 @@ Conversión de datos: `st_as_sf`, convierte un objeto externo en un spatial obje
 
 La función `as_tibble` de la paquetería `tibble`, genera una base de datos genérica de S3 con métodos más eficientes para matrices y data.frame. Su envoltorio delgado permite trabajar de manera más rápida que un `data.frame`.
 
-```{r}
+```{r, class.source = "fold-show"}
 # Paquetes 
 require(tibble)
 require(sf)
@@ -410,7 +424,7 @@ Para leer un archivo `shapefile`, se establecen los siguientes argumentos, como 
 A continuación se lee el archivo .shp que contiene de manera integrada la división de el área geoestadística municipal `agem`.
 
 ```{r,results=FALSE,class.source = "fold-show"}
-shape_municipios <- readOGR(dsn ="MGN 2020/conjunto_de_datos", 
+shape_municipios <- readOGR(dsn = paste0(here::here(), "/MGN 2020/conjunto_de_datos"), 
                              layer = "00mun",
                               encoding = "UTF-8",
                                use_iconv = TRUE)
@@ -418,7 +432,7 @@ shape_municipios <- readOGR(dsn ="MGN 2020/conjunto_de_datos",
 
 La función `rename()` del paquete `dplyr` permite cambiar el nombre de la columna de la clave geoestadística a nivel estatal dentro de la base de datos del shape.
 
-```{r,class.source = "fold-show"}
+```{r, class.source = "fold-show"}
 shape_municipios@data <- shape_municipios@data %>%
                           rename("CVE_GEO" = "CVEGEO")
 ```
@@ -430,7 +444,7 @@ La base de datos del índice de marginación por municipios se encuentra disponi
 Para poder trabajar con la base de datos del índice de marginación a nivel municipal, se elimina la fila que contiene los datos a nivel nacional con la función `::filter()` del paquete `dplyr` y por otro lado se cambia el nombre de la columna `CVE_MUN` que hace referencia a la clave geográfica del municipio por `CVE_GEO` para fines prácticos.
 
 ```{r, class.source = "fold-show"}
-IMM_2020 <- read_xlsx("Data/IMM_2020.xlsx", sheet = "IMM_2020") %>%
+IMM_2020 <- read_xlsx(paste0(here::here(), "/Data/IMM_2020.xlsx"), sheet = "IMM_2020") %>%
              filter(NOM_ENT != "Nacional") %>%
                mutate(CVE_GEO = CVE_MUN) %>%
                 as.data.frame()
@@ -439,9 +453,8 @@ IMM_2020 <- read_xlsx("Data/IMM_2020.xlsx", sheet = "IMM_2020") %>%
 Ahora bien, para la realización de los *mapas cloropléticos* que muestran áreas geográficas divididas o regiones que están coloreadas en relación con una variable de interés. Para este documento se decide hacer uso del **grado de marginación** que permite englobar a las unidades geográficas que presentan las mismas condiciones de exclusión social en cinco categorías.
 
 ```{r, echo = FALSE}
-
 tabla <- IMM_2020 %>%
-          mutate(GM_2020 = fct_relevel(GM_2020, levels = c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))) %>% 
+          mutate(GM_2020 = fct_relevel(GM_2020, c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))) %>% 
            dplyr::select(GM_2020) %>%
             group_by(GM_2020) %>%
              summarise(N = n()) %>%
@@ -455,7 +468,7 @@ kable(tabla,
   kable_styling(position = "center",
                  bootstrap_options = c("condensed", "responsive", "bordered", "hover"),
                   font_size = 10) %>%
-   kable_classic(full_width = F, html_font = "montserrat") %>%
+   kable_classic(full_width = F, html_font = "Montserrat") %>%
     row_spec(0, color = "black", bold = TRUE) %>% 
       gsub("font-size: initial !important;", "font-size: 11pt !important;", .) %>%
         gsub("text-align: initial !important;", "text-align: justify !important;", .)
@@ -503,7 +516,7 @@ Conversión de datos: `st_as_sf`, convierte un objeto externo en un spatial obje
 
 La función `as_tibble` de la paquetería `tibble`, genera una base de datos genérica de S3 con métodos más eficientes para matrices y data.frame. Su envoltorio delgado permite trabajar de manera más rápida que un `data.frame`.
 
-```{r}
+```{r, class.source = "fold-show"}
 # Paquetes 
 require(tibble)
 require(sf)
@@ -515,17 +528,17 @@ tbl_municipios <- as_tibble(st_as_sf(shape_municipios)) %>%
 ### Zonas Metropolitanas
 
 ```{r, class.source = "fold-show"}
-ZM_2015 <- read_xlsx("Data/ZM_2015.xlsx", sheet = "ZM_2015") 
+ZM_2020 <- read_xlsx(paste0(here::here(), "/Data/ZM_2020.xlsx"), sheet = "ZM_2020", range = "A7:I428") 
 ```
 
 ```{r, echo = FALSE}
-kable(head(ZM_2015, 10),
+kable(head(ZM_2020, 10),
        align = "c", 
-        caption = c("Base: Zonas Metropolitanas 2015.")) %>%
+        caption = c("Base: Zonas Metropolitanas 2020.")) %>%
  kable_styling(position = "center",
                 font_size = 11,
                  bootstrap_options = c("condensed", "responsive", "bordered")) %>%
-  kable_classic(full_width = T, html_font = "montserrat") %>%
+  kable_classic(full_width = T, html_font = "Montserrat") %>%
    row_spec(0, color = "black", bold = TRUE) %>%
     footnote(footnote_as_chunk = T,
               general_title = "Fuentes:",
@@ -542,7 +555,7 @@ Para leer un archivo `shapefile`, se establecen los siguientes argumentos, como 
 A continuación se lee el archivo .shp que contiene de manera integrada la división de el área geoestadística por localidad.
 
 ```{r,results=FALSE,class.source = "fold-show"}
-shape_localidad <- readOGR(dsn ="MGN 2020/conjunto_de_datos", 
+shape_localidad <- readOGR(dsn =paste0(here::here(), "/MGN 2020/conjunto_de_datos"), 
                             layer = "00l",
                              encoding = "UTF-8",
                               use_iconv = TRUE)
@@ -550,7 +563,7 @@ shape_localidad <- readOGR(dsn ="MGN 2020/conjunto_de_datos",
 
 La función `rename()` del paquete `dplyr` permite cambiar el nombre de la columna de la clave geoestadística a nivel estatal dentro de la base de datos del shape.
 
-```{r,class.source = "fold-show"}
+```{r, class.source = "fold-show"}
 shape_localidad@data <- shape_localidad@data %>%
                          rename("CVE_GEO" = "CVEGEO")
 ```
@@ -561,20 +574,20 @@ La base de datos del índice de marginación por localidades se encuentra dispon
 
 Para poder trabajar con la base de datos del índice de marginación a nivel localidad, se cambia el nombre de la columna `CVE_LOC` que hace referencia a la clave geográfica de la localidad por `CVE_GEO` para fines prácticos.
 
-```{r}
-IML_2020 <- read_xlsx("Data/IML_2020.xlsx", sheet = "IML_2020") %>%
+```{r, class.source = "fold-show"}
+IML_2020 <- read_xlsx(paste0(here::here(), "/Data/IML_2020.xlsx"), sheet = "IML_2020") %>%
               mutate(CVE_GEO = CVE_LOC) %>% 
                as.data.frame()
 ```
 
 Ahora bien, para la realización de los *mapas cloropléticos* que muestran áreas geográficas divididas o regiones que están coloreadas en relación con una variable de interés. Para este documento se decide hacer uso del **grado de marginación** que permite englobar a las unidades geográficas que presentan las mismas condiciones de exclusión social en cinco categorías.
 
-```{r, echo=FALSE}
+```{r, echo = FALSE}
 require(kableExtra)
 require(knitr)
 
 tabla <- IML_2020 %>%
-          mutate(GM_2020 = fct_relevel(GM_2020, levels = c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))) %>%
+          mutate(GM_2020 = fct_relevel(GM_2020, c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))) %>%
            dplyr::select(GM_2020) %>%
             group_by(GM_2020) %>%
              summarise(N = n()) %>%
@@ -588,7 +601,7 @@ kable(tabla,
   kable_styling(position = "center",
                  bootstrap_options = c("condensed", "responsive", "bordered", "hover"), 
                   font_size = 10) %>%
-   kable_classic(full_width = F, html_font = "montserrat") %>%
+   kable_classic(full_width = F, html_font = "Montserrat") %>%
     row_spec(0, color = "black", bold = TRUE) %>% 
       gsub("font-size: initial !important;", "font-size: 11pt !important;", .) %>%
         gsub("text-align: initial !important;", "text-align: justify !important;", .)
@@ -614,7 +627,7 @@ La función `fortify()` convierte un objeto S3 para convertir objetos diversos a
 capas_localidad <- shape_localidad %>%
                     sp::spChFIDs(., str_pad(shape_localidad@data$CVE_GEO, 9, "left", pad = "0")) %>%
                      fortify(., id = c("CVE_GEO")) %>%
-                      right_join(., IML_2020 %>% dplyr::select(CVE_GEO, ENT, NOM_ENT, MUN, NOM_MUN, NOM_LOC, GM_2020), 
+                      left_join(., IML_2020 %>% dplyr::select(CVE_GEO, GM_2020), 
                                   by = c("id" = "CVE_GEO")) 
 length(unique(capas_localidad$id))
 ```
@@ -639,7 +652,7 @@ Conversión de datos: `st_as_sf`, convierte un objeto externo en un spatial obje
 
 La función `as_tibble` de la paquetería `tibble`, genera una base de datos genérica de S3 con métodos más eficientes para matrices y data.frame. Su envoltorio delgado permite trabajar de manera más rápida que un `data.frame`.
 
-```{r}
+```{r, class.source = "fold-show"}
 # Paquetes 
 require(tibble)
 require(sf)
@@ -658,7 +671,7 @@ Para leer un archivo `shapefile`, se establecen los siguientes argumentos, como 
 A continuación se lee el archivo .shp que contiene de manera integrada la división de el área geoestadística a nivel ageb `ageb`.
 
 ```{r,results=FALSE,class.source = "fold-show"}
-shape_ageb <- readOGR(dsn ="MGN 2020/conjunto_de_datos", 
+shape_ageb <- readOGR(dsn = paste0(here::here(), "/MGN 2020/conjunto_de_datos"), 
                        layer = "00a",
                         encoding = "UTF-8",
                          use_iconv = TRUE)
@@ -666,7 +679,7 @@ shape_ageb <- readOGR(dsn ="MGN 2020/conjunto_de_datos",
 
 La función `rename()` del paquete `dplyr` permite cambiar el nombre de la columna de la clave geoestadística a nivel estatal dentro de la base de datos del shape.
 
-```{r,class.source = "fold-show"}
+```{r, class.source = "fold-show"}
 shape_ageb@data <- shape_ageb@data %>%
                     rename("CVE_GEO" = "CVEGEO")
 ```
@@ -677,20 +690,20 @@ La base de datos del índice de marginación por ageb se encuentra disponible en
 
 Para poder trabajar con la base de datos del índice de marginación a nivel ageb, se cambia el nombre de la columna \``CVE_AGEB` que hace referencia a la clave geográfica de la ageb por `CVE_GEO` para fines prácticos.
 
-```{r}
-IMU_2020 <- read_xlsx("Data/IMU_2020.xlsx", sheet = "IMU_2020") %>%
+```{r, class.source = "fold-show"}
+IMU_2020 <- read_xlsx(paste0(here::here(), "/Data/IMU_2020.xlsx"), sheet = "IMU_2020") %>%
              mutate(CVE_GEO = CVE_AGEB) %>% 
               as.data.frame()
 ```
 
 Ahora bien, para la realización de los *mapas cloropléticos* que muestran áreas geográficas divididas o regiones que están coloreadas en relación con una variable de interés. Para este documento se decide hacer uso del **grado de marginación** que permite englobar a las unidades geográficas que presentan las mismas condiciones de exclusión social en cinco categorías.
 
-```{r, echo=FALSE}
+```{r, echo = FALSE}
 require(kableExtra)
 require(knitr)
 
 tabla <- IMU_2020 %>%
-          mutate(GM_2020 = fct_relevel(GM_2020, levels = c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))) %>%
+          mutate(GM_2020 = fct_relevel(GM_2020, c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))) %>%
            dplyr::select(GM_2020) %>%
             group_by(GM_2020) %>%
              summarise(N = n()) %>%
@@ -704,7 +717,7 @@ kable(tabla,
   kable_styling(position = "center",
                  bootstrap_options = c("condensed", "responsive", "bordered", "hover"), 
                   font_size = 10) %>%
-   kable_classic(full_width = F, html_font = "montserrat") %>%
+   kable_classic(full_width = F, html_font = "Montserrat") %>%
     row_spec(0, color = "black", bold = TRUE) %>% 
       gsub("font-size: initial !important;", "font-size: 11pt !important;", .) %>%
         gsub("text-align: initial !important;", "text-align: justify !important;", .)
@@ -730,9 +743,12 @@ La función `fortify()` convierte un objeto S3 para convertir objetos diversos a
 capas_ageb <- shape_ageb %>%
                sp::spChFIDs(., str_pad(shape_ageb@data$CVE_GEO, 13, "left", pad = "0")) %>%
                 fortify(., id = "CVE_GEO") %>%
-                 right_join(., IMU_2020 %>% dplyr::select(CVE_GEO, ENT, NOM_ENT, MUN, NOM_MUN, LOC, NOM_LOC, GM_2020), 
+                 left_join(., IMU_2020 %>% dplyr::select(CVE_GEO, GM_2020), 
                              by = c("id" = "CVE_GEO"))
 ```
+
+
+
 
 #### SpatialPolygons
 
@@ -754,7 +770,7 @@ Conversión de datos: `st_as_sf`, convierte un objeto externo en un spatial obje
 
 La función `as_tibble` de la paquetería `tibble`, genera una base de datos genérica de S3 con métodos más eficientes para matrices y data.frame. Su envoltorio delgado permite trabajar de manera más rápida que un `data.frame`.
 
-```{r}
+```{r, class.source = "fold-show"}
 # Paquetes 
 require(tibble)
 require(sf)
@@ -772,7 +788,7 @@ capas_zm <- shape_ageb %>%
                right_join(., IMU_2020 %>% dplyr::select(CVE_GEO, ENT, NOM_ENT, MUN, NOM_MUN, LOC, NOM_LOC, GM_2020), 
                            by = c("id" = "CVE_GEO")) %>% 
                  mutate(CVE_MUN = paste0(ENT, MUN)) %>%
-                  right_join(., ZM_2015 %>% dplyr::select(CVE_MUN, CVE_ZM, NOM_ZM), 
+                  right_join(., ZM_2020 %>% dplyr::select(CVE_MUN, CVE_ZM, NOM_ZM), 
                               by = "CVE_MUN")
 ```
 
@@ -793,8 +809,8 @@ p <- ggplot() +
                       size = 0.5) +
         expand_limits(x = capas_estados$long,  
                       y = capas_estados$lat) + 
-          theme(plot.title = element_text(size = 24, hjust = 0.15, family = "montserrat", face = "bold"),
-                 plot.caption = element_text(size = 10, hjust = 0.2, vjust = 1, family = "montserrat")) +
+          theme(plot.title = element_text(size = 24, hjust = 0.15, family = "Montserrat", face = "bold"),
+                 plot.caption = element_text(size = 10, hjust = 0.2, vjust = 1, family = "Montserrat")) +
        labs(title = "Estructura básica de un mapa",
               caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
 p
@@ -820,11 +836,11 @@ p <- IME_2020 %>%
           expand_limits(x = capas_estados$long, 
                         y = capas_estados$lat) + 
            theme_transparent() + 
-            theme(plot.title = element_text(size = 22, hjust = 0.15, family = "montserrat", face = "bold"),
-                   plot.caption = element_text(size = 10, hjust = 0.2, vjust = 1, family = "montserrat"),
+            theme(plot.title = element_text(size = 22, hjust = 0.15, family = "Montserrat", face = "bold"),
+                   plot.caption = element_text(size = 10, hjust = 0.2, vjust = 1, family = "Montserrat"),
                     legend.key.size = unit(0.5, "cm"),
-                     legend.text = element_text(size = 10, family = "montserrat"), 
-                      legend.title = element_text(size = 12, hjust = 0.5, family = "montserrat", face = "bold"),
+                     legend.text = element_text(size = 10, family = "Montserrat"), 
+                      legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
                        legend.position = c(0.8, 0.7)) + 
               scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
                scale_color_manual(values = c("#BDBDBD")) + 
@@ -834,7 +850,7 @@ p <- IME_2020 %>%
               caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
 
 #path = "Images/IME_2020_gmap.pdf"
-#ggexport (p, width = 8, height = 5, res = 400, filename = path)
+#ggexport(p, width = 8, height = 5, res = 400, filename = path)
 
 p
 ```
@@ -858,11 +874,11 @@ p <- ggplot() +
         expand_limits(x = capas_estados$long,  
                       y = capas_estados$lat) + 
          theme_transparent() + 
-          theme(plot.title = element_text(size = 21, hjust = 0.15, family = "montserrat", face = "bold"),
-                 plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "montserrat"), 
+          theme(plot.title = element_text(size = 21, hjust = 0.15, family = "Montserrat", face = "bold"),
+                 plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
                   legend.key.size = unit(0.5, "cm"),
-                   legend.text = element_text(size = 10, family = "montserrat"), 
-                    legend.title = element_text(size = 12, hjust = 0.5, family = "montserrat", face = "bold"),
+                   legend.text = element_text(size = 10, family = "Montserrat"), 
+                    legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
                      legend.position = c(0.8, 0.7)) + 
            scale_fill_manual(values = rev(usecol(pal = pal_petrol, n = 5))) + 
             scale_color_manual(values = c("#BDBDBD")) +  
@@ -872,7 +888,7 @@ p <- ggplot() +
               caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
 
 #path = "Images/IME_2020_geom_polygon.pdf"
-#ggexport (p, width = 8, height = 5, res = 400, filename = path)
+#ggexport(p, width = 8, height = 5, res = 400, filename = path)
 
 p
 ```
@@ -885,7 +901,7 @@ Una de las ventajas a diferencia de ggplot(), es más rápido de generar los gr�
 
 La función `tm_shape`, crea un elemento que especifica un objeto de `SpatialPolygonsDataFrame`, sin la necesidad de convertir los datos a un data.frame. [GitHub: r-tmap/tmap](https://github.com/r-tmap/tmap)
 
-```{r, fig.width=10,fig.height=10}
+```{r, fig.width=10,fig.height=10, class.source = "fold-hide"}
 # Paquetes 
 require(tmap)
 require(tmaptools)
@@ -898,21 +914,21 @@ p <- tm_shape(layer_estados) +
        tm_borders(col = "grey20", lwd = 0.5) + 
         tm_layout(title.snap.to.legend = TRUE,
                    title = "Índice de marginación a nivel estatal, 2020",
-                    title.fontfamily = "montserrat",
+                    title.fontfamily = "Montserrat",
                      title.fontface = "bold",
                       title.size = 2,
                        main.title.fontface = "bold",
                         main.title.position = c("center", "top"),
                          main.title.size = 7, 
-                          main.title.fontfamily = "montserrat",
+                          main.title.fontfamily = "Montserrat",
                            legend.outside.position = "right",
-                            legend.title.fontfamily = "montserrat",
+                            legend.title.fontfamily = "Montserrat",
                              legend.title.fontface = "bold", 
-                              legend.text.fontfamily = "montserrat",
+                              legend.text.fontfamily = "Montserrat",
                                legend.title.size = 1.2, 
                                 legend.text.size = 1, 
                                  inner.margins = c(t = 0.05, r = 0.02, b = 0.11, l = 0.15),
-                                  fontfamily = "montserrat",
+                                  fontfamily = "Montserrat",
                                    frame = FALSE) + 
          tm_legend(legend.position = c("right", "center")) +
           tm_credits(expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")),
@@ -920,7 +936,7 @@ p <- tm_shape(layer_estados) +
                        size = 1.1)
      
 #path = "Images/IME_2020_tmap.pdf"
-#ggexport (p, width = 8, height = 5, res = 400, filename = path)
+#ggexport(p, width = 8, height = 5, res = 400, filename = path)
 
 p
 ```
@@ -929,18 +945,18 @@ p
 
 Cualquier capa espacial se puede agregar a un `ggplot()` usando la función `layer_spatial()` del paquete `ggspatial` (bueno, cualquier objeto de los paquetes `sf`, `sp` o `raster`...). Estas capas entrenarán las escalas y a diferencia de las funciones `geom_` o `stat_`, `layer_spatial()` siempre toma sus datos primero sin necesidad de especificar los límites de las escalas. [Estructura ggspatial](https://paleolimbot.github.io/ggspatial/articles/ggspatial.html).
 
-```{r}
+```{r, class.source = "fold-hide"}
 # Paquete 
 require(ggspatial)
 
 p <- ggplot() + 
       layer_spatial(layer_estados, aes(fill = GM_2020)) + 
        theme_transparent() + 
-        theme(plot.title = element_text(size = 22, hjust = 0.15, family = "montserrat", face = "bold"),
-               plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "montserrat"), 
+        theme(plot.title = element_text(size = 22, hjust = 0.15, family = "Montserrat", face = "bold"),
+               plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
                 legend.key.size = unit(0.5, "cm"),
-                 legend.text = element_text(size = 12, family = "montserrat"), 
-                  legend.title = element_text(size = 10, hjust = 0.5, family = "montserrat", face = "bold"),
+                 legend.text = element_text(size = 12, family = "Montserrat"), 
+                  legend.title = element_text(size = 10, hjust = 0.5, family = "Montserrat", face = "bold"),
                    legend.position = c(0.8, 0.7)) + 
           scale_fill_brewer(palette = rev("BuPu")) +
            scale_color_manual(values = c("#BDBDBD")) + 
@@ -950,7 +966,7 @@ p <- ggplot() +
             caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
 
 #path = "Images/IME_2020_ggspatial.pdf"
-#ggexport (p, width = 8, height = 5, res = 400, filename = path)
+#ggexport(p, width = 8, height = 5, res = 400, filename = path)
 
 p
 ```
@@ -973,7 +989,7 @@ A continuación, se muestra un ejemplo de cómo visualizar objetos `sf`. Este ti
 
 La función `as_tibble` de la paquetería `tibble`, genera una base de datos genérica de S3 con métodos más eficientes para matrices y data.frame. Su envoltorio delgado permite trabajar de manera más rápida que un `data.frame`.
 
-```{r}
+```{r, class.source = "fold-hide"}
 # Paquetes 
 require(ggplot2)
 require(tibble)
@@ -986,11 +1002,11 @@ p <- ggplot(data = tbl_estados) +
                color = "#BDBDBD", 
                 size = 0.1)  + 
        theme_transparent() + 
-        theme(plot.title = element_text(size = 16, hjust = 0.15, family = "montserrat", face = "bold"),
-               plot.caption = element_text(size = 9, hjust = 0.2, vjust = 1, family = "montserrat"),  
+        theme(plot.title = element_text(size = 16, hjust = 0.15, family = "Montserrat", face = "bold"),
+               plot.caption = element_text(size = 9, hjust = 0.2, vjust = 1, family = "Montserrat"),  
                 legend.key.size = unit(0.5, "cm"),
-                 legend.text = element_text(size = 8, family = "montserrat"),   
-                  legend.title = element_text(size = 10, hjust = 0.5, family = "montserrat", face = "bold"),
+                 legend.text = element_text(size = 8, family = "Montserrat"),   
+                  legend.title = element_text(size = 10, hjust = 0.5, family = "Montserrat", face = "bold"),
                    legend.position = c(0.8, 0.7)) + 
           scale_fill_manual(values = rev(usecol(pal = pal_petrol, n = 5))) + 
            scale_color_manual(values = rev(usecol(pal = pal_petrol, n = 5))) + 
@@ -1022,11 +1038,11 @@ p <- IMM_2020 %>%
                    color = 'transparent')  +
          expand_limits(x = capas_municipio$long, y = capas_municipio$lat) + 
           theme_transparent() + 
-           theme(plot.title = element_text(size = 20, hjust = 0.15, family = "montserrat", face = "bold"), 
-                  plot.caption = element_text(size = 10, hjust = 0.2, vjust = 1, family = "montserrat"), 
+           theme(plot.title = element_text(size = 20, hjust = 0.15, family = "Montserrat", face = "bold"), 
+                  plot.caption = element_text(size = 10, hjust = 0.2, vjust = 1, family = "Montserrat"), 
                    legend.key.size = unit(0.5, "cm"),
-                    legend.text = element_text(size = 10, family = "montserrat"), 
-                     legend.title = element_text(size = 12, hjust = 0.5, family = "montserrat", face = "bold"),
+                    legend.text = element_text(size = 10, family = "Montserrat"), 
+                     legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
                       legend.position = c(0.8, 0.7)) + 
             scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
              scale_color_manual(values = c("#BDBDBD")) + 
@@ -1036,7 +1052,7 @@ p <- IMM_2020 %>%
              caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
 
 #path = "Images/IMM_2020_gmap.pdf"
-#ggexport (p, width = 8, height = 5, res = 400, filename = path)
+#ggexport(p, width = 8, height = 5, res = 400, filename = path)
 
 p
 ```
@@ -1067,11 +1083,11 @@ p <- ggplot() +
                        size = 0.6) +
        coord_equal() +
         theme_transparent() + 
-         theme(plot.title = element_text(size = 21, hjust = 0.15, family = "montserrat", face = "bold"),     
-                plot.caption = element_text(size = 10, hjust = 0.2, vjust = 1, family = "montserrat"),
+         theme(plot.title = element_text(size = 21, hjust = 0.15, family = "Montserrat", face = "bold"),     
+                plot.caption = element_text(size = 10, hjust = 0.2, vjust = 1, family = "Montserrat"),
                  legend.key.size = unit(0.5, "cm"), 
-                  legend.text = element_text(size = 10, family = "montserrat"), 
-                   legend.title = element_text(size = 12, hjust = 0.5, family = "montserrat", face = "bold"),
+                  legend.text = element_text(size = 10, family = "Montserrat"), 
+                   legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
                     legend.position = c(0.8, 0.7)) + 
           scale_fill_brewer(palette = "YlGnBu") +
            guides(color = 'none') +
@@ -1080,7 +1096,7 @@ p <- ggplot() +
             caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
 
 #path = "Images/IMM_2020_geom_polygon.pdf"
-#ggexport (p, width = 8, height = 5, res = 400, filename = path)
+#ggexport(p, width = 8, height = 5, res = 400, filename = path)
 
 p
 ```
@@ -1093,7 +1109,7 @@ Una de las ventajas a diferencia de ggplot(), es más rápido de generar los gr�
 
 La función `tm_shape`, crea un elemento que especifica un objeto de `SpatialPolygonsDataFrame`, sin la necesidad de convertir los datos a un data.frame. [GitHub: r-tmap/tmap](https://github.com/r-tmap/tmap)
 
-```{r, fig.width=8, fig.height=8}
+```{r, fig.width=8, fig.height=8, class.source = "fold-hide"}
 # Paquetes
 require(tmap)
 require(tmaptools)
@@ -1107,21 +1123,21 @@ p <- tm_shape(layer_municipios, id = "CVE_GEO") +
        tm_borders("grey20", lwd = 0.5) + 
         tm_layout(title.snap.to.legend = TRUE,
                    title = "Índice de marginación a nivel municipal, 2020",
-                    title.fontfamily = "montserrat",
+                    title.fontfamily = "Montserrat",
                      title.fontface = "bold",
                       title.size = 2,
                        main.title.fontface = "bold",
                         main.title.position = c("center", "top"),
                          main.title.size = 7, 
-                          main.title.fontfamily = "montserrat",
+                          main.title.fontfamily = "Montserrat",
                            legend.outside.position = "right",
-                            legend.title.fontfamily = "montserrat",
+                            legend.title.fontfamily = "Montserrat",
                              legend.title.fontface = "bold", 
-                              legend.text.fontfamily = "montserrat",
+                              legend.text.fontfamily = "Montserrat",
                                legend.title.size = 1.5, 
                                 legend.text.size = 1.2, 
                                  inner.margins = c(t = 0.06, r = 0.04, b = 0.13, l = 0.15),
-                                  fontfamily = "montserrat",
+                                  fontfamily = "Montserrat",
                                    frame = FALSE) + 
          tm_legend(legend.position = c("right", "center")) +
           tm_credits(expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")),
@@ -1129,7 +1145,7 @@ p <- tm_shape(layer_municipios, id = "CVE_GEO") +
                        size = 1.4)
      
 #path = "Images/IMM_2020_tmap.pdf"
-#ggexport (p, width = 8, height = 5, res = 400, filename = path)
+#ggexport(p, width = 8, height = 5, res = 400, filename = path)
 
 p
 ```
@@ -1140,7 +1156,7 @@ A continuación, se muestra un ejemplo de cómo visualizar objetos `sf`. Este ti
 
 La función `as_tibble` de la paquetería `tibble`, genera una base de datos genérica de S3 con métodos más eficientes para matrices y data.frame. Su envoltorio delgado permite trabajar de manera más rápida que un `data.frame`.
 
-```{r}
+```{r, class.source = "fold-hide"}
 # Paquetes
 require(ggplot2)
 require(tibble)
@@ -1158,11 +1174,11 @@ p <- ggplot() +
                  color = "black") +
         coord_sf() +
         theme_transparent() + 
-         theme(plot.title = element_text(size = 22, hjust = 0.15, family = "montserrat", face = "bold"),
-                plot.caption = element_text(size = 10, hjust = 0.2, vjust = 1, family = "montserrat"),  
+         theme(plot.title = element_text(size = 22, hjust = 0.15, family = "Montserrat", face = "bold"),
+                plot.caption = element_text(size = 10, hjust = 0.2, vjust = 1, family = "Montserrat"),  
                  legend.key.size = unit(0.5, "cm"),
-                  legend.text = element_text(size = 10, family = "montserrat"),   
-                   legend.title = element_text(size = 12, hjust = 0.5, family = "montserrat", face = "bold"),
+                  legend.text = element_text(size = 10, family = "Montserrat"),   
+                   legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
                     legend.position = c(0.8, 0.7)) + 
           scale_fill_manual(values = usecol(pal_bordeaux, n = 5)) + 
            scale_color_manual(values = usecol(pal_bordeaux, n = 5)) + 
@@ -1172,7 +1188,7 @@ p <- ggplot() +
              caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
 
 #path = "Images/IMM_2020_geom_sf.pdf"
-#ggexport (p, width = 8, height = 5, res = 400, filename = path)
+#ggexport(p, width = 8, height = 5, res = 400, filename = path)
 
 p
 ```
@@ -1203,11 +1219,11 @@ p <- ggplot() +
                        alpha = 0.9) +
         coord_equal() +
          theme_transparent() + 
-          theme(plot.title = element_text(size = 24, hjust = 0.15, family = "montserrat", face = "bold"),
-                 plot.caption = element_text(size = 12, hjust = 0.2, vjust = 1, family = "montserrat"),  
+          theme(plot.title = element_text(size = 24, hjust = 0.15, family = "Montserrat", face = "bold"),
+                 plot.caption = element_text(size = 12, hjust = 0.2, vjust = 1, family = "Montserrat"),  
                   legend.key.size = unit(0.5, "cm"),
-                   legend.text = element_text(size = 12, family = "montserrat"), 
-                    legend.title = element_text(size = 14, hjust = 0.5, family = "montserrat", face = "bold"),
+                   legend.text = element_text(size = 12, family = "Montserrat"), 
+                    legend.title = element_text(size = 14, hjust = 0.5, family = "Montserrat", face = "bold"),
                      legend.position = c(0.8, 0.7)) + 
            scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
             scale_color_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
@@ -1224,7 +1240,7 @@ p
 
 #### Por estados
 
-```{r Localidad_por_estado}
+```{r Localidad_por_estado, class.source = "fold-hide"}
 # Clave única de estados 
 estados <- unique(IML_2020$ENT)
 nom_ent <- unique(IML_2020$NOM_ENT)
@@ -1272,11 +1288,11 @@ p[[i]] <- ggplot() +
                            alpha = 0.6) +
              coord_equal() +
               theme_transparent() + 
-               theme(plot.title = element_text(size = 15, hjust = 0.5, family = "montserrat", face = "bold"),
-                      plot.caption = element_text(size = 9, hjust = 0, family = "montserrat"), 
+               theme(plot.title = element_text(size = 15, hjust = 0.5, family = "Montserrat", face = "bold"),
+                      plot.caption = element_text(size = 9, hjust = 0, family = "Montserrat"), 
                        legend.key.size = unit(0.3, "cm"),
-                        legend.text = element_text(size = 10, family = "montserrat"), 
-                         legend.title = element_text(size = 12, hjust = 0.5, family = "montserrat", face = "bold"),
+                        legend.text = element_text(size = 10, family = "Montserrat"), 
+                         legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
                           legend.position = "bottom") + 
                 scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
                  scale_color_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
@@ -1310,11 +1326,11 @@ q[[j]] <- ggplot() +
                            alpha = 0.9) +
              coord_equal() +
               theme_transparent() + 
-               theme(plot.title = element_text(size = 18, hjust = 0.5, family = "montserrat", face = "bold"),
-                      plot.caption = element_text(size = 9, hjust = 0, family = "montserrat"), 
+               theme(plot.title = element_text(size = 18, hjust = 0.5, family = "Montserrat", face = "bold"),
+                      plot.caption = element_text(size = 9, hjust = 0, family = "Montserrat"), 
                        legend.key.size = unit(0.3, "cm"),
-                        legend.text = element_text(size = 10, family = "montserrat"), 
-                         legend.title = element_text(size = 12, hjust = 0.5, family = "montserrat", face = "bold"),
+                        legend.text = element_text(size = 10, family = "Montserrat"), 
+                         legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
                           legend.position = "right") + 
                 scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
                  scale_color_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
@@ -1329,8 +1345,8 @@ q[[j]] <- ggplot() +
 ### Se extrae la estructura de  la legenda del gráfico de entidad 
 
 legend <- get_legend(p[[22]] + theme(legend.key.size = unit(0.5, "cm"),
-                                      legend.text = element_text(size = 14, family = "montserrat"), 
-                                       legend.title = element_text(size = 16, hjust = 0.5, family = "montserrat", face = "bold"),                                legend.position = "right"))
+                                      legend.text = element_text(size = 14, family = "Montserrat"), 
+                                       legend.title = element_text(size = 16, hjust = 0.5, family = "Montserrat", face = "bold"),                                legend.position = "right"))
 
 tabla <- lapply(1:nrow(municipio), function(x){
                                       ggarrange(p[[22]] + guides(fill = 'none') + labs(title = ""),
@@ -1346,18 +1362,18 @@ tabla <- lapply(1:nrow(municipio), function(x){
 tabla <- lapply(1:nrow(municipio), function(x){
                                      annotate_figure(tabla[[x]], 
                                                      top = text_grob(stringr::str_wrap(paste(nom_ent[22], ": índice de marginación a nivel localidad, 2020"), 50),
-                                                                     family = "montserrat", 
+                                                                     family = "Montserrat", 
                                                                      face = "bold", 
                                                                      size = 22), 
                                                      bottom = text_grob(expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")),
-                                                                     family = "montserrat", 
+                                                                     family = "Montserrat", 
                                                                      face = "plain", 
                                                                      size = 12,
                                                                      hjust = 0.5))
 })
 
 #path = "Images/IML_2020_por estado_geom_polygon.pdf"
-#ggexport (list = tabla, width = 8, height = 5, res = 400, filename = path)
+#ggexport(list = tabla, width = 8, height = 5, res = 400, filename = path)
 
 tabla[[1]]
 ```
@@ -1368,7 +1384,7 @@ A continuación, se muestra un ejemplo de cómo visualizar objetos `sf`. Este ti
 
 La función `as_tibble` de la paquetería `tibble`, genera una base de datos genérica de S3 con métodos más eficientes para matrices y data.frame. Su envoltorio delgado permite trabajar de manera más rápida que un `data.frame`.
 
-```{r}
+```{r, class.source = "fold-hide"}
 require(ggplot2)
 require(tibble)
 require(sf)
@@ -1400,12 +1416,12 @@ p[[i]] <-  ggplot() +
              coord_sf(xlim = c(limites$min.x,limites$max.x),
                       ylim = c(limites$min.y,limites$max.y)) +
               theme_transparent() + 
-               theme(plot.title = element_text(size = 22, hjust = 0, family = "montserrat", face = "bold"),
-                      plot.caption = element_text(size = 9, hjust = 0.2, vjust = 1, family = "montserrat"),  
+               theme(plot.title = element_text(size = 22, hjust = 0, family = "Montserrat", face = "bold"),
+                      plot.caption = element_text(size = 9, hjust = 0.2, vjust = 1, family = "Montserrat"),  
                        plot.margin = unit(c(t = 0.5, r = 0, b = 0, l = 0), "cm"),
                         legend.key.size = unit(0.5, "cm"),
-                         legend.text = element_text(size = 10, family = "montserrat"),   
-                          legend.title = element_text(size = 12, hjust = 0.5, family = "montserrat", face = "bold"),
+                         legend.text = element_text(size = 10, family = "Montserrat"),   
+                          legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
                            legend.position = "right") + 
                 scale_fill_manual(values = usecol(pal_bordeaux, n = 5)) + 
                  scale_color_manual(values = usecol(pal_bordeaux, n = 5)) + 
@@ -1416,14 +1432,14 @@ p[[i]] <-  ggplot() +
 }
 
 #path = "Images/IML_2020_geom_sf.pdf"
-#ggexport (list = p, width = 8, height = 5, res = 400, filename = path)
+#ggexport(list = p, width = 8, height = 5, res = 400, filename = path)
 
 p[[7]]
 ```
 
 #### Con filtro
 
-```{r}
+```{r, class.source = "fold-hide"}
 require(ggplot2)
 require(tibble)
 require(sf)
@@ -1455,12 +1471,12 @@ p[[i]] <-  ggplot() +
              coord_sf(xlim = c(limites$min.x,limites$max.x),
                       ylim = c(limites$min.y,limites$max.y)) +
               theme_transparent() + 
-               theme(plot.title = element_text(size = 22, hjust = 0, family = "montserrat", face = "bold"),
-                      plot.caption = element_text(size = 9, hjust = 0.2, vjust = 1, family = "montserrat"),  
+               theme(plot.title = element_text(size = 22, hjust = 0, family = "Montserrat", face = "bold"),
+                      plot.caption = element_text(size = 9, hjust = 0.2, vjust = 1, family = "Montserrat"),  
                        plot.margin = unit(c(t = 0.5, r = 0, b = 0, l = 0), "cm"),
                         legend.key.size = unit(0.5, "cm"),
-                         legend.text = element_text(size = 10, family = "montserrat"),   
-                          legend.title = element_text(size = 12, hjust = 0.5, family = "montserrat", face = "bold"),
+                         legend.text = element_text(size = 10, family = "Montserrat"),   
+                          legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
                            legend.position = "right") + 
                 scale_fill_manual(values = usecol(pal_bordeaux, n = 5)) + 
                  scale_color_manual(values = usecol(pal_bordeaux, n = 5)) + 
@@ -1502,11 +1518,11 @@ p <- ggplot() +
                        alpha = 0.9) +
         coord_equal() +
          theme_transparent() + 
-          theme(plot.title = element_text(size = 24, hjust = 0.15, family = "montserrat", face = "bold"), 
-                 plot.caption = element_text(size = 12, hjust = 0.2, vjust = 1, family = "montserrat"), 
+          theme(plot.title = element_text(size = 24, hjust = 0.15, family = "Montserrat", face = "bold"), 
+                 plot.caption = element_text(size = 12, hjust = 0.2, vjust = 1, family = "Montserrat"), 
                   legend.key.size = unit(0.5, "cm"),
-                   legend.text = element_text(size = 12, family = "montserrat"), 
-                    legend.title = element_text(size = 14, hjust = 0.5, family = "montserrat", face = "bold"),
+                   legend.text = element_text(size = 12, family = "Montserrat"), 
+                    legend.title = element_text(size = 14, hjust = 0.5, family = "Montserrat", face = "bold"),
                      legend.position = c(0.8, 0.7)) + 
             scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
              scale_color_viridis_d(option = "A", begin = 0.3, end = 0.8) +  
@@ -1526,7 +1542,7 @@ p
 #### Zona Metropolitana del Valle de México (ZMVM)
 
 ```{r}
-tabla <- ZM_2015 %>%
+tabla <- ZM_2020 %>%
           filter(CVE_ZM == "09.01")
 
 p <-  ggplot() + 
@@ -1556,11 +1572,11 @@ p <-  ggplot() +
                        alpha = 0.7) +
         coord_equal() +
          theme_transparent() + 
-          theme(plot.title = element_text(size = 22, hjust = 0.15, family = "montserrat", face = "bold"), 
-                 plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "montserrat"), 
+          theme(plot.title = element_text(size = 22, hjust = 0.15, family = "Montserrat", face = "bold"), 
+                 plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
                   legend.key.size = unit(0.5, "cm"),
-                   legend.text = element_text(size = 12, family = "montserrat"), 
-                    legend.title = element_text(size = 14, hjust = 0.5, family = "montserrat", face = "bold"),
+                   legend.text = element_text(size = 12, family = "Montserrat"), 
+                    legend.title = element_text(size = 14, hjust = 0.5, family = "Montserrat", face = "bold"),
                      legend.position = "right") + 
             scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
              scale_color_viridis_d(option = "A", begin = 0.3, end = 0.8) +  
@@ -1622,11 +1638,11 @@ q[[i]] <-  ggplot() +
              coord_sf(xlim = c(limites$min.x,limites$max.x),
                       ylim = c(limites$min.y,limites$max.y)) +
               theme_transparent() + 
-               theme(plot.title = element_text(size = 22, hjust = 0.15, family = "montserrat", face = "bold"),
-                      plot.caption = element_text(size = 9, hjust = 0.2, vjust = 1, family = "montserrat"),  
+               theme(plot.title = element_text(size = 22, hjust = 0.15, family = "Montserrat", face = "bold"),
+                      plot.caption = element_text(size = 9, hjust = 0.2, vjust = 1, family = "Montserrat"),  
                        legend.key.size = unit(0.5, "cm"),
-                        legend.text = element_text(size = 10, family = "montserrat"),   
-                         legend.title = element_text(size = 12, hjust = 0.5, family = "montserrat", face = "bold"),
+                        legend.text = element_text(size = 10, family = "Montserrat"),   
+                         legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
                           legend.position = "right") + 
                 scale_fill_manual(values = usecol(pal_bordeaux, n = 5)) + 
                  scale_color_manual(values = usecol(pal_bordeaux, n = 5)) +  
@@ -1650,6 +1666,25 @@ if(i == 6){
 
 p[[6]]
 ```
+
+
+# RDS Files 
+
+```{r}
+saveRDS(shape_estados, file = paste0(here::here(), "/Output/shape_estados.RDS"))
+saveRDS(capas_estados, file = paste0(here::here(), "/Output/capa_estados.RDS"))
+saveRDS(layer_estados, file = paste0(here::here(), "/Output/layer_estados.RDS"))
+saveRDS(tbl_estados, file = paste0(here::here(), "/Output/tbl_estados.RDS"))
+saveRDS(shape_municipios, file = paste0(here::here(), "/Output/shape_municipios.RDS"))
+saveRDS(capas_municipio, file = paste0(here::here(), "/Output/capas_municipio.RDS"))
+saveRDS(layer_municipios, file = paste0(here::here(), "/Output/layer_municipios.RDS"))
+saveRDS(tbl_municipios, file = paste0(here::here(), "/Output/tbl_municipios.RDS"))
+saveRDS(shape_localidad, file = paste0(here::here(), "/Output/shape_localidad.RDS"))
+saveRDS(capas_localidad, file = paste0(here::here(), "/Output/capas_localidad.RDS"))
+saveRDS(layer_localidad, file = paste0(here::here(), "/Output/layer_localidad.RDS"))
+saveRDS(tbl_localidad, file = paste0(here::here(), "/Output/tbl_localidad.RDS"))
+```
+
 
 # Librerías
 
