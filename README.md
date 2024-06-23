@@ -6,6 +6,29 @@
 
 <!-- badges: end -->
 
+# Mapas por desagregaciones geográficas de México <img src='img/Mapa_Mx.png' align="right" height="138.5" />
+
+## Anotaciones
+
+<!-- Anotaciones: end -->
+
+Este repositorio puede ir cambiando, ya que se encuentra en versión de
+control y esta es la primera versión.
+
+## Instalación previa
+
+Es necesario contar con el paquete **rmarkdown** dentro de [RStudio
+IDE](https://www.rstudio.com/products/rstudio/download), pero no
+necesita instalarlo explícitamente o bien cargarlo, ya que RStudio hace
+ambas cosas automáticamente cuando es necesario. También se requiere una
+versión reciente de Pandoc (\>= 3.1.11); RStudio también incluye esto
+automáticamente, por lo que no se necesita descargar Pandoc si planea
+usar rmarkdown desde el IDE de RStudio.
+
+``` r
+install.packages("rmarkdown")
+```
+
 # Repositorio de Mapas en `R`
 
 ### Mapas por desagregaciones geográficas de México
