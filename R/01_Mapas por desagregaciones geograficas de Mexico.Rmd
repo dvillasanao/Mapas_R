@@ -963,8 +963,8 @@ p <- get_map(location = location, source = "google", maptype="roadmap", scale = 
               fill = stringr::str_wrap("Grado de marginación", 10),
                caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
 
-path = paste0(here::here(),"/img/img_2020_ggmap_API.pdf")
-ggexport (p, width = 8, height = 5, res = 400, filename = path)
+#path = paste0(here::here(),"/img/img_2020_ggmap_API.pdf")
+#ggexport (p, width = 8, height = 5, res = 400, filename = path)
 print(p)
 ```
 
