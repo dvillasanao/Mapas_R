@@ -11,9 +11,12 @@ output:
     toc_depth: 3
     toc_float:
       collapsed: true
+header-includes:
+  - \usepackage{amsmath}
 ---
 
 \usepackage{color}
+\usepackage{amsmath} 
 \color{#B6854D}{\text{}}{-}
 
 ```{=html}
@@ -36,6 +39,9 @@ h2 {
 }
 h3 {
   color: #172984;
+}
+h5 {
+  color: #B6854D;
 }
 </style>
 ```
@@ -139,6 +145,7 @@ require(rgdal)          #Para importar shapefiles.
 require(sp)             # Classes and Methos for Spatial Data
 require(spdplyr)        #Data manipulation verbs for the sptial classes
 require(tidyverse) 
+require(tinytex)
 require(tmap)
 require(tmaptools)
 require(tibble)
@@ -152,6 +159,7 @@ invisible(utils::memory.limit(size = 60000000))
 ```
 
 ```{r, echo = FALSE}
+# Se cargan las bases de datos generadas en el documento
 archivo <- c("shape", "capas", "layer", "tbl")
 nivel <- c("estados", "municipios", "localidad", "ageb")
 for(i in 1:4){
@@ -159,12 +167,13 @@ for(i in 1:4){
     assign(paste0(archivo[i], "_", nivel[j]), readRDS(file = paste0(here::here(), "/Output/", archivo[i], "_", nivel[j], ".RDS")))
   }
 }
-
+capas_zm <- readRDS(file = paste0(here::here(), "/Output/capas_zm.RDS"))
 load(file = paste0(here::here(), "/Output/IME_2020.RData"))
 load(file = paste0(here::here(), "/Output/IMM_2020.RData"))
 load(file = paste0(here::here(), "/Output/IML_2020.RData"))
 load(file = paste0(here::here(), "/Output/IMU_2020.RData"))
 load(file = paste0(here::here(), "/Output/ZM_2020.RData"))
+
 ```
 
 
@@ -365,7 +374,7 @@ kable(tabla,
         gsub("text-align: initial !important;", "text-align: justify !important;", .)
 ```
 
-### Layers {.tile1-text .top1-tiles .tabset .tabset-pills}
+### Layers {.tile1-text .top1-tiles .tabset .tabset-pills}  
 
 Existen dos maneras de trabajar los datos de los mapas:
 
@@ -373,9 +382,9 @@ Existen dos maneras de trabajar los datos de los mapas:
 
 -   O bien utilizar la función `fortify()` del paquete `ggplot2`, que permite convertir un objeto (ej.`spdf`) a un *data.frame*. Al hacer este tipo de conversión permite aplicar un `join` para unir ambas estructuras de datos al nuevo formato del data.frame.
 
-#### data.frame
+#### data.frame   
 
-##### $$SpatialPolygons \Rightarrow data.frame$$
+##### SpatialPolygons ⇒ data.frame     
 
 Cuando es necesario cambiar los ID's de las características en los objetos `SpatialLines` o `SpatialPolygons`, se puede usar la función `spChFIDs()` de la paquetería `sp`. Donde los nuevos ID's deben ser un vector de caracteres únicos de la longitud correcta.
 
@@ -389,9 +398,9 @@ capas_estados <- shape_estados %>%
                                by = c("id" = "CVE_GEO")) 
 ```
 
-#### SpatialPolygons
+#### SpatialPolygons   
 
-##### $$SpatialPolygons \Rightarrow SpatialPolygons + Datos$$
+##### SpatialPolygons ⇒ SpatialPolygons + Datos      
 
 ```{r, class.source = "fold-show"}
 layer_estados <- merge(shape_estados,
@@ -401,7 +410,7 @@ layer_estados <- merge(shape_estados,
                            by = "CVE_GEO")
 ```
 
-##### $$Data.frame \Rightarrow SpatialPolygonsDataFrame$$
+##### Data.frame ⇒ SpatialPolygonsDataFrame       
 
 Para poder emparejar polígonos y puntos, los objetos espaciales deben tener el mismo `CRS`. Para después poder calcular el área de cada polígono o bien se puede reproyectar los datos espaciales usando la función `spTransform`:
 
@@ -415,7 +424,7 @@ tabla <- SpatialPointsDataFrame(data = capas_estados,
 
 #### Tibble
 
-##### $$SpatialPolygons \Rightarrow tbl_df/ tbl / data.frame$$
+##### SpatialPolygons ⇒  tbl_df/ tbl / data.frame       
 
 Conversión de datos: `st_as_sf`, convierte un objeto externo en un spatial object. A continuación, se muestra un ejemplo de cómo visualizar objetos `sf`. Este tipo de función es un poco más amigable de usar.
 
@@ -501,7 +510,7 @@ Existen dos maneras de trabajar los datos de los mapas:
 
 #### data.frame
 
-##### $$SpatialPolygons \Rightarrow data.frame$$
+##### SpatialPolygons ⇒ data.frame     
 
 Cuando es necesario cambiar los ID's de las características en los objetos `SpatialLines` o `SpatialPolygons`, se puede usar la función `spChFIDs()` de la paquetería `sp`. Donde los nuevos ID's deben ser un vector de caracteres únicos de la longitud correcta.
 
@@ -516,7 +525,7 @@ capas_municipio <-  shape_municipios %>%
 
 #### SpatialPolygons
 
-##### $$SpatialPolygons \Rightarrow SpatialPolygons + Datos$$
+##### SpatialPolygons ⇒  SpatialPolygons + Datos     
 
 ```{r, class.source = "fold-show"}
 layer_municipios <- merge(shape_municipios,
@@ -527,7 +536,7 @@ layer_municipios <- merge(shape_municipios,
 
 #### Tibble
 
-##### $$SpatialPolygons \Rightarrow tbl_df/ tbl / data.frame$$
+##### SpatialPolygons ⇒  tbl_df/ tbl / data.frame    
 
 Conversión de datos: `st_as_sf`, convierte un objeto externo en un spatial object. A continuación, se muestra un ejemplo de cómo visualizar objetos `sf`. Este tipo de función es un poco más amigable de usar.
 
@@ -634,7 +643,7 @@ Existen dos maneras de trabajar los datos de los mapas:
 
 #### data.frame
 
-##### $$SpatialPolygons \Rightarrow data.frame$$
+##### SpatialPolygons ⇒  data.frame    
 
 Cuando es necesario cambiar los ID's de las características en los objetos `SpatialLines` o `SpatialPolygons`, se puede usar la función `spChFIDs()` de la paquetería `sp`. Donde los nuevos ID's deben ser un vector de caracteres únicos de la longitud correcta.
 
@@ -653,7 +662,7 @@ length(unique(capas_localidad$id))
 
 #### SpatialPolygon
 
-##### $$SpatialPolygons \Rightarrow SpatialPolygons + Datos$$
+##### SpatialPolygons ⇒  SpatialPolygons + Datos
 
 ```{r, class.source = "fold-show"}
 layer_localidad <- merge(shape_localidad,
@@ -665,7 +674,7 @@ layer_localidad <- merge(shape_localidad,
 
 #### Tibble
 
-##### $$SpatialPolygons \Rightarrow tbl_df/ tbl / data.frame$$
+##### SpatialPolygons ⇒  tbl_df/ tbl / data.frame    
 
 Conversión de datos: `st_as_sf`, convierte un objeto externo en un spatial object. A continuación, se muestra un ejemplo de cómo visualizar objetos `sf`. Este tipo de función es un poco más amigable de usar.
 
@@ -752,7 +761,7 @@ Existen dos maneras de trabajar los datos de los mapas:
 
 #### data.frame
 
-##### $$SpatialPolygons \Rightarrow data.frame$$
+##### SpatialPolygons ⇒  data.frame      
 
 Cuando es necesario cambiar los ID's de las características en los objetos `SpatialLines` o `SpatialPolygons`, se puede usar la función `spChFIDs()` de la paquetería `sp`. Donde los nuevos ID's deben ser un vector de caracteres únicos de la longitud correcta.
 
@@ -774,7 +783,7 @@ capas_ageb <- shape_ageb %>%
 
 #### SpatialPolygons
 
-##### $$SpatialPolygons \Rightarrow SpatialPolygons + Datos$$
+##### SpatialPolygons ⇒  SpatialPolygons + Datos     
 
 ```{r, class.source = "fold-show"}
 layer_ageb <- merge(shape_ageb,
@@ -786,7 +795,7 @@ layer_ageb <- merge(shape_ageb,
 
 #### Tibble
 
-##### $$SpatialPolygons \Rightarrow tbl_df/ tbl / data.frame$$
+##### SpatialPolygons ⇒  tbl_df/ tbl / data.frame      
 
 Conversión de datos: `st_as_sf`, convierte un objeto externo en un spatial object. A continuación, se muestra un ejemplo de cómo visualizar objetos `sf`. Este tipo de función es un poco más amigable de usar.
 
@@ -937,7 +946,7 @@ location <- c(left = min(shape_estados_T$long),
               right = max(shape_estados_T$long),
               top = max(shape_estados_T$lat))
 
-p <- get_map(location = location, source = "google", maptype="roadmap", scale = 2) %>% 
+p <- get_map(location = location, source = "google", maptype="roadmap", scale = 1) %>% 
        ggmap() + 
         geom_polygon(data = shape_estados_T, 
                       mapping = aes(x = long, 
@@ -2303,6 +2312,7 @@ saveRDS(shape_ageb, file = paste0(here::here(), "/Output/shape_ageb.RDS"))
 saveRDS(capas_ageb, file = paste0(here::here(), "/Output/capas_ageb.RDS"))
 saveRDS(layer_ageb, file = paste0(here::here(), "/Output/layer_ageb.RDS"))
 saveRDS(tbl_ageb, file = paste0(here::here(), "/Output/tbl_ageb.RDS"))
+saveRDS(capas_zm, file = paste0(here::here(), "/Output/capas_zm.RDS"))
 save(IME_2020, file = paste0(here::here(), "/Output/IME_2020.Rdata"))
 save(IMM_2020, file = paste0(here::here(), "/Output/IMM_2020.Rdata"))
 save(IML_2020, file = paste0(here::here(), "/Output/IML_2020.Rdata"))
