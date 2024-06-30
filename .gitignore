@@ -40,6 +40,7 @@ vignettes/*.pdf
 .Renviron
 
 # pkgdown site
+docs/
 Output/
 
 # translation temp files
