@@ -262,7 +262,7 @@ for(i in 1:5){
 ```
 
 
-### geojson_json (Por grados de marginación)  
+### `geojson_json()` (Por grados de marginación)  
 
 Se convierten las capas de polígonos filtrados en objetos `GeoJSON`. Este proceso es útil para guardar las capas en un formato que puede ser fácilmente utilizado para visualización en la web o en aplicaciones de mapas interactivos.     
 
@@ -296,7 +296,7 @@ for(i in 1:5){
 
 ## GeoJson (Estados)  
 
-Se vuelve a leer un archivo `GeoJSON ` y realizan algunas operaciones adicionales en el objeto espacial resultante:   
+👇  Se vuelve a leer un archivo `GeoJSON ` y realizan algunas operaciones adicionales en el objeto espacial resultante:   
 
 - `geojsonio::geojson_read()`: Esta función lee un archivo GeoJSON y lo convierte en un objeto espacial.   
 - `what = "sp"`: Especifica que el resultado debe ser un objeto Spatial (de la clase `sp`) y no un formato lineal `.json`.  
@@ -309,12 +309,12 @@ shape_estados_2020 <- list()
 shape_estados_2015 <- list()
 shape_estados_2010 <- list()
 for (i in 1:5){
-  shape_estados_2020[[paste0(grados[i])]] <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2020_", i, "_json.geojson"), what = "sp") %>%
-                                    sp::spChFIDs(.,  str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))
-  shape_estados_2015[[paste0(grados[i])]] <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2015_", i, "_json.geojson"), what = "sp") %>%
-                                    sp::spChFIDs(.,  str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))
-  shape_estados_2010[[paste0(grados[i])]] <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2010_", i, "_json.geojson"), what = "sp") %>% 
-                                    sp::spChFIDs(., str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))
+  shape_estados_2020[[i]] <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2020_", i, "_json.geojson"), what = "sp") %>%
+                                                         sp::spChFIDs(.,  str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))
+  shape_estados_2015[[i]] <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2015_", i, "_json.geojson"), what = "sp") %>%
+                                                         sp::spChFIDs(.,  str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))
+  shape_estados_2010[[i]] <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2010_", i, "_json.geojson"), what = "sp") %>% 
+                                                         sp::spChFIDs(., str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))
 }
 
 shape_estados <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2020_json.geojson"), what = "sp") %>%
@@ -395,18 +395,54 @@ bounding_box
 - `years`: Un vector que contiene los años para los que tenemos datos de shapefiles.  
 - `grados`: Un vector que contiene los niveles de marginación.  
 
-Se asigna a la lista `shape_estados` los datos de shapefile correspondientes a cada año, el cual a su vez cada lista contiene a los niveles de marginación.     
+Se asigna a la lista `shape_estados` con una estrcutura de listas de data frames geoespaciales correspondientes a diferentes años y grados de marginación. Para cada data frame de los `SpatiaPolygonsDataFrame`, se le añaden varias columnas nuevas: una con IDs únicos, otra con el año correspondiente, otra con una combinación de ID y año.     
+
+**Vector y función**   
+- `years`: Se define un vector con los años `2020`, `2015` y `2010`.     
+- `generate_ids`: Es una función que genera una secuencia de números que los convierte en caracteres y les agrega ceros a la izquierda para que tengan al menos dos dígitos.      - `map2(shape_estados, years, ...)`: La función en conjunto transforma los shapefiles de cada año y grado, generando IDs únicos y añadiendo columnas adicionales que ayudan a identificar cada observación con un ID y un año específicos.     
+
+Se generan algunas variables que van a ayudar a integrar los años y los grados de marginación dentro del leaflet de manera dinámica.      
+
+- `ID`: Se genera IDs únicos para cada entidad, utilizando la función `generate_ids`. Por ejemplo, para el primer año (2020), generará IDs del 1 al 32; para el segundo año (2015), del 33 al 64; y para el tercer año (2010), del 65 al 96. Tomando en cuenta que cada año, se encuentra estructurado por un grupo de listas que corresponden a los diferentes grados de marginación.          
+- `ANIO`: Agrega una columna con el año correspondiente (`2020`, `2015` o `2010`).     
+- `id_year`: Crea una columna que combina el ID generado con el año correspondiente, por ejemplo, 0102020, 0202020, etc.   
+
 
 ```{r}
-# Define los datos y años
+require(purrr)
+# Define los grados y años
 years <- c("2020", "2015", "2010")
-grados <-  c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
+grados <- c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
 
 shape_estados <- NULL
-for(i in 1:3){
- shape_estados[[paste0(years[i])]] <- get(paste0("shape_estados_", years[i]))
+shape_estados <- list(shape_estados_2020, shape_estados_2015, shape_estados_2010)
+
+# Función para generar el ID del 1 a 96
+generate_ids <- function(start, end) {
+                  str_pad(as.character(seq(start, end)), 2, "left", pad = "0")
 }
+
+# Aplicar la transformación a cada lista de shape_estados
+start_id <- 1
+shape_estados <- map2(shape_estados, years, function(shape_files, year) {
+                            shape_files <- map2(shape_files, grados, function(shape_file, grado) {
+                                                 if (is.data.frame(shape_file@data)) {
+                                                      end_id <- start_id + nrow(shape_file) - 1
+                                                      shape_file <- shape_file %>%
+                                                                     mutate(ID = generate_ids(start_id, end_id),
+                                                                            ANIO = year,
+                                                                            id_year = paste0(generate_ids(start_id, end_id), year))
+                                                      start_id <<- end_id + 1
+                                                     }
+                                                 shape_file
+                                                  }
+                                                )
+                            shape_files
+  }
+)
 ```
+
+
 
 #### Se define una función para añadir capas de polígonos   
 
@@ -415,8 +451,9 @@ Se define una función llamada `addPolygonLayer`, la cual añade una capa de pol
 - `map`: El objeto de mapa de Leaflet al que se le añadirá la nueva capa de polígonos.   
 - `data`: Los datos que contienen la información geográfica de los polígonos.   
 - `year`: Año asociado con los datos de los polígonos, usado para agrupar.    
-- `grado`: Grado asociado con los datos de los polígonos, también usado para agrupar.   
-- `paleta`: Paleta de colores que se usará para rellenar los polígonos.    
+- `paleta`: Paleta de colores que se usará para rellenar los polígonos de acuerdo al grado de marginación.   
+- `grado`: Representa el grupo al que pertenecen estos polígonos.    
+- `id`: Es el identificador único para esta capa de polígonos en el mapa. Puede ser útil para identificar y manipular específicamente esta capa en operaciones posteriores. 
 
 ```{r}
 # Define una función para añadir capas de polígonos
@@ -428,21 +465,26 @@ addPolygonLayer <- function(map, data, year, grado, paleta, id) {
                                                    stroke = TRUE,
                                                     weight = 1,
                                                      dashArray = "1",
-                                                      opacity = 1,
-                                                       color = "#D4D0BD",
-                                                        group = grado,
-                                                         layerId = id
+                                                      opacity = 1.3,
+                                                       color = "#DBDBDB",  # line colour 
+                                                        highlight = highlightOptions(weight = 2,
+                                                                                     color = "red", # Color de selección
+                                                                                     dashArray = "",
+                                                                                     fillOpacity = 0.6,
+                                                                                     bringToFront = TRUE),
+                                                         group = grado,
+                                                          layerId = id
                                                 )
                              return(map)
 }
 ```
 
+
 ####  Se crea el mapa inicial   
 
-Se crea un mapa centrado en unas coordenadas específicas (`lat = 23.6260333` y `lng = -102.5375005`), con un nivel de zoom fijo, y establece los límites máximos para evitar que el usuario se desplace fuera de una región definida. El mapa utiliza capa de OpenStreetMap tanto en la capa base como en una capa adicional de tiles del mismo proveedor.    
+Se crea un mapa centrado en unas coordenadas específicas (`lat = 23.6260333` y `lng = -102.5375005`), con un nivel de zoom fijo, y establece los límites máximos para evitar que el usuario se desplace fuera de una región definida. El mapa utiliza capa de OpenStreetMap tanto en la capa base como en una capa adicional de tiles del mismo proveedor. 
 
 ```{r}
-rm(map)
 # Crear el mapa inicial
 map <- leaflet(options = leafletOptions(minZoom = 5, maxZoom = 5, zoomControl = FALSE)) %>%
         addTiles() %>%
@@ -460,165 +502,110 @@ map <- leaflet(options = leafletOptions(minZoom = 5, maxZoom = 5, zoomControl = 
 Se añaden las capas de polígonos al mapa de Leaflet para cada combinación de año y grado. Se recorren todas las combinaciones posibles de años (`years`) y grados (`grados`), y para cada combinación, añade una capa de polígonos al mapa utilizando la función `addPolygonLayer`. La lista shape_estados contiene los datos geográficos organizados por año y grado, y la lista paleta proporciona la paleta de colores correspondiente para cada grado.    
 
 
+#### Función `addPolygonLayer()`   
+
+Se construye dinámicamente un mapa interactivo que muestra diferentes capas de polígonos para los años `2020`, `2015` y `2010`, utilizando funciones y enfoques que permiten manejar de manera flexible los datos geoespaciales. Cada iteración del bucle añade una nueva capa de polígonos al mapa `map`, lo que permite visualizar los datos geoespaciales para cada año de manera superpuesta en el mismo mapa interactivo. Se recorren todas las combinaciones posibles de años (`years`), y se añade una capa de polígonos al mapa utilizando la función `addPolygonLayer`. La función contiene, los shape_estados que son los datos geográficos organizados por año y grado, la paleta de colores correspondiente para cada grado y el ID unico de cada observación correspondiente a cada año.  
+
 ```{r}
-# Contador de IDs
-id_counter <- 1
+# Define los datos y años
+years <- c("2020", "2015", "2010")
+grados <- c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
 
 # Añadir capas de polígonos para cada año
 for (i in seq_along(years)) {
   for(j in seq_along(grados)){
-           shape_estados[[i]][[j]] <- shape_estados[[i]][[j]] %>%
-                                        mutate(ID = str_pad(as.character(id_counter), 2, "left", pad = "0"))
            map <- addPolygonLayer(map, 
-                                  shape_estados[[i]][[j]], 
+                                  data = shape_estados[[i]][[j]], 
                                   year = ~ANIO, 
                                   grado = ~get(paste0("GM_", years[i])), 
                                   paleta = ~mypalette(get(paste0("GM_", years[i]))), 
-                                  id = union(~ID, ~ANIO))
-           id_counter <- id_counter + 1
+                                  id = ~id_year
+                                  )
   }
 }
 map
-#paste0(paste0(str_pad(as.character(seq(1,16)), 2, "left", pad = "0")), c(rep("2020", 5), rep("2015", 5), rep("2010", 5)))
 ```
 
 
 #### Se añade la leyenda y control de capas    
 
-Se añaden los controles adicionales y una leyenda al mapa de Leaflet, y luego se define un comportamiento personalizado para gestionar la visibilidad de las capas en función de la selección del usuario.    
+Se añaden los controles adicionales y una leyenda al mapa de Leaflet. Permitiendo al usuario explorar diferentes capas de datos y visualizar información geoespacial de manera organizada y comprensible.     
 
-- `addLayersControl()`: Añade controles de capas al mapa.   
-- `overlayGroups = grados`: Grupos de capas superpuestas que el usuario puede activar o desactivar.   
-- `baseGroups = years`: Grupos de capas base entre los que el usuario puede cambiar.     
-- `options = layersControlOptions(collapsed = FALSE)`: Opciones para los controles de capas, incluyendo que el control no esté colapsado por defecto.    
-
-`htmlwidgets::onRender()`: Añade una función JavaScript personalizada para gestionar el comportamiento del mapa. 
-
-- `updateLayers`: se encarga de actualizar las capas visibles en el mapa en función de las selecciones del usuario en los controles de capas.       
-
-- `var selectedYear = document.querySelectorAll('.leaflet-control-layers-base input:checked')[0].nextSibling.innerText.trim();`: Obtiene el año seleccionado de los controles de capas base.    
-
-- `var selectedGrados = Array.from(document.querySelectorAll('.leaflet-control-layers-overlays input:checked')).map(input => input.nextSibling.innerText.trim());`: Obtiene los grados seleccionados de los controles de capas superpuestas.      
-
-**Ocultar todas las capas:**
-
-- Se itera sobre todas las capas del mapa y las elimina si tienen una opción group definida. 
-
-**Mostrando solo las capas del año seleccionado y los grados seleccionados:**    
-
-- Se itera sobre todas las capas del mapa y las añade de nuevo si pertenecen al año seleccionado y a uno de los grados seleccionados.  
-
-Los eventos `baselayerchange`, `overlayadd`, `overlayremove`: Añaden eventos para actualizar las capas visibles cuando el usuario cambia la capa base o añade/remueve capas superpuestas.     
+- `addLayersControl()`: Agrega un control de capas al mapa para permitir al usuario seleccionar qué capas base u overlay (superpuestas) desea visualizar.   
+- `overlayGroups = c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")`: Define los grupos de capas superpuestas que se mostrarán en el control de capas. En este caso, parecen ser categorías de grado de marginación.   
+- `baseGroups = c("2020", "2015", "2010")`: Define los grupos de capas base que se mostrarán en el control de capas. Estos podrían ser los años para los cuales se están visualizando datos.    
+- `options = layersControlOptions(collapsed = FALSE)`:  Especifica las opciones del control de capas. collapsed = FALSE significa que el control de capas estará expandido por defecto, mostrando todas las opciones disponibles sin necesidad de expandirlo manualmente.         
 
 ```{r}
 map <- map %>%
-  addControl(title, position = "bottomright") %>%
-  addLegend("bottomright", 
-            colors = paleta, 
-            labels = grados,
-            #values = ~forcats::fct_relevel(DP2_2020$GM_2020, c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
-            title = stringr::str_wrap("Grado de marginación", 15), 
-            opacity = 0.7) %>%
-  addLayersControl(
-    overlayGroups = grados,
-    baseGroups = years, 
-    options = layersControlOptions(collapsed = FALSE))
+        addControl(title, position = "bottomright") %>%
+         addLegend("bottomright", 
+                    colors = paleta, 
+                    labels = grados,
+                    title = stringr::str_wrap("Grado de marginación", 15), 
+                    opacity = 0.7) %>%
+          addLayersControl(
+           overlayGroups = c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"),
+            baseGroups = c("2020", "2015", "2010"), 
+             options = layersControlOptions(collapsed = FALSE))
+```
+
+#### Se configura el control de capas     
+
+El bloque de este código JavaScript se utiliza junto con el paquete `htmlwidgets`  para controlar la visibilidad y la interactividad de las capas en un mapa Leaflet. Este código JavaScript personalizado mejora la funcionalidad de un mapa Leaflet al permitir que el usuario controle dinámicamente qué capas base y superpuestas están visibles en el mapa. Al cambiar la capa base o añadir capas superpuestas, las capas que no corresponden se ocultan automáticamente, manteniendo así una visualización clara y organizada de los datos geoespaciales.     
+
+Los eventos `baselayerchange`, `overlayadd`, `overlayremove`: Añaden eventos para actualizar las capas visibles cuando el usuario cambia la capa base o añade/remueve capas superpuestas.   
+
+- `baselayerchange`: Este evento se activa cuando el usuario cambia la capa base del mapa.
+- `overlayadd`: Este evento se activa cuando se añade una capa superpuesta al mapa.
+
+```{r}
+map <- map %>%
+        htmlwidgets::onRender("
+          function(el, x) {
+            var myMap = this;
+            var baseLayer = '2020';
+            myMap.eachLayer(function(layer) {
+              var id = layer.options.layerId;
+              if (id) {
+                if (!id.endsWith(baseLayer)) {
+                  layer.getElement().style.display = 'none';
+                }
+              }
+            });
+      
+            myMap.on('baselayerchange', function(e) {
+              baseLayer = e.name;
+              myMap.eachLayer(function(layer) {
+                var id = layer.options.layerId;
+                if (id) {
+                  if (!id.endsWith(baseLayer)) {
+                    layer.getElement().style.display = 'none';
+                    layer.closePopup();
+                  } 
+                  else {
+                    layer.getElement().style.display = 'block';
+                  }
+                }
+              });
+            });
+      
+            myMap.on('overlayadd', function(e) {
+              myMap.eachLayer(function(layer) {
+                var id = layer.options.layerId;
+                if (id) {
+                  if (!id.endsWith(baseLayer)) {
+                    layer.getElement().style.display = 'none';
+                  } else {
+                    layer.getElement().style.display = 'block';
+                  }
+                }
+              });
+            });
+          }")
 map
 ```
 
-```{r}
-# Añadir el script de control dinámico de capas usando onRender
-p <- map %>%
-      htmlwidgets::onRender("
-        function(el, x) {
-          var myMap = this;
-          var baseLayer = {'2020', '2015', '2010'};
-          myMap.eachLayer(function(layer) {
-            var id = layer.options.layerId;
-            if (id) {
-              if (!id.endsWith('_' + baseLayer)) {
-                layer.getElement().style.display = 'none';
-              }
-              }
-            }
-          });
-          myMap.on('baselayerchange', function(e) {
-            baseLayer = e.name;
-            myMap.eachLayer(function(layer) {
-              var id = layer.options.layerId;
-              if (id) {
-                if (!id.endsWith('_' + baseLayer)) {
-                  layer.getElement().style.display = 'none';
-                  layer.closePopup();
-                } else {
-                  layer.getElement().style.display = 'block';
-                }
-              }
-            });
-          });
-    
-          myMap.on('overlayadd', function(e) {
-            myMap.eachLayer(function(layer) {
-              var id = layer.options.layerId;
-              if (id) {
-                if (!id.endsWith('_' + baseLayer)) {
-                  layer.getElement().style.display = 'none';
-                } else {
-                  layer.getElement().style.display = 'block';
-                }
-              }
-            });
-          });
-        }")
-
-# Imprimir el mapa
-p
-```
-
-```{r}
-p <- map %>%
-      htmlwidgets::onRender("
-    function(el, x) {
-      // Crear grupos para overlay y base
-      var overlayGroups = {};
-      var baseGroups = {};
-      
-      // Añadir capas de polígonos para cada año y grado
-      var years = x.options.baseGroups;
-      var grados = x.options.overlayGroups;
-      
-      for (var i = 0; i < years.length; i++) {
-        for (var j = 0; j < grados.length; j++) {
-          var group_name = years[i] + ' ' + grados[j];
-          overlayGroups[group_name] = L.layerGroup();
-          baseGroups[years[i]] = L.layerGroup();
-        }
-      }
-      
-      // Añadir controles de capas al mapa
-      L.control.layers(baseGroups, overlayGroups, {collapsed: false}).addTo(this);
-    }
-  ")
-p
-```
-
-```{r}
-p <- map %>%
-       htmlwidgets::onRender("
-    function(el, x) {
-      var updateLegend = function () {
-          var selectedGroup = document.querySelectorAll('input:checked')[0].nextSibling.innerText.substr(1);
-
-          document.querySelectorAll('.legend').forEach(a => a.hidden=true);
-          document.querySelectorAll('.legend').forEach(l => {
-            if (l.children[0].children[0].innerText == selectedGroup) l.hidden=false;
-          });
-      };
-      updateLegend();
-      this.on('baselayerchange', e => updateLegend());
-    }")
-p
-```
 
 Se genera un Widget Interactivo con la función `saveWidget()`, 
   
@@ -630,13 +617,12 @@ Se genera un Widget Interactivo con la función `saveWidget()`,
 - `mapshot`: Captura una imagen estática del mapa interactivo, útil para generar vistas previas o miniaturas sin necesidad de interacción directa.    
 
 Es importante que el uso combinado de saveWidget y mapshot en el mismo contexto podría no ser necesario. Normalmente, se elige uno u otro según la necesidad específica: guardar el mapa interactivo para ser utilizado en un sitio web (saveWidget) o capturar una imagen estática para propósitos de visualización o impresión (mapshot).    
-
+ 
 ```{r}
 #saveRDS(map,  paste0(here::here(), "/Output/map_2020.RDS"))
-saveWidget(map,  paste0(here::here(), "/index.html"), selfcontained = TRUE)
-
-map %>% 
- mapshot(url = paste0(here::here(), "/index.html")) 
+saveWidget(map,  paste0(here::here(), "/img/map_2010_2020.html"), selfcontained = TRUE)
+map <- map %>% 
+        mapshot(url = paste0(here::here(), "/map_2010_2020.html"))
 ```
 
 

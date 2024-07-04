@@ -276,7 +276,7 @@ shape_estados_2010 <- geojsonio::geojson_read(paste0(here::here(), "/Output/esta
                                   sp::spChFIDs(., str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))
 ```
 
-## Leaflet 
+## Leaflet   
 
 
 ### Paleta de colores 
@@ -343,7 +343,9 @@ Se calcula el cuadro delimitador que contiene las coordenadas de los límitesde 
 bounding_box <- st_bbox(shape_estados_2020)
 bounding_box
 ```
-### Opción 1 {.tabset .tabset-fade .tabset-pills}
+## Opciones de Leaflet {.tabset .tabset-fade .tabset-pills}    
+
+### Opción 1   
 
 Se genera un mapa interactivo utilizando leaflet en R, añadiendo diferentes capas de polígonos para los años `2020`, `2015` y `2010`. Cada capa está coloreada según una paleta específica.      
 
@@ -384,7 +386,7 @@ map <- map %>%
                          weight = 1,  # line thickness
                           dashArray = "1",
                            opacity = 1,
-                            color = "#D4D0BD",  # line colour 
+                            color = "#DBDBDB",  # line colour 
                              highlight = highlightOptions(weight = 2,
                                                           color = "red", # Color de selección
                                                           dashArray = "",
@@ -399,7 +401,7 @@ map <- map %>%
                          weight = 1,  # line thickness
                           dashArray = "1",
                            opacity = 1,
-                            color = "#D4D0BD",  # line colour 
+                            color = "#DBDBDB",  # line colour 
                              highlight = highlightOptions(weight = 2,
                                                           color = "red", # Color de selección
                                                           dashArray = "",
@@ -414,7 +416,7 @@ map <- map %>%
                          weight = 1,  # line thickness
                           dashArray = "1",
                            opacity = 1,
-                            color = "#D4D0BD",  # line colour 
+                            color = "#DBDBDB",  # line colour 
                              highlight = highlightOptions(weight = 2,
                                                           color = "red", # Color de selección
                                                           dashArray = "",
@@ -465,7 +467,7 @@ map <- map %>%
 ```
 
 
-### Opción 2 {.tabset .tabset-fade .tabset-pills}
+### Opción 2    
 
 Se sigue la misma estructura que la **Opción 1**, la única diferencia es que se encuentran reducidos todos los `addPolygons` dentro de un loop, en la que se define de manera previa se genera una función `addPolygonLayer`, que introduce todos los parámetros del addPolygons. De esta manera, hace que no se tengan que desplegar las capas de todos los años, y se realiza todo de manera simplificada.      
 
@@ -503,8 +505,13 @@ addPolygonLayer <- function(map, data, year, palette) {
                                                     weight = 1.3,
                                                      dashArray = "1",
                                                       opacity = 1,
-                                                       color = "#D4D0BD",
-                                                        group = year
+                                                       color = "#DBDBDB",  # line colour 
+                                                        highlight = highlightOptions(weight = 2,
+                                                                                     color = "red", # Color de selección
+                                                                                     dashArray = "",
+                                                                                     fillOpacity = 0.6,
+                                                                                     bringToFront = TRUE),
+                                                         group = year
                                                 )
                              return(map)
 }
@@ -579,7 +586,7 @@ map <- map %>%
         mapshot(url = paste0(here::here(), "/map_2010_2020.html"))
 ```
 
-### Opción 3 {.tabset .tabset-fade .tabset-pills} 
+### Opción 3   
 
 Se sigue la misma estructura que la **Opción 2**, se genera un lista de data frames geoespaciales correspondientes a diferentes años, y para cada data frame, añade varias columnas nuevas: una con IDs únicos, otra con el año correspondiente, otra con una combinación de ID y año.   
 
@@ -636,9 +643,14 @@ addPolygonLayer <- function(map, data, year, grado, paleta, id) {
                                                     weight = 1,
                                                      dashArray = "1",
                                                       opacity = 1.3,
-                                                       color = "#D4D0BD",
-                                                        group = grado,
-                                                         layerId = id
+                                                       color = "#DBDBDB",  # line colour 
+                                                        highlight = highlightOptions(weight = 2,
+                                                                                     color = "red", # Color de selección
+                                                                                     dashArray = "",
+                                                                                     fillOpacity = 0.6,
+                                                                                     bringToFront = TRUE),
+                                                         group = grado,
+                                                          layerId = id
                                                 )
                              return(map)
 }
