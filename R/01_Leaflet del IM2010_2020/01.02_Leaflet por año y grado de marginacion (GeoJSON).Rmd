@@ -1,0 +1,655 @@
+---
+title: "Leaflet a nivel estatal por grados de marginación, 2010 - 2020"
+subtitle: "Utilizando capas `geojson`"
+author: "Diana Villasana Ocampo"
+output:
+   html_document:
+      highlight: tango
+      theme: flatly
+      toc: yes
+      toc_depth: 4
+      toc_float:
+        collapsed: yes
+knit: (function(input, ...) {
+    rmarkdown::render(
+      input,
+      output_dir = "../../docs"
+    )
+  })
+---
+
+```{=html}
+<style type="text/css">
+body {
+text-align: justify;
+font-style: normal;
+font-family: "Montserrat";
+font-size: 14px
+}
+h1.title {
+  font-size: 40px;
+  color: #1C3BA4;
+}
+h1 {
+  color: #B6854D;
+}
+h2 {
+  color: #172984;
+}
+h3 {
+  color: #172984;
+}
+h5 {
+  color: #B6854D;
+}
+</style>
+```
+
+```{=html}
+<style>
+.nav>li>a {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    color: #1C3BA4
+}
+.nav-pills>li.active>a, .nav-pills>li.active>a:hover, .nav-pills>li>a:focus {
+    color: #ffffff;
+    background-color: #09C2BC
+}
+</style>
+```
+
+```{r, include=FALSE}
+# automatically create a bib database for R packages
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = FALSE,  
+                      eval = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+setwd(here::here())
+options(digits = 2)
+``` 
+
+
+```{r, echo = FALSE, results=FALSE, eval = TRUE}
+require(dplyr)
+require(forcats)
+require(sp)
+require(stringr)
+require(spdplyr)
+require(htmltools)
+require(leaflet)
+require(htmlwidgets)
+require(ggmap)
+require(ggplot2)
+require(ggridges)
+require(grDevices)
+require(ggpubr)
+require(forcats)
+require(rgdal)
+require(tibble)
+require(sf)
+require(stringr)
+require(RColorBrewer)
+require(leafgl)
+require(leaflet.extras)
+require(mapview)
+require(leaflet.providers)
+#tempdir <- tempdir()
+#unlink(tempdir, recursive = TRUE)
+```
+
+# Sistema de Información Geográfica
+
+El Instituto Nacional de Estadística, Geografía e Informática (INEGI) tiene puestos a disposición del público los shapefiles con los distintos niveles de información geográfica. Estos archivos digitales se encuentran disponibles en el [`Marco Geoestadístico Nacional (MGN)`](https://www.inegi.org.mx/temas/mg/#Descargas), el cual es un sistema único y se presenta la división del territorio nacional en diferentes niveles de desagregación para referir geográficamente la información estadística de los censos y encuestas. Se integra al Sistema Nacional de Información Estadística y Geográfica (SNIEG).
+
+
+## Índice de marginación 2010 - 2020
+
+Se cargan las bases de datos del índice de marginación a nivel estatal para los años `2010`, `2015` y `2020`. Las cuales se encuentran en formato `.RData`.   
+
+**Bases de datos**   
+- Nivel estatal    
+- Nivel municipal   
+- Nivel localidad   
+- Nivel AGEB  
+- Nivel Colonia    
+
+**Base de datos** de los tres años se encuentran disponibles en la página oficial de [CONAPO](https://www.gob.mx/conapo/documentos/indices-de-marginacion-2020-284372)   
+
+**Datos abiertos de México** [datos.gob.mx](https://datos.gob.mx/busca/dataset/indice-de-marginacion-carencias-poblacionales-por-localidad-municipio-y-entidad)   
+
+**Publicación** [Índice De Marginación Por Entidad Federativa Y Municipio 2020](https://www.gob.mx/conapo/documentos/indices-de-marginacion-2020-284372).    
+
+
+```{r}
+tablas <- c("2010", "2015", "2020")
+for(i in tablas){
+load(file = paste0(here::here(), "/Output/IME_", i, ".RData"))
+}
+```
+
+
+## Shapefiles
+
+A continuación, se leen y se transforman los shapefiles de las divisiones geográficas de los estados de México correspondientes a los años `2020`, `2015` y `2010`.   
+
+Utilizando la paquetería `rgdal`, se definen los siguientes parámetros:      
+ 
+- `readOGR`: Esta función se usa para leer shapefiles.   
+- `dsn`: Especifica la ruta al directorio que contiene el shapefile.  
+- `layer`: Especifica el nombre de la capa dentro del shapefile.  
+- `encoding`: Especifica la codificación de los caracteres, en este caso, UTF-8.  
+- `use_iconv`: Se usa para convertir la codificación si es necesario.  
+
+Una vez cargados los sahpefiles, se transforman los sistemas de coordenadas:     
+
+- `spTransform`: Esta función se usa para transformar las coordenadas del shapefile a un nuevo sistema de referencia.    
+- `CRSobj`: Especifica el sistema de referencia de coordenadas de destino. En este caso, se usa el sistema de coordenadas geográficas (latitud y longitud) basado en el elipsoide y `datum WGS84`.    
+
+
+Estos pasos son cruciales para asegurar que los datos geoespaciales sean consistentes y compatibles para su uso en análisis geográficos y visualización, por ejemplo, en aplicaciones de Leaflet o cualquier otro software de mapeo.   
+
+**Shapefile estados 2020**
+
+```{r, eval = FALSE}
+shape_estados_2020 <- readOGR(dsn = "D:/MGN/MGN 2020/MGN 2020/conjunto_de_datos",
+                               layer = "00ent",
+                                encoding = "UTF-8",
+                                 use_iconv = TRUE)
+
+shape_estados_2020 <- spTransform(shape_estados_2020, CRSobj = CRS('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'))
+```
+
+**Shapefile estados 2015**
+
+```{r, eval = FALSE}
+shape_estados_2015 <- readOGR(dsn ="D:/MGN/MGN Junio 2016/conjunto_de_datos", 
+                               layer = "areas_geoestadisticas_estatales",
+                                encoding = "UTF-8",
+                                 use_iconv = TRUE)
+
+shape_estados_2015 <- spTransform(shape_estados_2015, CRSobj = CRS('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'))
+```
+
+**Shapefile estados 2010**
+
+```{r, eval = FALSE}
+shape_estados_2010 <- readOGR(dsn ="D:/MGN/MGN 2010 Version 4.3 (Jul-Dic 2009)/32_Entidades_Federativas", 
+                               layer = "ESTADOS",
+                                encoding = "UTF-8",
+                                 use_iconv = TRUE)
+shape_estados_2010 <- spTransform(shape_estados_2010, CRSobj = CRS('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'))
+```
+
+
+
+### ShapefilesDataFrame
+
+Se cambian de `IDs` de los Features del Shapefile; de esta manera si se hace alguna manipulación al shapefile directamente los polígonos tendrán el ID de la clave de la entidad y conservarán el orden. Además de que es útil cuando se necesita asegurar que los IDs de las entidades geográficas sean consistentes en longitud y formato para su posterior análisis o visualización.     
+
+- `sp::spChFIDs` cambia los IDs de las features del objeto Spatial.
+- `str_pad(shape_estados_2020@data$CVE_ENT, 2, "left", pad = "0")`: Utiliza la función `str_pad()` para rellenar con ceros a la izquierda (si es necesario) para asegurarse de que cada ID tenga al menos 2 dígitos.     
+
+
+```{r, eval = FALSE}
+shape_estados_2020 <- shape_estados_2020 %>%
+                       select(CVE_ENT) %>%
+                         sp::spChFIDs(., str_pad(shape_estados_2020@data$CVE_ENT, 2, "left", pad = "0"))
+
+shape_estados_2015 <- shape_estados_2015 %>%
+                       select(CVE_ENT) %>%
+                         sp::spChFIDs(., str_pad(shape_estados_2015@data$CVE_ENT, 2, "left", pad = "0"))
+
+shape_estados_2010 <- shape_estados_2010 %>%
+                       select(CVE_ENT) %>%
+                         sp::spChFIDs(., str_pad(shape_estados_2010@data$CVE_ENT, 2, "left", pad = "0"))
+```
+
+
+
+**Se insertan los datos del índice de marginación y se seccionan por grado de marginación**  
+
+Este código realiza las siguientes acciones:
+
+- Selecciona las columnas `CVE_ENT` y `GM_` del dataframe `DP2_`.   
+- `stringr::str_trim(.$GM_, "both")`: Elimina los espacios en blanco al principio y al final de los valores en `GM_`.   
+- `fct_relevel(..., c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))`: Reordena los niveles del factor `GM_` en el orden especificado.   
+- `spdplyr:::left_join.Spatial()`,  Realiza un merge entre shape_estados_ y el dataframe modificado, usando `CVE_ENT` como clave.   
+
+El resultado es un nuevo objeto Spatial (capa_estados_2020) que combina la geometría de shape_estados_2020 con la información adicional de `DP2_`, incluyendo la columna `GM_` con niveles reordenados.    
+
+
+
+```{r, eval = FALSE}
+capa_estados_2020 <- shape_estados_2020 %>%
+                      spdplyr:::left_join.Spatial(., DP2_2020 %>% 
+                                                      select(CVE_ENT, ANIO, GM_2020) %>%  
+                                                       mutate(GM_2020 = fct_relevel(stringr::str_trim(.$GM_2020, "both"), c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))),
+                                                        by = c("CVE_ENT")) 
+
+capa_estados_2015 <- shape_estados_2015 %>%
+                      spdplyr:::left_join.Spatial(., DP2_2015 %>% 
+                                                      select(CVE_ENT, ANIO, GM_2015) %>%  
+                                                       mutate(GM_2015 = fct_relevel(stringr::str_trim(.$GM_2015, "both"), c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))),
+                                                        by = c("CVE_ENT")) 
+
+capa_estados_2010 <- shape_estados_2010 %>%
+                      spdplyr:::left_join.Spatial(., DP2_2010 %>% 
+                                                      select(CVE_ENT, ANIO, GM_2010) %>%  
+                                                       mutate(GM_2010 = fct_relevel(stringr::str_trim(.$GM_2010, "both"), c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))),
+                                                        by = c("CVE_ENT")) 
+```
+
+### Capas de estados separados por el grado de marginación   
+ 
+Se crean listas de capas de polígonos filtrados por los grados de marginación para los años `2020`, `2015` y `2010`.   
+- Las listas (`layers_estados_2020`, `layers_estados_2015`, `layers_estados_2010`), cada una con cinco elementos. Cada elemento es una capa de polígonos filtrada por un grado de marginación específico.
+
+```{r, eval = FALSE}
+grados <- c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
+
+layers_estados_2020 <- list()
+layers_estados_2015 <- list()
+layers_estados_2010 <- list()
+for(i in 1:5){
+  layers_estados_2020[[i]] <- capa_estados_2020  %>%
+                               filter(GM_2020 == grados[i])
+  layers_estados_2015[[i]] <- capa_estados_2015  %>%
+                               filter(GM_2015 == grados[i])
+  layers_estados_2010[[i]] <- capa_estados_2010  %>%
+                               filter(GM_2010 == grados[i])
+}
+```
+
+
+### geojson_json (Por grados de marginación)  
+
+Se convierten las capas de polígonos filtrados en objetos `GeoJSON`. Este proceso es útil para guardar las capas en un formato que puede ser fácilmente utilizado para visualización en la web o en aplicaciones de mapas interactivos.     
+
+- `geojsonio::geojson_json`: Esta función convierte un objeto espacial a formato `GeoJSON`.  
+- `geometry = "polygon"`: Especifica que las geometrías deben ser de tipo polígono. Esto es adecuado para las entidades geográficas de los estados que generalmente se representan como polígonos.   
+- `geojsonio::geojson_write`: Esta función escribe un objeto GeoJSON a un archivo.   
+
+
+Esto es útil para guardar y compartir datos espaciales en un formato ampliamente compatible, como GeoJSON, que puede ser fácilmente utilizado en aplicaciones web, sistemas de información geográfica (SIG), y otros contextos de análisis y visualización de datos geoespaciales.    
+
+
+```{r, eval = FALSE}
+capa_estados_2020_json <- list()
+capa_estados_2015_json <- list()
+capa_estados_2010_json <- list()
+for(i in 1:5){
+  capa_estados_2020_json[[i]] <- geojsonio::geojson_json(layers_estados_2020[[i]], geometry = "polygon")
+  capa_estados_2015_json[[i]] <- geojsonio::geojson_json(layers_estados_2015[[i]], geometry = "polygon")
+  capa_estados_2010_json[[i]] <- geojsonio::geojson_json(layers_estados_2010[[i]], geometry = "polygon")
+}
+```
+
+```{r}
+for(i in 1:5){
+ geojsonio::geojson_write(capa_estados_2020_json[[i]], file = paste0(here::here(), "/Output/estados_2020_", i, "_json.geojson")) 
+ geojsonio::geojson_write(capa_estados_2015_json[[i]], file = paste0(here::here(), "/Output/estados_2015_", i, "_json.geojson")) 
+ geojsonio::geojson_write(capa_estados_2010_json[[i]], file = paste0(here::here(), "/Output/estados_2010_", i, "_json.geojson")) 
+}
+```
+
+
+## GeoJson (Estados)  
+
+Se vuelve a leer un archivo `GeoJSON ` y realizan algunas operaciones adicionales en el objeto espacial resultante:   
+
+- `geojsonio::geojson_read()`: Esta función lee un archivo GeoJSON y lo convierte en un objeto espacial.   
+- `what = "sp"`: Especifica que el resultado debe ser un objeto Spatial (de la clase `sp`) y no un formato lineal `.json`.  
+- `sp::spChFIDs`: Esta función cambia los IDs de las features (FIDs) del objeto Spatial.    
+
+```{r}
+grados <- c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
+
+shape_estados_2020 <- list()
+shape_estados_2015 <- list()
+shape_estados_2010 <- list()
+for (i in 1:5){
+  shape_estados_2020[[paste0(grados[i])]] <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2020_", i, "_json.geojson"), what = "sp") %>%
+                                    sp::spChFIDs(.,  str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))
+  shape_estados_2015[[paste0(grados[i])]] <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2015_", i, "_json.geojson"), what = "sp") %>%
+                                    sp::spChFIDs(.,  str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))
+  shape_estados_2010[[paste0(grados[i])]] <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2010_", i, "_json.geojson"), what = "sp") %>% 
+                                    sp::spChFIDs(., str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))
+}
+
+shape_estados <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2020_json.geojson"), what = "sp") %>%
+                                          sp::spChFIDs(., str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))
+```
+
+## Leaflet 
+
+### Paleta de colores  
+
+Se crea una paleta de colores que se usará para mapear valores de una variable categórica a colores en una visualización de Leaflet.  
+
+```{r}
+paleta <- c("#13322B", #Muy alto
+            "#086953", #Alto 
+            "#4C9562", #Medio
+            "#D1BB9E", #Bajo
+            "#C3BA6D") # Muy bajo
+
+            
+## Paleta de colores                         
+mypalette <- leaflet::colorFactor(palette = paleta, 
+                                            domain = forcats::fct_relevel(DP2_2020$GM_2020, c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")), 
+                                            na.color = "transparent")
+```
+
+
+### Título 
+
+Se define el estilo y el contenido de un título para un mapa Leaflet utilizando `HTML` y `CSS` dentro de `R`.    
+
+- `tags$style(HTML("..."))`: Esta función permite incluir estilos CSS en el documento.   
+- `.leaflet-control.map-title`: Define una clase CSS que se aplicará al título del mapa.  
+- `tags$div(...)`: Crea un contenedor div en el cual se coloca el título del mapa.  
+- `tag.map.title`: Aplica los estilos definidos anteriormente a este contenedor div.  
+
+```{r}
+# Estructura del título
+tag.map.title <- tags$style(HTML("
+  .leaflet-control.map-title { 
+    transform: translate(-50%,20%);
+    position: fixed !important;
+    left: 50%;
+    text-align: center;
+    padding-left: 10px; 
+    padding-right: 10px; 
+    background: rgba(255,255,255,0.75);
+    font-weight: bold;
+    font-size: 28px;
+  }
+ ")) 
+
+# Nota de página
+title <- tags$div(
+  tag.map.title, HTML("Fuentes:Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020.")
+)  
+```
+
+### Límites del mapa    
+
+Se calcula el cuadro delimitador que contiene las coordenadas de los límitesde un objeto espacial utilizando la función `st_bbox()` de la librería `sf`.     
+
+- `xmin`: La coordenada mínima en el eje x (longitud mínima).   
+- `ymin`: La coordenada mínima en el eje y (latitud mínima).   
+- `xmax`: La coordenada máxima en el eje x (longitud máxima).   
+- `ymax`: La coordenada máxima en el eje y (latitud máxima).     
+
+```{r}
+bounding_box <- st_bbox(shape_estados)
+bounding_box
+```
+
+
+### Leaflet estructura   
+
+#### Se definen los años y los grados de marginación    
+
+- `years`: Un vector que contiene los años para los que tenemos datos de shapefiles.  
+- `grados`: Un vector que contiene los niveles de marginación.  
+
+Se asigna a la lista `shape_estados` los datos de shapefile correspondientes a cada año, el cual a su vez cada lista contiene a los niveles de marginación.     
+
+```{r}
+# Define los datos y años
+years <- c("2020", "2015", "2010")
+grados <-  c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
+
+shape_estados <- NULL
+for(i in 1:3){
+ shape_estados[[paste0(years[i])]] <- get(paste0("shape_estados_", years[i]))
+}
+```
+
+#### Se define una función para añadir capas de polígonos   
+
+Se define una función llamada `addPolygonLayer`, la cual añade una capa de polígonos a un mapa de Leaflet. Se tienen que especificar los argumentos:   
+
+- `map`: El objeto de mapa de Leaflet al que se le añadirá la nueva capa de polígonos.   
+- `data`: Los datos que contienen la información geográfica de los polígonos.   
+- `year`: Año asociado con los datos de los polígonos, usado para agrupar.    
+- `grado`: Grado asociado con los datos de los polígonos, también usado para agrupar.   
+- `paleta`: Paleta de colores que se usará para rellenar los polígonos.    
+
+```{r}
+# Define una función para añadir capas de polígonos
+addPolygonLayer <- function(map, data, year, grado, paleta, id) {
+                            map <- map %>%
+                                    addPolygons(data = data,
+                                                 fillColor = paleta,
+                                                  fillOpacity = 0.8,
+                                                   stroke = TRUE,
+                                                    weight = 1,
+                                                     dashArray = "1",
+                                                      opacity = 1,
+                                                       color = "#D4D0BD",
+                                                        group = grado,
+                                                         layerId = id
+                                                )
+                             return(map)
+}
+```
+
+####  Se crea el mapa inicial   
+
+Se crea un mapa centrado en unas coordenadas específicas (`lat = 23.6260333` y `lng = -102.5375005`), con un nivel de zoom fijo, y establece los límites máximos para evitar que el usuario se desplace fuera de una región definida. El mapa utiliza capa de OpenStreetMap tanto en la capa base como en una capa adicional de tiles del mismo proveedor.    
+
+```{r}
+rm(map)
+# Crear el mapa inicial
+map <- leaflet(options = leafletOptions(minZoom = 5, maxZoom = 5, zoomControl = FALSE)) %>%
+        addTiles() %>%
+         setView(lat = 23.6260333, lng = -102.5375005, zoom = 5) %>%
+          setMaxBounds(lng1 = bounding_box[1],
+                       lat1 = bounding_box[2],
+                       lng2 = bounding_box[3],
+                       lat2 = bounding_box[4]) %>%
+           addProviderTiles(providers$OpenStreetMap, options = providerTileOptions(minZoom = 5, maxZoom = 5))
+```
+
+
+#### Función `addPolygonLayer()`   
+
+Se añaden las capas de polígonos al mapa de Leaflet para cada combinación de año y grado. Se recorren todas las combinaciones posibles de años (`years`) y grados (`grados`), y para cada combinación, añade una capa de polígonos al mapa utilizando la función `addPolygonLayer`. La lista shape_estados contiene los datos geográficos organizados por año y grado, y la lista paleta proporciona la paleta de colores correspondiente para cada grado.    
+
+
+```{r}
+# Contador de IDs
+id_counter <- 1
+
+# Añadir capas de polígonos para cada año
+for (i in seq_along(years)) {
+  for(j in seq_along(grados)){
+           shape_estados[[i]][[j]] <- shape_estados[[i]][[j]] %>%
+                                        mutate(ID = str_pad(as.character(id_counter), 2, "left", pad = "0"))
+           map <- addPolygonLayer(map, 
+                                  shape_estados[[i]][[j]], 
+                                  year = ~ANIO, 
+                                  grado = ~get(paste0("GM_", years[i])), 
+                                  paleta = ~mypalette(get(paste0("GM_", years[i]))), 
+                                  id = union(~ID, ~ANIO))
+           id_counter <- id_counter + 1
+  }
+}
+map
+#paste0(paste0(str_pad(as.character(seq(1,16)), 2, "left", pad = "0")), c(rep("2020", 5), rep("2015", 5), rep("2010", 5)))
+```
+
+
+#### Se añade la leyenda y control de capas    
+
+Se añaden los controles adicionales y una leyenda al mapa de Leaflet, y luego se define un comportamiento personalizado para gestionar la visibilidad de las capas en función de la selección del usuario.    
+
+- `addLayersControl()`: Añade controles de capas al mapa.   
+- `overlayGroups = grados`: Grupos de capas superpuestas que el usuario puede activar o desactivar.   
+- `baseGroups = years`: Grupos de capas base entre los que el usuario puede cambiar.     
+- `options = layersControlOptions(collapsed = FALSE)`: Opciones para los controles de capas, incluyendo que el control no esté colapsado por defecto.    
+
+`htmlwidgets::onRender()`: Añade una función JavaScript personalizada para gestionar el comportamiento del mapa. 
+
+- `updateLayers`: se encarga de actualizar las capas visibles en el mapa en función de las selecciones del usuario en los controles de capas.       
+
+- `var selectedYear = document.querySelectorAll('.leaflet-control-layers-base input:checked')[0].nextSibling.innerText.trim();`: Obtiene el año seleccionado de los controles de capas base.    
+
+- `var selectedGrados = Array.from(document.querySelectorAll('.leaflet-control-layers-overlays input:checked')).map(input => input.nextSibling.innerText.trim());`: Obtiene los grados seleccionados de los controles de capas superpuestas.      
+
+**Ocultar todas las capas:**
+
+- Se itera sobre todas las capas del mapa y las elimina si tienen una opción group definida. 
+
+**Mostrando solo las capas del año seleccionado y los grados seleccionados:**    
+
+- Se itera sobre todas las capas del mapa y las añade de nuevo si pertenecen al año seleccionado y a uno de los grados seleccionados.  
+
+Los eventos `baselayerchange`, `overlayadd`, `overlayremove`: Añaden eventos para actualizar las capas visibles cuando el usuario cambia la capa base o añade/remueve capas superpuestas.     
+
+```{r}
+map <- map %>%
+  addControl(title, position = "bottomright") %>%
+  addLegend("bottomright", 
+            colors = paleta, 
+            labels = grados,
+            #values = ~forcats::fct_relevel(DP2_2020$GM_2020, c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
+            title = stringr::str_wrap("Grado de marginación", 15), 
+            opacity = 0.7) %>%
+  addLayersControl(
+    overlayGroups = grados,
+    baseGroups = years, 
+    options = layersControlOptions(collapsed = FALSE))
+map
+```
+
+```{r}
+# Añadir el script de control dinámico de capas usando onRender
+p <- map %>%
+      htmlwidgets::onRender("
+        function(el, x) {
+          var myMap = this;
+          var baseLayer = {'2020', '2015', '2010'};
+          myMap.eachLayer(function(layer) {
+            var id = layer.options.layerId;
+            if (id) {
+              if (!id.endsWith('_' + baseLayer)) {
+                layer.getElement().style.display = 'none';
+              }
+              }
+            }
+          });
+          myMap.on('baselayerchange', function(e) {
+            baseLayer = e.name;
+            myMap.eachLayer(function(layer) {
+              var id = layer.options.layerId;
+              if (id) {
+                if (!id.endsWith('_' + baseLayer)) {
+                  layer.getElement().style.display = 'none';
+                  layer.closePopup();
+                } else {
+                  layer.getElement().style.display = 'block';
+                }
+              }
+            });
+          });
+    
+          myMap.on('overlayadd', function(e) {
+            myMap.eachLayer(function(layer) {
+              var id = layer.options.layerId;
+              if (id) {
+                if (!id.endsWith('_' + baseLayer)) {
+                  layer.getElement().style.display = 'none';
+                } else {
+                  layer.getElement().style.display = 'block';
+                }
+              }
+            });
+          });
+        }")
+
+# Imprimir el mapa
+p
+```
+
+```{r}
+p <- map %>%
+      htmlwidgets::onRender("
+    function(el, x) {
+      // Crear grupos para overlay y base
+      var overlayGroups = {};
+      var baseGroups = {};
+      
+      // Añadir capas de polígonos para cada año y grado
+      var years = x.options.baseGroups;
+      var grados = x.options.overlayGroups;
+      
+      for (var i = 0; i < years.length; i++) {
+        for (var j = 0; j < grados.length; j++) {
+          var group_name = years[i] + ' ' + grados[j];
+          overlayGroups[group_name] = L.layerGroup();
+          baseGroups[years[i]] = L.layerGroup();
+        }
+      }
+      
+      // Añadir controles de capas al mapa
+      L.control.layers(baseGroups, overlayGroups, {collapsed: false}).addTo(this);
+    }
+  ")
+p
+```
+
+```{r}
+p <- map %>%
+       htmlwidgets::onRender("
+    function(el, x) {
+      var updateLegend = function () {
+          var selectedGroup = document.querySelectorAll('input:checked')[0].nextSibling.innerText.substr(1);
+
+          document.querySelectorAll('.legend').forEach(a => a.hidden=true);
+          document.querySelectorAll('.legend').forEach(l => {
+            if (l.children[0].children[0].innerText == selectedGroup) l.hidden=false;
+          });
+      };
+      updateLegend();
+      this.on('baselayerchange', e => updateLegend());
+    }")
+p
+```
+
+Se genera un Widget Interactivo con la función `saveWidget()`, 
+  
+
+**Consideraciones**   
+
+- `saveWidget`: Guarda el mapa interactivo como un archivo HTML, ideal para ser compartido y visualizado en navegadores web.    
+- `selfcontained = TRUE`: Indica que el archivo `HTML` generado incluirá todos los recursos necesarios (como `JavaScript` y `CSS`)  en él, haciendo que sea autocontenido y no dependiente de recursos externos.  
+- `mapshot`: Captura una imagen estática del mapa interactivo, útil para generar vistas previas o miniaturas sin necesidad de interacción directa.    
+
+Es importante que el uso combinado de saveWidget y mapshot en el mismo contexto podría no ser necesario. Normalmente, se elige uno u otro según la necesidad específica: guardar el mapa interactivo para ser utilizado en un sitio web (saveWidget) o capturar una imagen estática para propósitos de visualización o impresión (mapshot).    
+
+```{r}
+#saveRDS(map,  paste0(here::here(), "/Output/map_2020.RDS"))
+saveWidget(map,  paste0(here::here(), "/index.html"), selfcontained = TRUE)
+
+map %>% 
+ mapshot(url = paste0(here::here(), "/index.html")) 
+```
+
+
+# Librerías
+
+**Librerías que se usaron en el trabajo**
+
+```{r, echo = FALSE, eval = TRUE}
+sesion_info <- devtools::session_info()
+knitr::kable(dplyr::select(tibble::as_tibble(sesion_info$packages %>% dplyr::filter(attached == TRUE)),
+                    c(package, loadedversion, source))) %>%
+ kableExtra::kable_classic(full_width = TRUE, html_font = 'Montserrat Medium', font_size = 10) 
+```
+
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img src="https://i.creativecommons.org/l/by/4.0/88x31.png" alt="Creative Commons Licence" style="border-width:0"/></a><br />This work by [**Diana Villasana Ocampo**]{xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName"} is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.  
