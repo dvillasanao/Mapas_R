@@ -2258,37 +2258,36 @@ corresponden a los diferentes grados de marginación.<br />
 <li><code>id_year</code>: Crea una columna que combina el ID generado
 con el año correspondiente, por ejemplo, 0102020, 0202020, etc.</li>
 </ul>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">require</span>(purrr)</span>
-<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a><span class="co"># Define los grados y años</span></span>
-<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;2020&quot;</span>, <span class="st">&quot;2015&quot;</span>, <span class="st">&quot;2010&quot;</span>)</span>
-<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>grados <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Muy alto&quot;</span>, <span class="st">&quot;Alto&quot;</span>, <span class="st">&quot;Medio&quot;</span>, <span class="st">&quot;Bajo&quot;</span>, <span class="st">&quot;Muy bajo&quot;</span>)</span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a></span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="fu">list</span>(shape_estados_2020, shape_estados_2015, shape_estados_2010)</span>
-<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a></span>
-<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a><span class="co"># Función para generar el ID del 1 a 96</span></span>
-<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a>generate_ids <span class="ot">&lt;-</span> <span class="cf">function</span>(start, end) {</span>
-<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a>                  <span class="fu">str_pad</span>(<span class="fu">as.character</span>(<span class="fu">seq</span>(start, end)), <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>)</span>
-<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a>}</span>
-<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a></span>
-<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a><span class="co"># Aplicar la transformación a cada lista de shape_estados</span></span>
-<span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a>start_id <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb16-16"><a href="#cb16-16" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="fu">map2</span>(shape_estados, years, <span class="cf">function</span>(shape_files, year) {</span>
-<span id="cb16-17"><a href="#cb16-17" tabindex="-1"></a>                            shape_files <span class="ot">&lt;-</span> <span class="fu">map2</span>(shape_files, grados, <span class="cf">function</span>(shape_file, grado) {</span>
-<span id="cb16-18"><a href="#cb16-18" tabindex="-1"></a>                                                 <span class="cf">if</span> (<span class="fu">is.data.frame</span>(shape_file<span class="sc">@</span>data)) {</span>
-<span id="cb16-19"><a href="#cb16-19" tabindex="-1"></a>                                                      end_id <span class="ot">&lt;-</span> start_id <span class="sc">+</span> <span class="fu">nrow</span>(shape_file) <span class="sc">-</span> <span class="dv">1</span></span>
-<span id="cb16-20"><a href="#cb16-20" tabindex="-1"></a>                                                      shape_file <span class="ot">&lt;-</span> shape_file <span class="sc">%&gt;%</span></span>
-<span id="cb16-21"><a href="#cb16-21" tabindex="-1"></a>                                                                     <span class="fu">mutate</span>(<span class="at">ID =</span> <span class="fu">generate_ids</span>(start_id, end_id),</span>
-<span id="cb16-22"><a href="#cb16-22" tabindex="-1"></a>                                                                            <span class="at">ANIO =</span> year,</span>
-<span id="cb16-23"><a href="#cb16-23" tabindex="-1"></a>                                                                            <span class="at">id_year =</span> <span class="fu">paste0</span>(<span class="fu">generate_ids</span>(start_id, end_id), year))</span>
-<span id="cb16-24"><a href="#cb16-24" tabindex="-1"></a>                                                      start_id <span class="ot">&lt;&lt;-</span> end_id <span class="sc">+</span> <span class="dv">1</span></span>
-<span id="cb16-25"><a href="#cb16-25" tabindex="-1"></a>                                                     }</span>
-<span id="cb16-26"><a href="#cb16-26" tabindex="-1"></a>                                                 shape_file</span>
-<span id="cb16-27"><a href="#cb16-27" tabindex="-1"></a>                                                  }</span>
-<span id="cb16-28"><a href="#cb16-28" tabindex="-1"></a>                                                )</span>
-<span id="cb16-29"><a href="#cb16-29" tabindex="-1"></a>                            shape_files</span>
-<span id="cb16-30"><a href="#cb16-30" tabindex="-1"></a>  }</span>
-<span id="cb16-31"><a href="#cb16-31" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># Define los grados y años</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;2020&quot;</span>, <span class="st">&quot;2015&quot;</span>, <span class="st">&quot;2010&quot;</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>grados <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Muy alto&quot;</span>, <span class="st">&quot;Alto&quot;</span>, <span class="st">&quot;Medio&quot;</span>, <span class="st">&quot;Bajo&quot;</span>, <span class="st">&quot;Muy bajo&quot;</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="fu">list</span>(shape_estados_2020, shape_estados_2015, shape_estados_2010)</span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a><span class="co"># Función para generar el ID del 1 a 96</span></span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>generate_ids <span class="ot">&lt;-</span> <span class="cf">function</span>(start, end) {</span>
+<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a>                  <span class="fu">str_pad</span>(<span class="fu">as.character</span>(<span class="fu">seq</span>(start, end)), <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>)</span>
+<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a>}</span>
+<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a></span>
+<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a><span class="co"># Aplicar la transformación a cada lista de shape_estados</span></span>
+<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a>start_id <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="fu">map2</span>(shape_estados, years, <span class="cf">function</span>(shape_files, year) {</span>
+<span id="cb16-16"><a href="#cb16-16" tabindex="-1"></a>                            shape_files <span class="ot">&lt;-</span> <span class="fu">map2</span>(shape_files, grados, <span class="cf">function</span>(shape_file, grado) {</span>
+<span id="cb16-17"><a href="#cb16-17" tabindex="-1"></a>                                                 <span class="cf">if</span> (<span class="fu">is.data.frame</span>(shape_file<span class="sc">@</span>data)) {</span>
+<span id="cb16-18"><a href="#cb16-18" tabindex="-1"></a>                                                      end_id <span class="ot">&lt;-</span> start_id <span class="sc">+</span> <span class="fu">nrow</span>(shape_file) <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb16-19"><a href="#cb16-19" tabindex="-1"></a>                                                      shape_file <span class="ot">&lt;-</span> shape_file <span class="sc">%&gt;%</span></span>
+<span id="cb16-20"><a href="#cb16-20" tabindex="-1"></a>                                                                     <span class="fu">mutate</span>(<span class="at">ID =</span> <span class="fu">generate_ids</span>(start_id, end_id),</span>
+<span id="cb16-21"><a href="#cb16-21" tabindex="-1"></a>                                                                            <span class="at">ANIO =</span> year,</span>
+<span id="cb16-22"><a href="#cb16-22" tabindex="-1"></a>                                                                            <span class="at">id_year =</span> <span class="fu">paste0</span>(<span class="fu">generate_ids</span>(start_id, end_id), year))</span>
+<span id="cb16-23"><a href="#cb16-23" tabindex="-1"></a>                                                      start_id <span class="ot">&lt;&lt;-</span> end_id <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb16-24"><a href="#cb16-24" tabindex="-1"></a>                                                     }</span>
+<span id="cb16-25"><a href="#cb16-25" tabindex="-1"></a>                                                 shape_file</span>
+<span id="cb16-26"><a href="#cb16-26" tabindex="-1"></a>                                                  }</span>
+<span id="cb16-27"><a href="#cb16-27" tabindex="-1"></a>                                                )</span>
+<span id="cb16-28"><a href="#cb16-28" tabindex="-1"></a>                            shape_files</span>
+<span id="cb16-29"><a href="#cb16-29" tabindex="-1"></a>  }</span>
+<span id="cb16-30"><a href="#cb16-30" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="se-define-una-función-para-añadir-capas-de-polígonos" class="section level4">
 <h4>Se define una función para añadir capas de polígonos</h4>
@@ -2395,8 +2394,7 @@ año.</p>
 <span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a>                                  <span class="at">id =</span> <span class="sc">~</span>id_year</span>
 <span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a>                                  )</span>
 <span id="cb19-15"><a href="#cb19-15" tabindex="-1"></a>  }</span>
-<span id="cb19-16"><a href="#cb19-16" tabindex="-1"></a>}</span>
-<span id="cb19-17"><a href="#cb19-17" tabindex="-1"></a>map</span></code></pre></div>
+<span id="cb19-16"><a href="#cb19-16" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 <div id="se-añade-la-leyenda-y-control-de-capas" class="section level4">
 <h4>Se añade la leyenda y control de capas</h4>
