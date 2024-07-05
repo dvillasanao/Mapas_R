@@ -106,11 +106,11 @@ aplicaciones web y análisis.
 #### IMx2020 (RMapshaper)
 
 **Enlace:**
-<https://dvillasanao.github.io/Mapas_R/docs/01.02_Leaflet-por-año-y-grado-de-marginacion--GeoJSON-.html>
+<https://dvillasanao.github.io/Mapas_R/docs/01.03_Leaflet-por-año-y-grado-de-marginacion--RMapshaper-.html>
 
 <html>
 <body>
-<a href="https://dvillasanao.github.io/Mapas_R/docs/01.02_Leaflet-por-año-y-grado-de-marginacion--GeoJSON-.html" target="_blank">
+<a href="https://dvillasanao.github.io/Mapas_R/docs/01.03_Leaflet-por-año-y-grado-de-marginacion--RMapshaper-.html" target="_blank">
 <img src="img/03_img.png" width="50%" height="50%"> </a>
 </body>
 </html>
