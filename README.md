@@ -111,6 +111,6 @@ aplicaciones web y análisis.
 <html>
 <body>
 <a href="https://dvillasanao.github.io/Mapas_R/docs/01.03_Leaflet-por-año-y-grado-de-marginacion--RMapshaper-.html" target="_blank">
-<img src="img/03_img.png" width="50%" height="50%"> </a>
+<img src="img/04_img.png" width="50%" height="50%"> </a>
 </body>
 </html>
