@@ -441,7 +441,6 @@ Se generan algunas variables que van a ayudar a integrar los años y los grados 
 
 
 ```{r}
-require(purrr)
 # Define los grados y años
 years <- c("2020", "2015", "2010")
 grados <- c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
@@ -553,7 +552,6 @@ for (i in seq_along(years)) {
                                   )
   }
 }
-map
 ```
 
 
