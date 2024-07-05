@@ -499,11 +499,6 @@ map <- leaflet(options = leafletOptions(minZoom = 5, maxZoom = 5, zoomControl = 
 
 #### Función `addPolygonLayer()`   
 
-Se añaden las capas de polígonos al mapa de Leaflet para cada combinación de año y grado. Se recorren todas las combinaciones posibles de años (`years`) y grados (`grados`), y para cada combinación, añade una capa de polígonos al mapa utilizando la función `addPolygonLayer`. La lista shape_estados contiene los datos geográficos organizados por año y grado, y la lista paleta proporciona la paleta de colores correspondiente para cada grado.    
-
-
-#### Función `addPolygonLayer()`   
-
 Se construye dinámicamente un mapa interactivo que muestra diferentes capas de polígonos para los años `2020`, `2015` y `2010`, utilizando funciones y enfoques que permiten manejar de manera flexible los datos geoespaciales. Cada iteración del bucle añade una nueva capa de polígonos al mapa `map`, lo que permite visualizar los datos geoespaciales para cada año de manera superpuesta en el mismo mapa interactivo. Se recorren todas las combinaciones posibles de años (`years`), y se añade una capa de polígonos al mapa utilizando la función `addPolygonLayer`. La función contiene, los shape_estados que son los datos geográficos organizados por año y grado, la paleta de colores correspondiente para cada grado y el ID unico de cada observación correspondiente a cada año.  
 
 ```{r}
