@@ -32,12 +32,19 @@ h1.title {
 }
 h1 {
   color: #B6854D;
+  font-size: 30px;
 }
 h2 {
   color: #172984;
+  font-size: 25px;
 }
 h3 {
   color: #172984;
+  font-size: 20px;
+}
+h4 {
+  color: #174EC5;
+  font-size: 18px;
 }
 h5 {
   color: #B6854D;
