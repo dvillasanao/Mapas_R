@@ -69,7 +69,7 @@ Object Notation), donde se emplean el Sistema Geodésico Mundial de 1984
 (WGS84) como su sistema de referencia de coordenadas y utiliza grados
 decimales como unidades.
 
-### IMx2020 (Nivel entidad federativa, 2010 - 2020)
+#### IMx2020 (Nivel entidad federativa, 2010 - 2020)
 
 **Enlace:**
 <https://dvillasanao.github.io/Mapas_R/docs/01.01_Leaflet-por-a%C3%B1o-2010_2020--GeoJSON-.html>
@@ -81,7 +81,29 @@ decimales como unidades.
 </body>
 </html>
 
-### IMx2020 (Nivel entidad federativa desagregado por grado de marginación, 2010 - 2020)
+#### IMx2020 (Nivel entidad federativa desagregado por grado de marginación, 2010 - 2020)
+
+**Enlace:**
+<https://dvillasanao.github.io/Mapas_R/docs/01.02_Leaflet-por-año-y-grado-de-marginacion--GeoJSON-.html>
+
+<html>
+<body>
+<a href="https://dvillasanao.github.io/Mapas_R/docs/01.02_Leaflet-por-año-y-grado-de-marginacion--GeoJSON-.html" target="_blank">
+<img src="img/03_img.png" width="50%" height="50%"> </a>
+</body>
+</html>
+
+#### `RMapshaper`
+
+`RMapshaper` es un paquete que proporciona una interfaz para la
+biblioteca JavaScript **mapshaper**, que se utiliza para simplificar,
+transformar y analizar datos geoespaciales. Este paquete es
+especialmente útil para trabajar con archivos GeoJSON, Shapefiles y
+otros formatos de datos espaciales, reduciendo el tamaño del archivo y
+la complejidad de las geometrías, lo que puede mejorar el rendimiento en
+aplicaciones web y análisis.
+
+#### IMx2020 (RMapshaper)
 
 **Enlace:**
 <https://dvillasanao.github.io/Mapas_R/docs/01.02_Leaflet-por-año-y-grado-de-marginacion--GeoJSON-.html>
