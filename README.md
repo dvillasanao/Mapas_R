@@ -53,3 +53,32 @@ Tomando como base a el índice de marginación 2020.
 <img src="img/01_img.png" width="50%"> </a>
 </body>
 </html>
+
+### Manejo de diferentes datos en formato `JSON`
+
+#### `GeoJSON`
+
+Los archivos
+[GeoJSON](https://enterprise.arcgis.com/es/portal/latest/use/geojson.htm)
+son archivos de texto que almacenan datos geoespaciales en el formato de
+intercambio GeoJSON. Estos archivos se utilizan para representar
+entidades geográficas, como puntos, líneas y polígonos, junto con sus
+atributos no espaciales (metadatos). Cada entidad geográfica en un
+archivo GeoJSON se describe utilizando la sintaxis `JSON` (JavaScript
+Object Notation), donde se emplean el Sistema Geodésico Mundial de 1984
+(WGS84) como su sistema de referencia de coordenadas y utiliza grados
+decimales como unidades.
+
+### IMx2020 (Nivel entidad federativa, 2010 - 2020)
+
+**Enlace:**
+<https://dvillasanao.github.io/Mapas_R/docs/01.01_Leaflet-por-a%C3%B1o-2010_2020--GeoJSON-.html>
+
+<html>
+<body>
+<a href="https://dvillasanao.github.io/Mapas_R/docs/01.01_Leaflet-por-a%C3%B1o-2010_2020--GeoJSON-.html" target="_blank">
+<img src="img/02_img.png" width="50%" height="50%"> </a>
+</body>
+</html>
+
+### IMx2020 (Nivel entidad federativa desagregado por grado de marginación, 2010 - 2020)
