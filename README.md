@@ -82,3 +82,13 @@ decimales como unidades.
 </html>
 
 ### IMx2020 (Nivel entidad federativa desagregado por grado de marginación, 2010 - 2020)
+
+**Enlace:**
+<https://dvillasanao.github.io/Mapas_R/docs/01.02_Leaflet-por-año-y-grado-de-marginacion--GeoJSON-.html>
+
+<html>
+<body>
+<a href="https://dvillasanao.github.io/Mapas_R/docs/01.02_Leaflet-por-año-y-grado-de-marginacion--GeoJSON-.html" target="_blank">
+<img src="img/03_img.png" width="50%" height="50%"> </a>
+</body>
+</html>
