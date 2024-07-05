@@ -665,6 +665,8 @@ library(jsonlite)
 years <- c("2020", "2015", "2010")
 grados <-  c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
 
+shape_estados <- list(shape_estados_2020, shape_estados_2015, shape_estados_2010)
+
 # lista de TopoJSONs:
 shape_estados <- lapply(seq_along(years), function(i){
                   lapply(seq_along(grados), function(j){
@@ -678,7 +680,7 @@ generate_ids <- function(start, end) {
 }
 
 start_id <- 1
-shape_estados_<- map2(shape_estados, years, function(shape_files, year) {
+shape_estados<- map2(shape_estados, years, function(shape_files, year) {
                         shape_files <- map2(shape_files, grados, function(shape_file, grado) {
                             properties <- shape_file$objects$foo$geometries$properties
                             if (is.data.frame(properties)) {
@@ -687,16 +689,13 @@ shape_estados_<- map2(shape_estados, years, function(shape_files, year) {
                                                 mutate(ID = generate_ids(start_id, end_id),
                                                        ANIO = year,
                                                        id_year = paste0(generate_ids(start_id, end_id), year))
-                                shape_file$objects$foo$geometries$properties <- NULL
+                                shape_file$objects$foo$geometries$properties <- properties
                                 start_id <<- end_id + 1
                             }
                             shape_file
                         })
                         shape_files
 })
-
-shape_estados[[1]][[1]]$objects$foo$geometries$properties
-is.data.frame(shape_estados[[1]][[1]][["objects"]][["foo"]][["geometries"]][["properties"]])
 ```
 
 #### Se define una función para añadir capas de polígonos   
@@ -711,7 +710,7 @@ Se define una función llamada `addPolygonLayer`, la cual añade una capa de pol
 
 ```{r}
 # Define una función para añadir capas de polígonos
-addPolygonLayer <- function(map, data, year, grado, paleta, id) {
+addPolygonLayer <- function(map, data, year, grado, paleta) {
                             map <- map %>%
                                     addTopoJSON(data,
                                                  fillColor = paleta,
@@ -721,8 +720,8 @@ addPolygonLayer <- function(map, data, year, grado, paleta, id) {
                                                      dashArray = "1",
                                                       opacity = 1,
                                                        color = "#D4D0BD",
-                                                        group = grados,
-                                                         layerId = id
+                                                        group = grado
+                                                         
                                                 )
                              return(map)
 }
@@ -759,23 +758,18 @@ map <- base
 # Añadir capas de polígonos para cada año
 for (i in seq_along(years)) {
   for(j in seq_along(grados)){
-          id_year <- paste0(str_pad(as.character(id_counter), 2, "left", pad = "0"), years[i])
-           map <- addPolygonLayer(map, shape_estados[[i]][[j]], 
-                                   year = years[i], 
-                                    grado = grados[j], 
-                                     paleta = paleta[j], 
-                                      id = id_year)
+           map <- addPolygonLayer(map, 
+                                   data = shape_estados_[[i]][[j]], 
+                                    year = years[i], 
+                                     grado = grados[j], 
+                                      paleta = paleta[j]
+                                       #id = paste0(str_pad(id_counter, 2, "left", pad = "0"), years[i])
+                                  )
            id_counter <- id_counter + 1
   }
 }
 map
-class(shape_estados_2010[[1]])
 ```
-```{r}
-require(jsonlite)
-p <- fromJSON(shape_estados_2010[[1]]) 
-```
-
 
 #### Se añade la leyenda y control de capas    
 
@@ -796,8 +790,9 @@ map <- map %>%
                     opacity = 0.7) %>%
           addLayersControl(
            overlayGroups = c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"),
-            baseGroups = c("2010"), 
+           # baseGroups = c("2010"), 
              options = layersControlOptions(collapsed = FALSE))
+map
 ```
 
 
