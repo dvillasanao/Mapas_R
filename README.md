@@ -114,3 +114,32 @@ aplicaciones web y análisis.
 <img src="img/04_img.png" width="50%" height="50%"> </a>
 </body>
 </html>
+
+#### `TopoJSON`
+
+Los archivos `TopoJSON`; es un formato para codificar datos geográficos
+que mejora la eficiencia sobre GeoJSON. Comprime los datos compartiendo
+aristas entre geometrías vecinas y reduciendo redundancias.
+
+- `Optimización de datos`: Es un formato más eficiente que optimiza la
+  representación de datos geoespaciales.  
+- `Topología compartida`: Utiliza una estructura de topología
+  compartida. Esto significa que las fronteras comunes entre polígonos
+  se comparten, lo que reduce la redundancia de datos y, por lo tanto,
+  el tamaño del archivo.  
+- `Proceso de conversión`: `TopoJSON` necesita ser convertido a
+  `GeoJSON` o a otros formatos compatibles antes de ser utilizado en la
+  mayoría de las aplicaciones GIS y bibliotecas de visualización,
+  incluyendo Leaflet.
+
+#### IMx2020 (TopoJSON)
+
+**Enlace:**
+<https://dvillasanao.github.io/Mapas_R/docs/01.04_Leaflet-por-año-y-grado-de-marginacion--TopoJSON-.html>
+
+<html>
+<body>
+<a href="https://dvillasanao.github.io/Mapas_R/docs/01.04_Leaflet-por-año-y-grado-de-marginacion--TopoJSON-.html" target="_blank">
+<img src="img/05_img.png" width="50%" height="50%"> </a>
+</body>
+</html>
