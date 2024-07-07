@@ -1583,17 +1583,24 @@ font-family: "Montserrat";
 font-size: 14px
 }
 h1.title {
-font-size: 40px;
+font-size: 35px;
 color: #1C3BA4;
 }
 h1 {
 color: #B6854D;
+font-size: 30px;
 }
 h2 {
 color: #172984;
+font-size: 25px;
 }
 h3 {
 color: #172984;
+font-size: 20px;
+}
+h4 {
+color: #174EC5;
+font-size: 18px;
 }
 h5 {
 color: #B6854D;
@@ -1830,41 +1837,57 @@ contextos de análisis y visualización de datos geoespaciales.</p>
 <code>TopoJSON</code>, utilizando la función <code>geo2topo</code> del
 paquete <code>geojsonio</code>. Sin embargo, hay un pequeño ajuste que
 se debe hacer para que funcione correctamente.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">require</span>(geojsonio)</span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>capa_estados_2020_topojson <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>capa_estados_2015_topojson <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>capa_estados_2010_topojson <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>){</span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>  capa_estados_2020_topojson[[i]] <span class="ot">&lt;-</span> capa_estados_2020_json[[i]] <span class="sc">%&gt;%</span> geojsonio<span class="sc">::</span><span class="fu">geo2topo</span>()</span>
-<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>  capa_estados_2015_topojson[[i]] <span class="ot">&lt;-</span> capa_estados_2015_json[[i]] <span class="sc">%&gt;%</span> geojsonio<span class="sc">::</span><span class="fu">geo2topo</span>()</span>
-<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>  capa_estados_2010_topojson[[i]] <span class="ot">&lt;-</span> capa_estados_2010_json[[i]] <span class="sc">%&gt;%</span> geojsonio<span class="sc">::</span><span class="fu">geo2topo</span>()</span>
-<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>}</span>
-<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a></span>
-<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="do">## Se guardan las listas en formato .RDS, para trabajarlas más adelante. </span></span>
-<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="do">## Podemos trabajar directamente con el formato lineal de topojson</span></span>
-<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="fu">saveRDS</span>(capa_estados_2020_topojson, <span class="at">file =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/capa_estados_topojson_2020.rds&quot;</span>))</span>
-<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="fu">saveRDS</span>(capa_estados_2015_topojson, <span class="at">file =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/capa_estados_topojson_2015.rds&quot;</span>))</span>
-<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="fu">saveRDS</span>(capa_estados_2010_topojson, <span class="at">file =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/capa_estados_topojson_2010.rds&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>capa_estados_2020_topojson <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>capa_estados_2015_topojson <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>capa_estados_2010_topojson <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>){</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>  capa_estados_2020_topojson[[i]] <span class="ot">&lt;-</span> capa_estados_2020_json[[i]] <span class="sc">%&gt;%</span> geojsonio<span class="sc">::</span><span class="fu">geo2topo</span>()</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>  capa_estados_2015_topojson[[i]] <span class="ot">&lt;-</span> capa_estados_2015_json[[i]] <span class="sc">%&gt;%</span> geojsonio<span class="sc">::</span><span class="fu">geo2topo</span>()</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>  capa_estados_2010_topojson[[i]] <span class="ot">&lt;-</span> capa_estados_2010_json[[i]] <span class="sc">%&gt;%</span> geojsonio<span class="sc">::</span><span class="fu">geo2topo</span>()</span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>}</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="do">## Se guardan las listas en formato .RDS, para trabajarlas más adelante. </span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="do">## Podemos trabajar directamente con el formato lineal de topojson</span></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="fu">saveRDS</span>(capa_estados_2020_topojson, <span class="at">file =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/capa_estados_topojson_2020.rds&quot;</span>))</span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="fu">saveRDS</span>(capa_estados_2015_topojson, <span class="at">file =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/capa_estados_topojson_2015.rds&quot;</span>))</span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="fu">saveRDS</span>(capa_estados_2010_topojson, <span class="at">file =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/capa_estados_topojson_2010.rds&quot;</span>))</span></code></pre></div>
 </div>
 <div id="topojson_write" class="section level3">
 <h3><code>topojson_write()</code></h3>
-<p>La función<code>geojson_write</code> del paquete
+<p>La función <code>topojson_write()</code> del paquete
 <code>geojsonio</code> para escribir archivos <code>GeoJSON</code> a
 partir de los datos en las listas. Este código permitirá generar
 múltiples archivos GeoJSON, uno para cada combinación de año
 (<code>2020</code>, <code>2015</code>, <code>2010</code>) y dentro cada
 grado de marginación.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>){</span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a> <span class="fu">topojson_write</span>(capa_estados_2020_topojson[[i]], </span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>                <span class="at">geometry =</span> <span class="st">&quot;polygon&quot;</span>,</span>
-<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>                <span class="at">file =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/estados_2020_&quot;</span>, i, <span class="st">&quot;_topojson.geojson&quot;</span>)) </span>
-<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a> <span class="fu">topojson_write</span>(capa_estados_2015_topojson[[i]], </span>
-<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>                <span class="at">geometry =</span> <span class="st">&quot;polygon&quot;</span>, </span>
-<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>                <span class="at">file =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/estados_2015_&quot;</span>, i, <span class="st">&quot;_topojson.geojson&quot;</span>)) </span>
-<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a> <span class="fu">topojson_write</span>(capa_estados_2010_topojson[[i]], </span>
-<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>                <span class="at">geometry =</span> <span class="st">&quot;polygon&quot;</span>,</span>
-<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>                <span class="at">file =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/estados_2010_&quot;</span>, i, <span class="st">&quot;_topojson.geojson&quot;</span>)) </span>
-<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>grados <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Muy alto&quot;</span>, <span class="st">&quot;Alto&quot;</span>, <span class="st">&quot;Medio&quot;</span>, <span class="st">&quot;Bajo&quot;</span>, <span class="st">&quot;Muy bajo&quot;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>){</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a> <span class="fu">topojson_write</span>(capa_estados_2020_topojson[[i]], </span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>                 <span class="at">geometry =</span> <span class="st">&quot;polygon&quot;</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>                <span class="at">file =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/estados_2020_&quot;</span>, i, <span class="st">&quot;_topojson.geojson&quot;</span>), )</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a> <span class="fu">topojson_write</span>(capa_estados_2015_topojson[[i]], </span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>                <span class="at">geometry =</span> <span class="st">&quot;polygon&quot;</span>, </span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>                <span class="at">file =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/estados_2015_&quot;</span>, i, <span class="st">&quot;_topojson.geojson&quot;</span>)) </span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a> <span class="fu">topojson_write</span>(capa_estados_2010_topojson[[i]], </span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>                <span class="at">geometry =</span> <span class="st">&quot;polygon&quot;</span>,</span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a>                <span class="at">file =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/estados_2010_&quot;</span>, i, <span class="st">&quot;_topojson.geojson&quot;</span>)) </span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<div id="writelines" class="section level3">
+<h3><code>writeLines()</code></h3>
+<p>La función <code>writeLines</code> escribe las líneas de texto de un
+objeto en un archivo. En este caso, los objetos <code>TopoJSON</code>,
+generar múltiples archivos uno para cada combinación de año
+(<code>2020</code>, <code>2015</code>, <code>2010</code>) y dentro cada
+grado de marginación, donde se escriben directamente en archivos con
+formato .topojson.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>grados <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Muy alto&quot;</span>, <span class="st">&quot;Alto&quot;</span>, <span class="st">&quot;Medio&quot;</span>, <span class="st">&quot;Bajo&quot;</span>, <span class="st">&quot;Muy bajo&quot;</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>){</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a> <span class="fu">writeLines</span>(capa_estados_2020_topojson[[i]], <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/estados_2020_&quot;</span>, i, <span class="st">&quot;_topojson.topojson&quot;</span>)) </span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a> <span class="fu">writeLines</span>(capa_estados_2015_topojson[[i]], <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/estados_2015_&quot;</span>, i, <span class="st">&quot;_topojson.topojson&quot;</span>)) </span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a> <span class="fu">writeLines</span>(capa_estados_2010_topojson[[i]], <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/estados_2010_&quot;</span>, i, <span class="st">&quot;_topojson.topojson&quot;</span>)) </span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>}</span></code></pre></div>
 <p>La diferencia principal entre <code>GeoJSON</code> y
 <code>TopoJSON</code> radica en cómo representan y manejan la
 información geoespacial:</p>
@@ -1884,24 +1907,28 @@ debido a la repetición de coordenadas y la estructura directa de las
 geometrías.</li>
 </ul>
 <p><code>TopoJSON</code>:</p>
-<p><code>Optimización de datos</code>: <code>TopoJSON</code> es un
+<ul>
+<li><code>Optimización de datos</code>: <code>TopoJSON</code> es un
 formato más eficiente que optimiza la representación de datos
 geoespaciales.<br />
-<code>Topología compartida</code>: En lugar de representar cada
+</li>
+<li><code>Topología compartida</code>: En lugar de representar cada
 geometría directamente, <code>TopoJSON</code> utiliza una estructura de
 topología compartida. Esto significa que las fronteras comunes entre
 polígonos se comparten, lo que reduce la redundancia de datos y, por lo
 tanto, el tamaño del archivo.<br />
-<code>Proceso de conversión</code>: <code>TopoJSON</code> necesita ser
-convertido a <code>GeoJSON</code> o a otros formatos compatibles antes
-de ser utilizado en la mayoría de las aplicaciones GIS y bibliotecas de
-visualización, incluyendo Leaflet.</p>
+</li>
+<li><code>Proceso de conversión</code>: <code>TopoJSON</code> necesita
+ser convertido a <code>GeoJSON</code> o a otros formatos compatibles
+antes de ser utilizado en la mayoría de las aplicaciones GIS y
+bibliotecas de visualización, incluyendo Leaflet.</li>
+</ul>
 </div>
 </div>
 <div id="geojson-estados" class="section level2">
 <h2>GeoJson (Estados)</h2>
-<p>Se vuelve a leer un archivo <code>GeoJSON</code> y realizan algunas
-operaciones adicionales en el objeto espacial resultante:</p>
+<p>👇 Se vuelve a leer un archivo <code>GeoJSON</code> y realizan
+algunas operaciones adicionales en el objeto espacial resultante:</p>
 <ul>
 <li><code>geojsonio::geojson_read()</code>: Esta función lee un archivo
 GeoJSON y lo convierte en un objeto espacial.<br />
@@ -1913,22 +1940,29 @@ objeto Spatial (de la clase <code>sp</code>) y no un formato lineal
 <li><code>sp::spChFIDs</code>: Esta función cambia los IDs de las
 features (FIDs) del objeto Spatial.</li>
 </ul>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>grados <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Muy alto&quot;</span>, <span class="st">&quot;Alto&quot;</span>, <span class="st">&quot;Medio&quot;</span>, <span class="st">&quot;Bajo&quot;</span>, <span class="st">&quot;Muy bajo&quot;</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>shape_estados_2020 <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>shape_estados_2015 <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>shape_estados_2010 <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>){</span>
-<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>  shape_estados_2020[[<span class="fu">paste0</span>(grados[i])]] <span class="ot">&lt;-</span> geojsonio<span class="sc">::</span><span class="fu">geojson_read</span>(<span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/estados_2020_&quot;</span>, i, <span class="st">&quot;_topojson.geojson&quot;</span>), <span class="at">what =</span> <span class="st">&quot;sp&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>                                    sp<span class="sc">::</span><span class="fu">spChFIDs</span>(.,  <span class="fu">str_pad</span>(.<span class="sc">@</span>data<span class="sc">$</span>CVE_ENT, <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>))</span>
-<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>  shape_estados_2015[[<span class="fu">paste0</span>(grados[i])]] <span class="ot">&lt;-</span> geojsonio<span class="sc">::</span><span class="fu">geojson_read</span>(<span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/estados_2015_&quot;</span>, i, <span class="st">&quot;_topojson.geojson&quot;</span>), <span class="at">what =</span> <span class="st">&quot;sp&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>                                    sp<span class="sc">::</span><span class="fu">spChFIDs</span>(.,  <span class="fu">str_pad</span>(.<span class="sc">@</span>data<span class="sc">$</span>CVE_ENT, <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>))</span>
-<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a>  shape_estados_2010[[<span class="fu">paste0</span>(grados[i])]] <span class="ot">&lt;-</span> geojsonio<span class="sc">::</span><span class="fu">geojson_read</span>(<span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/estados_2010_&quot;</span>, i, <span class="st">&quot;_topojson.geojson&quot;</span>), <span class="at">what =</span> <span class="st">&quot;sp&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a>                                    sp<span class="sc">::</span><span class="fu">spChFIDs</span>(., <span class="fu">str_pad</span>(.<span class="sc">@</span>data<span class="sc">$</span>CVE_ENT, <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>))</span>
-<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a>}</span>
-<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a></span>
-<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> geojsonio<span class="sc">::</span><span class="fu">geojson_read</span>(<span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/estados_2020_json.geojson&quot;</span>), <span class="at">what =</span> <span class="st">&quot;sp&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a>                                          sp<span class="sc">::</span><span class="fu">spChFIDs</span>(., <span class="fu">str_pad</span>(.<span class="sc">@</span>data<span class="sc">$</span>CVE_ENT, <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>grados <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Muy alto&quot;</span>, <span class="st">&quot;Alto&quot;</span>, <span class="st">&quot;Medio&quot;</span>, <span class="st">&quot;Bajo&quot;</span>, <span class="st">&quot;Muy bajo&quot;</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>shape_estados_2020 <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>shape_estados_2015 <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>shape_estados_2010 <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>){</span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>  shape_estados_2020[[<span class="fu">paste0</span>(grados[i])]] <span class="ot">&lt;-</span> geojsonio<span class="sc">::</span><span class="fu">geojson_read</span>(<span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/estados_2020_&quot;</span>, i, <span class="st">&quot;_topojson.geojson&quot;</span>), </span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>                                                                      <span class="at">what =</span> <span class="st">&quot;sp&quot;</span>, <span class="at">parse =</span> <span class="cn">TRUE</span>, <span class="at">stringsAsFactors =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a>                                                         sp<span class="sc">::</span><span class="fu">spChFIDs</span>(.,  <span class="fu">str_pad</span>(.<span class="sc">@</span>data<span class="sc">$</span>CVE_ENT, <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>                                                          <span class="fu">mutate</span>(<span class="at">id =</span> <span class="fu">str_pad</span>(.<span class="sc">@</span>data<span class="sc">$</span>CVE_ENT, <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>))    </span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a>  shape_estados_2015[[<span class="fu">paste0</span>(grados[i])]] <span class="ot">&lt;-</span> geojsonio<span class="sc">::</span><span class="fu">geojson_read</span>(<span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/estados_2015_&quot;</span>, i, <span class="st">&quot;_topojson.geojson&quot;</span>), </span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a>                                                                      <span class="at">what =</span> <span class="st">&quot;sp&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a>                                                         sp<span class="sc">::</span><span class="fu">spChFIDs</span>(.,  <span class="fu">str_pad</span>(.<span class="sc">@</span>data<span class="sc">$</span>CVE_ENT, <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a>                                                          <span class="fu">mutate</span>(<span class="at">id =</span> <span class="fu">str_pad</span>(.<span class="sc">@</span>data<span class="sc">$</span>CVE_ENT, <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>))    </span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a>  shape_estados_2010[[<span class="fu">paste0</span>(grados[i])]] <span class="ot">&lt;-</span> geojsonio<span class="sc">::</span><span class="fu">geojson_read</span>(<span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/estados_2010_&quot;</span>, i, <span class="st">&quot;_topojson.geojson&quot;</span>), </span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a>                                                                      <span class="at">what =</span> <span class="st">&quot;sp&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a>                                                         sp<span class="sc">::</span><span class="fu">spChFIDs</span>(., <span class="fu">str_pad</span>(.<span class="sc">@</span>data<span class="sc">$</span>CVE_ENT, <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a>                                                          <span class="fu">mutate</span>(<span class="at">id =</span> <span class="fu">str_pad</span>(.<span class="sc">@</span>data<span class="sc">$</span>CVE_ENT, <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>))    </span>
+<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a>}</span>
+<span id="cb12-20"><a href="#cb12-20" tabindex="-1"></a></span>
+<span id="cb12-21"><a href="#cb12-21" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> geojsonio<span class="sc">::</span><span class="fu">geojson_read</span>(<span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/estados_2020_json.geojson&quot;</span>), </span>
+<span id="cb12-22"><a href="#cb12-22" tabindex="-1"></a>                                         <span class="at">what =</span> <span class="st">&quot;sp&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-23"><a href="#cb12-23" tabindex="-1"></a>                                        sp<span class="sc">::</span><span class="fu">spChFIDs</span>(., <span class="fu">str_pad</span>(.<span class="sc">@</span>data<span class="sc">$</span>CVE_ENT, <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>))</span></code></pre></div>
 </div>
 <div id="leaflet" class="section level2">
 <h2>Leaflet</h2>
@@ -1937,7 +1971,7 @@ features (FIDs) del objeto Spatial.</li>
 directamente archivos GeoJSON para la visualización de datos
 geoespaciales. Es compatible de manera nativa con GeoJSON, lo que
 significa que puedes agregar capas de GeoJSON directamente al mapa
-Leaflet usando funciones como addGeoJSON.</p></li>
+Leaflet usando funciones como <code>addGeoJSON</code>.</p></li>
 <li><p><code>TopoJSON en Leaflet</code>: Aunque Leaflet no puede manejar
 directamente archivos TopoJSON, puedes convertir archivos TopoJSON a
 GeoJSON utilizando herramientas como
@@ -1949,17 +1983,17 @@ TopoJSON mientras se trabaja con Leaflet.</p></li>
 <h3>Paleta de colores</h3>
 <p>Se crea una paleta de colores que se usará para mapear valores de una
 variable categórica a colores en una visualización de Leaflet.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>paleta <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;#13322B&quot;</span>, <span class="co">#Muy alto</span></span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>            <span class="st">&quot;#086953&quot;</span>, <span class="co">#Alto </span></span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>            <span class="st">&quot;#4C9562&quot;</span>, <span class="co">#Medio</span></span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>            <span class="st">&quot;#D1BB9E&quot;</span>, <span class="co">#Bajo</span></span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>            <span class="st">&quot;#C3BA6D&quot;</span>) <span class="co"># Muy bajo</span></span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>            </span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="do">## Paleta de colores                         </span></span>
-<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a>mypalette <span class="ot">&lt;-</span> leaflet<span class="sc">::</span><span class="fu">colorFactor</span>(<span class="at">palette =</span> paleta, </span>
-<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>                                            <span class="at">domain =</span> forcats<span class="sc">::</span><span class="fu">fct_relevel</span>(DP2_2020<span class="sc">$</span>GM_2020, <span class="fu">c</span>(<span class="st">&quot;Muy alto&quot;</span>, <span class="st">&quot;Alto&quot;</span>, <span class="st">&quot;Medio&quot;</span>, <span class="st">&quot;Bajo&quot;</span>, <span class="st">&quot;Muy bajo&quot;</span>)), </span>
-<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a>                                            <span class="at">na.color =</span> <span class="st">&quot;transparent&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>paleta <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;#13322B&quot;</span>, <span class="co">#Muy alto</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>            <span class="st">&quot;#086953&quot;</span>, <span class="co">#Alto </span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>            <span class="st">&quot;#4C9562&quot;</span>, <span class="co">#Medio</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>            <span class="st">&quot;#D1BB9E&quot;</span>, <span class="co">#Bajo</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>            <span class="st">&quot;#C3BA6D&quot;</span>) <span class="co"># Muy bajo</span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>            </span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="do">## Paleta de colores                         </span></span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a>mypalette <span class="ot">&lt;-</span> leaflet<span class="sc">::</span><span class="fu">colorFactor</span>(<span class="at">palette =</span> paleta, </span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a>                                            <span class="at">domain =</span> forcats<span class="sc">::</span><span class="fu">fct_relevel</span>(DP2_2020<span class="sc">$</span>GM_2020, <span class="fu">c</span>(<span class="st">&quot;Muy alto&quot;</span>, <span class="st">&quot;Alto&quot;</span>, <span class="st">&quot;Medio&quot;</span>, <span class="st">&quot;Bajo&quot;</span>, <span class="st">&quot;Muy bajo&quot;</span>)), </span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a>                                            <span class="at">na.color =</span> <span class="st">&quot;transparent&quot;</span>)</span></code></pre></div>
 </div>
 <div id="título" class="section level3">
 <h3>Título</h3>
@@ -1979,25 +2013,25 @@ coloca el título del mapa.<br />
 <li><code>tag.map.title</code>: Aplica los estilos definidos
 anteriormente a este contenedor div.</li>
 </ul>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># Estructura del título</span></span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>tag.map.title <span class="ot">&lt;-</span> tags<span class="sc">$</span><span class="fu">style</span>(<span class="fu">HTML</span>(<span class="st">&quot;</span></span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="st">  .leaflet-control.map-title { </span></span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="st">    transform: translate(-50%,20%);</span></span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="st">    position: fixed !important;</span></span>
-<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="st">    left: 50%;</span></span>
-<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="st">    text-align: center;</span></span>
-<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="st">    padding-left: 10px; </span></span>
-<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="st">    padding-right: 10px; </span></span>
-<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="st">    background: rgba(255,255,255,0.75);</span></span>
-<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="st">    font-weight: bold;</span></span>
-<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a><span class="st">    font-size: 28px;</span></span>
-<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a><span class="st">  }</span></span>
-<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a><span class="st"> &quot;</span>)) </span>
-<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a></span>
-<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a><span class="co"># Nota de página</span></span>
-<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a>title <span class="ot">&lt;-</span> tags<span class="sc">$</span><span class="fu">div</span>(</span>
-<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a>  tag.map.title, <span class="fu">HTML</span>(<span class="st">&quot;Fuentes:Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020.&quot;</span>)</span>
-<span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a>)  </span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># Estructura del título</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>tag.map.title <span class="ot">&lt;-</span> tags<span class="sc">$</span><span class="fu">style</span>(<span class="fu">HTML</span>(<span class="st">&quot;</span></span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="st">  .leaflet-control.map-title { </span></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="st">    transform: translate(-50%,20%);</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="st">    position: fixed !important;</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="st">    left: 50%;</span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="st">    text-align: center;</span></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="st">    padding-left: 10px; </span></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="st">    padding-right: 10px; </span></span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="st">    background: rgba(255,255,255,0.75);</span></span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="st">    font-weight: bold;</span></span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a><span class="st">    font-size: 28px;</span></span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a><span class="st">  }</span></span>
+<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a><span class="st"> &quot;</span>)) </span>
+<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a></span>
+<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a><span class="co"># Nota de página</span></span>
+<span id="cb14-17"><a href="#cb14-17" tabindex="-1"></a>title <span class="ot">&lt;-</span> tags<span class="sc">$</span><span class="fu">div</span>(</span>
+<span id="cb14-18"><a href="#cb14-18" tabindex="-1"></a>  tag.map.title, <span class="fu">HTML</span>(<span class="st">&quot;Fuentes:Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020.&quot;</span>)</span>
+<span id="cb14-19"><a href="#cb14-19" tabindex="-1"></a>)  </span></code></pre></div>
 </div>
 <div id="límites-del-mapa" class="section level3">
 <h3>Límites del mapa</h3>
@@ -2017,9 +2051,9 @@ máxima).<br />
 <li><code>ymax</code>: La coordenada máxima en el eje y (latitud
 máxima).</li>
 </ul>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>bounding_box <span class="ot">&lt;-</span> <span class="fu">st_bbox</span>(shape_estados)</span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>bounding_box </span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="co">#bounding_box &lt;- c(-118.4, 14.5, -86.7, 32.7)</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>bounding_box <span class="ot">&lt;-</span> <span class="fu">st_bbox</span>(shape_estados)</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>bounding_box </span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="co">#bounding_box &lt;- c(-118.4, 14.5, -86.7, 32.7)</span></span></code></pre></div>
 </div>
 <div id="leaflet-estructura" class="section level3">
 <h3>Leaflet estructura</h3>
@@ -2050,7 +2084,15 @@ grados de marginación. Para cada data frame de los
 <code>SpatiaPolygonsDataFrame</code>, se le añaden varias columnas
 nuevas: una con IDs únicos, otra con el año correspondiente, otra con
 una combinación de ID y año.</p>
-<p><strong>Vector y función</strong><br />
+<p><strong>Transformación de Coordenadas</strong></p>
+<p>Se asegura que cada shapefile tenga un sistema de coordenadas
+uniforme. Utilizando la función <code>map2()</code> de
+<code>purrr</code> para iterar sobre las listas anidadas de shapefiles y
+sus años correspondientes. Dentro de la función anidada, se itera sobre
+cada shapefile y sus grados correspondientes, asignandoles el sistema de
+coordenadas <code>CRS &quot;+init=epsg:4326&quot;</code>a cada shapefile y se
+transforma a este sistema de coordenadas.</p>
+<p><strong>Vectores y funciónes</strong><br />
 - <code>years</code>: Se define un vector con los años
 <code>2020</code>, <code>2015</code> y <code>2010</code>.<br />
 - <code>generate_ids</code>: Es una función que genera una secuencia de
@@ -2076,36 +2118,108 @@ corresponden a los diferentes grados de marginación.<br />
 <li><code>id_year</code>: Crea una columna que combina el ID generado
 con el año correspondiente, por ejemplo, 0102020, 0202020, etc.</li>
 </ul>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="co"># Define los grados y años</span></span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;2020&quot;</span>, <span class="st">&quot;2015&quot;</span>, <span class="st">&quot;2010&quot;</span>)</span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>grados <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Muy alto&quot;</span>, <span class="st">&quot;Alto&quot;</span>, <span class="st">&quot;Medio&quot;</span>, <span class="st">&quot;Bajo&quot;</span>, <span class="st">&quot;Muy bajo&quot;</span>)</span>
-<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a></span>
-<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="fu">list</span>(shape_estados_2020, shape_estados_2015, shape_estados_2010)</span>
-<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a></span>
-<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a><span class="co"># Función para generar el ID del 1 a 96</span></span>
-<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a>generate_ids <span class="ot">&lt;-</span> <span class="cf">function</span>(start, end) {</span>
-<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a>                  <span class="fu">str_pad</span>(<span class="fu">as.character</span>(<span class="fu">seq</span>(start, end)), <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>)</span>
-<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a>}</span>
-<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a></span>
-<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a><span class="co"># Aplicar la transformación a cada lista de shape_estados</span></span>
-<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a>start_id <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="fu">map2</span>(shape_estados, years, <span class="cf">function</span>(shape_files, year) {</span>
-<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a>                            shape_files <span class="ot">&lt;-</span> <span class="fu">map2</span>(shape_files, grados, <span class="cf">function</span>(shape_file, grado) {</span>
-<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a>                                                 <span class="cf">if</span> (<span class="fu">is.data.frame</span>(shape_file<span class="sc">@</span>data)) {</span>
-<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a>                                                      end_id <span class="ot">&lt;-</span> start_id <span class="sc">+</span> <span class="fu">nrow</span>(shape_file) <span class="sc">-</span> <span class="dv">1</span></span>
-<span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a>                                                      shape_file <span class="ot">&lt;-</span> shape_file <span class="sc">%&gt;%</span></span>
-<span id="cb15-20"><a href="#cb15-20" tabindex="-1"></a>                                                                     <span class="fu">mutate</span>(<span class="at">ID =</span> <span class="fu">generate_ids</span>(start_id, end_id),</span>
-<span id="cb15-21"><a href="#cb15-21" tabindex="-1"></a>                                                                            <span class="at">ANIO =</span> year,</span>
-<span id="cb15-22"><a href="#cb15-22" tabindex="-1"></a>                                                                            <span class="at">id_year =</span> <span class="fu">paste0</span>(<span class="fu">generate_ids</span>(start_id, end_id), year))</span>
-<span id="cb15-23"><a href="#cb15-23" tabindex="-1"></a>                                                      start_id <span class="ot">&lt;&lt;-</span> end_id <span class="sc">+</span> <span class="dv">1</span></span>
-<span id="cb15-24"><a href="#cb15-24" tabindex="-1"></a>                                                     }</span>
-<span id="cb15-25"><a href="#cb15-25" tabindex="-1"></a>                                                 shape_file</span>
-<span id="cb15-26"><a href="#cb15-26" tabindex="-1"></a>                                                  }</span>
-<span id="cb15-27"><a href="#cb15-27" tabindex="-1"></a>                                                )</span>
-<span id="cb15-28"><a href="#cb15-28" tabindex="-1"></a>                            shape_files</span>
-<span id="cb15-29"><a href="#cb15-29" tabindex="-1"></a>  }</span>
-<span id="cb15-30"><a href="#cb15-30" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># Define los grados y años</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;2020&quot;</span>, <span class="st">&quot;2015&quot;</span>, <span class="st">&quot;2010&quot;</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>grados <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Muy alto&quot;</span>, <span class="st">&quot;Alto&quot;</span>, <span class="st">&quot;Medio&quot;</span>, <span class="st">&quot;Bajo&quot;</span>, <span class="st">&quot;Muy bajo&quot;</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="fu">list</span>(shape_estados_2020, shape_estados_2015, shape_estados_2010)</span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a><span class="co"># Aplicar la transformación a cada elemento en las listas anidadas usando map2</span></span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="fu">map2</span>(shape_estados, years, <span class="cf">function</span>(shape_files, year) {</span>
+<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a>                       <span class="fu">map2</span>(shape_files, grados, <span class="cf">function</span>(shape_file, grado) {</span>
+<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a>                             <span class="fu">proj4string</span>(shape_file) <span class="ot">&lt;-</span> <span class="fu">CRS</span>(<span class="st">&quot;+init=epsg:4326&quot;</span>)</span>
+<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a>                             shape_file  <span class="ot">=</span> <span class="fu">spTransform</span>(shape_file, <span class="fu">CRS</span>(<span class="st">&quot;+init=epsg:4326&quot;</span>))</span>
+<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a>                             shape_file</span>
+<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a>                      })</span>
+<span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a>})</span>
+<span id="cb16-16"><a href="#cb16-16" tabindex="-1"></a></span>
+<span id="cb16-17"><a href="#cb16-17" tabindex="-1"></a><span class="co">#shape_estados_coords &lt;- map2(shape_estados, years, function(shape_files, year) {</span></span>
+<span id="cb16-18"><a href="#cb16-18" tabindex="-1"></a><span class="co">#                         map2(shape_files, grados, function(shape_file, grado) {</span></span>
+<span id="cb16-19"><a href="#cb16-19" tabindex="-1"></a><span class="co">#                           # Extraer y renombrar coordenadas</span></span>
+<span id="cb16-20"><a href="#cb16-20" tabindex="-1"></a><span class="co">#                           # Extraer y renombrar coordenadas</span></span>
+<span id="cb16-21"><a href="#cb16-21" tabindex="-1"></a><span class="co">#                           shape_file@polygons &lt;- lapply(shape_file@polygons, function(polygon) {</span></span>
+<span id="cb16-22"><a href="#cb16-22" tabindex="-1"></a><span class="co">#                             polygon@Polygons &lt;- lapply(polygon@Polygons, function(sub_polygon) {</span></span>
+<span id="cb16-23"><a href="#cb16-23" tabindex="-1"></a><span class="co">#                               coords &lt;- as.data.frame(sub_polygon@coords)</span></span>
+<span id="cb16-24"><a href="#cb16-24" tabindex="-1"></a><span class="co">#                               colnames(coords) &lt;- c(&quot;lng&quot;, &quot;lat&quot;)</span></span>
+<span id="cb16-25"><a href="#cb16-25" tabindex="-1"></a><span class="co">#                               sub_polygon@coords &lt;- as.matrix(coords)</span></span>
+<span id="cb16-26"><a href="#cb16-26" tabindex="-1"></a><span class="co">#                               sub_polygon</span></span>
+<span id="cb16-27"><a href="#cb16-27" tabindex="-1"></a><span class="co">#                             })</span></span>
+<span id="cb16-28"><a href="#cb16-28" tabindex="-1"></a><span class="co">#                             polygon</span></span>
+<span id="cb16-29"><a href="#cb16-29" tabindex="-1"></a><span class="co">#                           })</span></span>
+<span id="cb16-30"><a href="#cb16-30" tabindex="-1"></a><span class="co">#                           </span></span>
+<span id="cb16-31"><a href="#cb16-31" tabindex="-1"></a><span class="co">#                           shape_file</span></span>
+<span id="cb16-32"><a href="#cb16-32" tabindex="-1"></a><span class="co">#                         })</span></span>
+<span id="cb16-33"><a href="#cb16-33" tabindex="-1"></a><span class="co">#})</span></span>
+<span id="cb16-34"><a href="#cb16-34" tabindex="-1"></a></span>
+<span id="cb16-35"><a href="#cb16-35" tabindex="-1"></a><span class="do">## Función para generar IDs:  </span></span>
+<span id="cb16-36"><a href="#cb16-36" tabindex="-1"></a>generate_ids <span class="ot">&lt;-</span> <span class="cf">function</span>(start, end) {</span>
+<span id="cb16-37"><a href="#cb16-37" tabindex="-1"></a>                  <span class="fu">str_pad</span>(<span class="fu">as.character</span>(<span class="fu">seq</span>(start, end)), <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>)</span>
+<span id="cb16-38"><a href="#cb16-38" tabindex="-1"></a>}</span>
+<span id="cb16-39"><a href="#cb16-39" tabindex="-1"></a></span>
+<span id="cb16-40"><a href="#cb16-40" tabindex="-1"></a><span class="co"># Aplicar la transformación a cada lista de shape_estados</span></span>
+<span id="cb16-41"><a href="#cb16-41" tabindex="-1"></a>start_id <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb16-42"><a href="#cb16-42" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="fu">map2</span>(shape_estados, years, <span class="cf">function</span>(shape_files, year) {</span>
+<span id="cb16-43"><a href="#cb16-43" tabindex="-1"></a>                       shape_files <span class="ot">&lt;-</span> <span class="fu">map2</span>(shape_files, grados, <span class="cf">function</span>(shape_file, grado) {</span>
+<span id="cb16-44"><a href="#cb16-44" tabindex="-1"></a>                                            <span class="cf">if</span> (<span class="fu">is.data.frame</span>(shape_file<span class="sc">@</span>data)) {</span>
+<span id="cb16-45"><a href="#cb16-45" tabindex="-1"></a>                                                 end_id <span class="ot">&lt;-</span> start_id <span class="sc">+</span> <span class="fu">nrow</span>(shape_file) <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb16-46"><a href="#cb16-46" tabindex="-1"></a>                                                 shape_file <span class="ot">&lt;-</span> shape_file <span class="sc">%&gt;%</span></span>
+<span id="cb16-47"><a href="#cb16-47" tabindex="-1"></a>                                                                <span class="fu">mutate</span>(<span class="at">ID =</span> <span class="fu">generate_ids</span>(start_id, end_id),</span>
+<span id="cb16-48"><a href="#cb16-48" tabindex="-1"></a>                                                                       <span class="at">ANIO =</span> year,</span>
+<span id="cb16-49"><a href="#cb16-49" tabindex="-1"></a>                                                                       <span class="at">id_year =</span> <span class="fu">paste0</span>(<span class="fu">generate_ids</span>(start_id, end_id), year))</span>
+<span id="cb16-50"><a href="#cb16-50" tabindex="-1"></a>                                                 start_id <span class="ot">&lt;&lt;-</span> end_id <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb16-51"><a href="#cb16-51" tabindex="-1"></a>                                                }</span>
+<span id="cb16-52"><a href="#cb16-52" tabindex="-1"></a>                                       shape_file</span>
+<span id="cb16-53"><a href="#cb16-53" tabindex="-1"></a>                                       })</span>
+<span id="cb16-54"><a href="#cb16-54" tabindex="-1"></a>                       shape_files</span>
+<span id="cb16-55"><a href="#cb16-55" tabindex="-1"></a>  }</span>
+<span id="cb16-56"><a href="#cb16-56" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="se-define-una-función-para-añadir-capas-de-polígonos" class="section level4">
+<h4>Se define una función para añadir capas de polígonos</h4>
+<p>Se define una función llamada <code>addPolygonLayer</code>, la cual
+añade una capa de polígonos a un mapa de Leaflet. Se tienen que
+especificar los argumentos:</p>
+<ul>
+<li><code>map</code>: El objeto de mapa de Leaflet al que se le añadirá
+la nueva capa de polígonos.<br />
+</li>
+<li><code>data</code>: Los datos que contienen la información geográfica
+de los polígonos.<br />
+</li>
+<li><code>year</code>: Año asociado con los datos de los polígonos,
+usado para agrupar.<br />
+</li>
+<li><code>grado</code>: Grado asociado con los datos de los polígonos,
+también usado para agrupar.<br />
+</li>
+<li><code>paleta</code>: Paleta de colores que se usará para rellenar
+los polígonos.</li>
+<li><code>id</code>: Es el identificador único para esta capa de
+polígonos en el mapa. Puede ser útil para identificar y manipular
+específicamente esta capa en operaciones posteriores.</li>
+</ul>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="co"># Define una función para añadir capas de polígonos</span></span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>addPolygonLayer <span class="ot">&lt;-</span> <span class="cf">function</span>(map, data, year, grado, paleta, id) {</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>                            map <span class="ot">&lt;-</span> map <span class="sc">%&gt;%</span></span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>                                    <span class="fu">addPolygons</span>(<span class="at">data =</span> data,</span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>                                                 <span class="at">fillColor =</span> paleta,</span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>                                                  <span class="at">fillOpacity =</span> <span class="fl">0.8</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>                                                   <span class="at">stroke =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>                                                    <span class="at">weight =</span> <span class="dv">1</span>,</span>
+<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a>                                                     <span class="at">dashArray =</span> <span class="st">&quot;1&quot;</span>,</span>
+<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a>                                                      <span class="at">opacity =</span> <span class="fl">1.3</span>,</span>
+<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a>                                                       <span class="at">color =</span> <span class="st">&quot;#DBDBDB&quot;</span>,  <span class="co"># line colour </span></span>
+<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a>                                                        <span class="at">highlight =</span> <span class="fu">highlightOptions</span>(<span class="at">weight =</span> <span class="dv">2</span>,</span>
+<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a>                                                                                     <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="co"># Color de selección</span></span>
+<span id="cb17-14"><a href="#cb17-14" tabindex="-1"></a>                                                                                     <span class="at">dashArray =</span> <span class="st">&quot;&quot;</span>,</span>
+<span id="cb17-15"><a href="#cb17-15" tabindex="-1"></a>                                                                                     <span class="at">fillOpacity =</span> <span class="fl">0.6</span>,</span>
+<span id="cb17-16"><a href="#cb17-16" tabindex="-1"></a>                                                                                     <span class="at">bringToFront =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb17-17"><a href="#cb17-17" tabindex="-1"></a>                                                         <span class="at">group =</span> grado,</span>
+<span id="cb17-18"><a href="#cb17-18" tabindex="-1"></a>                                                          <span class="at">layerId =</span> id</span>
+<span id="cb17-19"><a href="#cb17-19" tabindex="-1"></a>                                                )</span>
+<span id="cb17-20"><a href="#cb17-20" tabindex="-1"></a>                             <span class="fu">return</span>(map)</span>
+<span id="cb17-21"><a href="#cb17-21" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 <div id="se-crea-el-mapa-inicial" class="section level4">
 <h4>Se crea el mapa inicial</h4>
@@ -2115,27 +2229,17 @@ un nivel de zoom fijo, y establece los límites máximos para evitar que
 el usuario se desplace fuera de una región definida. El mapa utiliza
 capa de OpenStreetMap tanto en la capa base como en una capa adicional
 de tiles del mismo proveedor.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># Crear el mapa inicial</span></span>
-<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>map <span class="ot">&lt;-</span> <span class="fu">leaflet</span>(<span class="at">options =</span> <span class="fu">leafletOptions</span>(<span class="at">minZoom =</span> <span class="dv">5</span>, <span class="at">maxZoom =</span> <span class="dv">5</span>, <span class="at">zoomControl =</span> <span class="cn">FALSE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>        <span class="fu">addTiles</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>         <span class="fu">setView</span>(<span class="at">lat =</span> <span class="fl">23.6260333</span>, <span class="at">lng =</span> <span class="sc">-</span><span class="fl">102.5375005</span>, <span class="at">zoom =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>          <span class="fu">setMaxBounds</span>(<span class="at">lng1 =</span> bounding_box[<span class="dv">1</span>],</span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>                       <span class="at">lat1 =</span> bounding_box[<span class="dv">2</span>],</span>
-<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>                       <span class="at">lng2 =</span> bounding_box[<span class="dv">3</span>],</span>
-<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>                       <span class="at">lat2 =</span> bounding_box[<span class="dv">4</span>]) <span class="sc">%&gt;%</span></span>
-<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>           <span class="fu">addProviderTiles</span>(providers<span class="sc">$</span>OpenStreetMap, <span class="at">options =</span> <span class="fu">providerTileOptions</span>(<span class="at">minZoom =</span> <span class="dv">5</span>, <span class="at">maxZoom =</span> <span class="dv">5</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="co"># Crear el mapa inicial</span></span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>map  <span class="ot">&lt;-</span> <span class="fu">leaflet</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a>         <span class="fu">addTiles</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a>          <span class="fu">setView</span>(<span class="at">lat =</span> <span class="fl">23.6260333</span>, <span class="at">lng =</span> <span class="sc">-</span><span class="fl">102.5375005</span>, <span class="at">zoom =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a>           <span class="fu">setMaxBounds</span>(<span class="at">lng1 =</span> bounding_box[<span class="dv">1</span>],</span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a>                        <span class="at">lat1 =</span> bounding_box[<span class="dv">2</span>],</span>
+<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a>                        <span class="at">lng2 =</span> bounding_box[<span class="dv">3</span>],</span>
+<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a>                        <span class="at">lat2 =</span> bounding_box[<span class="dv">4</span>]) <span class="sc">%&gt;%</span></span>
+<span id="cb18-9"><a href="#cb18-9" tabindex="-1"></a>            <span class="fu">addProviderTiles</span>(providers<span class="sc">$</span>OpenStreetMap, <span class="at">options =</span> <span class="fu">providerTileOptions</span>(<span class="at">minZoom =</span> <span class="dv">5</span>, <span class="at">maxZoom =</span> <span class="dv">5</span>))</span></code></pre></div>
 </div>
 <div id="función-addpolygonlayer" class="section level4">
-<h4>Función <code>addPolygonLayer()</code></h4>
-<p>Se añaden las capas de polígonos al mapa de Leaflet para cada
-combinación de año y grado. Se recorren todas las combinaciones posibles
-de años (<code>years</code>) y grados (<code>grados</code>), y para cada
-combinación, añade una capa de polígonos al mapa utilizando la función
-<code>addPolygonLayer</code>. La lista shape_estados contiene los datos
-geográficos organizados por año y grado, y la lista paleta proporciona
-la paleta de colores correspondiente para cada grado.</p>
-</div>
-<div id="función-addpolygonlayer-1" class="section level4">
 <h4>Función <code>addPolygonLayer()</code></h4>
 <p>Se construye dinámicamente un mapa interactivo que muestra diferentes
 capas de polígonos para los años <code>2020</code>, <code>2015</code> y
@@ -2150,22 +2254,22 @@ La función contiene, los shape_estados que son los datos geográficos
 organizados por año y grado, la paleta de colores correspondiente para
 cada grado y el ID unico de cada observación correspondiente a cada
 año.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="co"># Define los datos y años</span></span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;2020&quot;</span>, <span class="st">&quot;2015&quot;</span>, <span class="st">&quot;2010&quot;</span>)</span>
-<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>grados <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Muy alto&quot;</span>, <span class="st">&quot;Alto&quot;</span>, <span class="st">&quot;Medio&quot;</span>, <span class="st">&quot;Bajo&quot;</span>, <span class="st">&quot;Muy bajo&quot;</span>)</span>
-<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a></span>
-<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a><span class="co"># Añadir capas de polígonos para cada año</span></span>
-<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(years)) {</span>
-<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> <span class="fu">seq_along</span>(grados)){</span>
-<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>           map <span class="ot">&lt;-</span> <span class="fu">addPolygonLayer</span>(map, </span>
-<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a>                                  <span class="at">data =</span> shape_estados[[i]][[j]], </span>
-<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a>                                  <span class="at">year =</span> <span class="sc">~</span>ANIO, </span>
-<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a>                                  <span class="at">grado =</span> <span class="sc">~</span><span class="fu">get</span>(<span class="fu">paste0</span>(<span class="st">&quot;GM_&quot;</span>, years[i])), </span>
-<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a>                                  <span class="at">paleta =</span> <span class="sc">~</span><span class="fu">mypalette</span>(<span class="fu">get</span>(<span class="fu">paste0</span>(<span class="st">&quot;GM_&quot;</span>, years[i]))), </span>
-<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a>                                  <span class="at">id =</span> <span class="sc">~</span>id_year</span>
-<span id="cb17-14"><a href="#cb17-14" tabindex="-1"></a>                                  )</span>
-<span id="cb17-15"><a href="#cb17-15" tabindex="-1"></a>  }</span>
-<span id="cb17-16"><a href="#cb17-16" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="co"># Define los datos y años</span></span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;2020&quot;</span>, <span class="st">&quot;2015&quot;</span>, <span class="st">&quot;2010&quot;</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>grados <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Muy alto&quot;</span>, <span class="st">&quot;Alto&quot;</span>, <span class="st">&quot;Medio&quot;</span>, <span class="st">&quot;Bajo&quot;</span>, <span class="st">&quot;Muy bajo&quot;</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a><span class="co"># Añadir capas de polígonos para cada año</span></span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(years)) {</span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> <span class="fu">seq_along</span>(grados)){</span>
+<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a>           map <span class="ot">&lt;-</span> <span class="fu">addPolygonLayer</span>(map,</span>
+<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a>                                  <span class="at">data =</span> shape_estados[[i]][[grados[j]]], </span>
+<span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a>                                  <span class="at">year =</span> <span class="sc">~</span>ANIO, </span>
+<span id="cb19-11"><a href="#cb19-11" tabindex="-1"></a>                                  <span class="at">grado =</span> <span class="sc">~</span><span class="fu">get</span>(<span class="fu">paste0</span>(<span class="st">&quot;GM_&quot;</span>, years[i])), </span>
+<span id="cb19-12"><a href="#cb19-12" tabindex="-1"></a>                                  <span class="at">paleta =</span> paleta[j], </span>
+<span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a>                                  <span class="at">id =</span> <span class="sc">~</span>id_year</span>
+<span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a>                                  )</span>
+<span id="cb19-15"><a href="#cb19-15" tabindex="-1"></a>  }</span>
+<span id="cb19-16"><a href="#cb19-16" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 <div id="se-añade-la-leyenda-y-control-de-capas" class="section level4">
 <h4>Se añade la leyenda y control de capas</h4>
@@ -2192,17 +2296,17 @@ significa que el control de capas estará expandido por defecto,
 mostrando todas las opciones disponibles sin necesidad de expandirlo
 manualmente.</li>
 </ul>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>map <span class="ot">&lt;-</span> map <span class="sc">%&gt;%</span></span>
-<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>        <span class="fu">addControl</span>(title, <span class="at">position =</span> <span class="st">&quot;bottomright&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a>         <span class="fu">addLegend</span>(<span class="st">&quot;bottomright&quot;</span>, </span>
-<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a>                    <span class="at">colors =</span> paleta, </span>
-<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a>                    <span class="at">labels =</span> grados,</span>
-<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a>                    <span class="at">title =</span> stringr<span class="sc">::</span><span class="fu">str_wrap</span>(<span class="st">&quot;Grado de marginación&quot;</span>, <span class="dv">15</span>), </span>
-<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a>                    <span class="at">opacity =</span> <span class="fl">0.7</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a>          <span class="fu">addLayersControl</span>(</span>
-<span id="cb18-9"><a href="#cb18-9" tabindex="-1"></a>           <span class="at">overlayGroups =</span> <span class="fu">c</span>(<span class="st">&quot;Muy alto&quot;</span>, <span class="st">&quot;Alto&quot;</span>, <span class="st">&quot;Medio&quot;</span>, <span class="st">&quot;Bajo&quot;</span>, <span class="st">&quot;Muy bajo&quot;</span>),</span>
-<span id="cb18-10"><a href="#cb18-10" tabindex="-1"></a>            <span class="at">baseGroups =</span> <span class="fu">c</span>(<span class="st">&quot;2020&quot;</span>, <span class="st">&quot;2015&quot;</span>, <span class="st">&quot;2010&quot;</span>), </span>
-<span id="cb18-11"><a href="#cb18-11" tabindex="-1"></a>             <span class="at">options =</span> <span class="fu">layersControlOptions</span>(<span class="at">collapsed =</span> <span class="cn">FALSE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>map <span class="ot">&lt;-</span> map <span class="sc">%&gt;%</span></span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>        <span class="fu">addControl</span>(title, <span class="at">position =</span> <span class="st">&quot;bottomright&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>         <span class="fu">addLegend</span>(<span class="st">&quot;bottomright&quot;</span>, </span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a>                    <span class="at">colors =</span> paleta, </span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a>                    <span class="at">labels =</span> grados,</span>
+<span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a>                    <span class="at">title =</span> stringr<span class="sc">::</span><span class="fu">str_wrap</span>(<span class="st">&quot;Grado de marginación&quot;</span>, <span class="dv">15</span>), </span>
+<span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a>                    <span class="at">opacity =</span> <span class="fl">0.7</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a>          <span class="fu">addLayersControl</span>(</span>
+<span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a>           <span class="at">overlayGroups =</span> <span class="fu">c</span>(<span class="st">&quot;Muy alto&quot;</span>, <span class="st">&quot;Alto&quot;</span>, <span class="st">&quot;Medio&quot;</span>, <span class="st">&quot;Bajo&quot;</span>, <span class="st">&quot;Muy bajo&quot;</span>),</span>
+<span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a>            <span class="at">baseGroups =</span> <span class="fu">c</span>(<span class="st">&quot;2020&quot;</span>, <span class="st">&quot;2015&quot;</span>, <span class="st">&quot;2010&quot;</span>), </span>
+<span id="cb20-11"><a href="#cb20-11" tabindex="-1"></a>             <span class="at">options =</span> <span class="fu">layersControlOptions</span>(<span class="at">collapsed =</span> <span class="cn">FALSE</span>))</span></code></pre></div>
 </div>
 <div id="se-configura-el-control-de-capas" class="section level4">
 <h4>Se configura el control de capas</h4>
@@ -2225,50 +2329,50 @@ usuario cambia la capa base del mapa.</li>
 <li><code>overlayadd</code>: Este evento se activa cuando se añade una
 capa superpuesta al mapa.</li>
 </ul>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>map <span class="ot">&lt;-</span> map <span class="sc">%&gt;%</span></span>
-<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>        htmlwidgets<span class="sc">::</span><span class="fu">onRender</span>(<span class="st">&quot;</span></span>
-<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a><span class="st">          function(el, x) {</span></span>
-<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a><span class="st">            var myMap = this;</span></span>
-<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a><span class="st">            var baseLayer = &#39;2020&#39;;</span></span>
-<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a><span class="st">            myMap.eachLayer(function(layer) {</span></span>
-<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a><span class="st">              var id = layer.options.layerId;</span></span>
-<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a><span class="st">              if (id) {</span></span>
-<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a><span class="st">                if (!id.endsWith(baseLayer)) {</span></span>
-<span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a><span class="st">                  layer.getElement().style.display = &#39;none&#39;;</span></span>
-<span id="cb19-11"><a href="#cb19-11" tabindex="-1"></a><span class="st">                }</span></span>
-<span id="cb19-12"><a href="#cb19-12" tabindex="-1"></a><span class="st">              }</span></span>
-<span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a><span class="st">            });</span></span>
-<span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a><span class="st">      </span></span>
-<span id="cb19-15"><a href="#cb19-15" tabindex="-1"></a><span class="st">            myMap.on(&#39;baselayerchange&#39;, function(e) {</span></span>
-<span id="cb19-16"><a href="#cb19-16" tabindex="-1"></a><span class="st">              baseLayer = e.name;</span></span>
-<span id="cb19-17"><a href="#cb19-17" tabindex="-1"></a><span class="st">              myMap.eachLayer(function(layer) {</span></span>
-<span id="cb19-18"><a href="#cb19-18" tabindex="-1"></a><span class="st">                var id = layer.options.layerId;</span></span>
-<span id="cb19-19"><a href="#cb19-19" tabindex="-1"></a><span class="st">                if (id) {</span></span>
-<span id="cb19-20"><a href="#cb19-20" tabindex="-1"></a><span class="st">                  if (!id.endsWith(baseLayer)) {</span></span>
-<span id="cb19-21"><a href="#cb19-21" tabindex="-1"></a><span class="st">                    layer.getElement().style.display = &#39;none&#39;;</span></span>
-<span id="cb19-22"><a href="#cb19-22" tabindex="-1"></a><span class="st">                    layer.closePopup();</span></span>
-<span id="cb19-23"><a href="#cb19-23" tabindex="-1"></a><span class="st">                  } </span></span>
-<span id="cb19-24"><a href="#cb19-24" tabindex="-1"></a><span class="st">                  else {</span></span>
-<span id="cb19-25"><a href="#cb19-25" tabindex="-1"></a><span class="st">                    layer.getElement().style.display = &#39;block&#39;;</span></span>
-<span id="cb19-26"><a href="#cb19-26" tabindex="-1"></a><span class="st">                  }</span></span>
-<span id="cb19-27"><a href="#cb19-27" tabindex="-1"></a><span class="st">                }</span></span>
-<span id="cb19-28"><a href="#cb19-28" tabindex="-1"></a><span class="st">              });</span></span>
-<span id="cb19-29"><a href="#cb19-29" tabindex="-1"></a><span class="st">            });</span></span>
-<span id="cb19-30"><a href="#cb19-30" tabindex="-1"></a><span class="st">      </span></span>
-<span id="cb19-31"><a href="#cb19-31" tabindex="-1"></a><span class="st">            myMap.on(&#39;overlayadd&#39;, function(e) {</span></span>
-<span id="cb19-32"><a href="#cb19-32" tabindex="-1"></a><span class="st">              myMap.eachLayer(function(layer) {</span></span>
-<span id="cb19-33"><a href="#cb19-33" tabindex="-1"></a><span class="st">                var id = layer.options.layerId;</span></span>
-<span id="cb19-34"><a href="#cb19-34" tabindex="-1"></a><span class="st">                if (id) {</span></span>
-<span id="cb19-35"><a href="#cb19-35" tabindex="-1"></a><span class="st">                  if (!id.endsWith(baseLayer)) {</span></span>
-<span id="cb19-36"><a href="#cb19-36" tabindex="-1"></a><span class="st">                    layer.getElement().style.display = &#39;none&#39;;</span></span>
-<span id="cb19-37"><a href="#cb19-37" tabindex="-1"></a><span class="st">                  } else {</span></span>
-<span id="cb19-38"><a href="#cb19-38" tabindex="-1"></a><span class="st">                    layer.getElement().style.display = &#39;block&#39;;</span></span>
-<span id="cb19-39"><a href="#cb19-39" tabindex="-1"></a><span class="st">                  }</span></span>
-<span id="cb19-40"><a href="#cb19-40" tabindex="-1"></a><span class="st">                }</span></span>
-<span id="cb19-41"><a href="#cb19-41" tabindex="-1"></a><span class="st">              });</span></span>
-<span id="cb19-42"><a href="#cb19-42" tabindex="-1"></a><span class="st">            });</span></span>
-<span id="cb19-43"><a href="#cb19-43" tabindex="-1"></a><span class="st">          }&quot;</span>)</span>
-<span id="cb19-44"><a href="#cb19-44" tabindex="-1"></a>map</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>map <span class="ot">&lt;-</span> map <span class="sc">%&gt;%</span></span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>        htmlwidgets<span class="sc">::</span><span class="fu">onRender</span>(<span class="st">&quot;</span></span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a><span class="st">          function(el, x) {</span></span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a><span class="st">            var myMap = this;</span></span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a><span class="st">            var baseLayer = &#39;2020&#39;;</span></span>
+<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a><span class="st">            myMap.eachLayer(function(layer) {</span></span>
+<span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a><span class="st">              var id = layer.options.layerId;</span></span>
+<span id="cb21-8"><a href="#cb21-8" tabindex="-1"></a><span class="st">              if (id) {</span></span>
+<span id="cb21-9"><a href="#cb21-9" tabindex="-1"></a><span class="st">                if (!id.endsWith(baseLayer)) {</span></span>
+<span id="cb21-10"><a href="#cb21-10" tabindex="-1"></a><span class="st">                  layer.getElement().style.display = &#39;none&#39;;</span></span>
+<span id="cb21-11"><a href="#cb21-11" tabindex="-1"></a><span class="st">                }</span></span>
+<span id="cb21-12"><a href="#cb21-12" tabindex="-1"></a><span class="st">              }</span></span>
+<span id="cb21-13"><a href="#cb21-13" tabindex="-1"></a><span class="st">            });</span></span>
+<span id="cb21-14"><a href="#cb21-14" tabindex="-1"></a><span class="st">      </span></span>
+<span id="cb21-15"><a href="#cb21-15" tabindex="-1"></a><span class="st">            myMap.on(&#39;baselayerchange&#39;, function(e) {</span></span>
+<span id="cb21-16"><a href="#cb21-16" tabindex="-1"></a><span class="st">              baseLayer = e.name;</span></span>
+<span id="cb21-17"><a href="#cb21-17" tabindex="-1"></a><span class="st">              myMap.eachLayer(function(layer) {</span></span>
+<span id="cb21-18"><a href="#cb21-18" tabindex="-1"></a><span class="st">                var id = layer.options.layerId;</span></span>
+<span id="cb21-19"><a href="#cb21-19" tabindex="-1"></a><span class="st">                if (id) {</span></span>
+<span id="cb21-20"><a href="#cb21-20" tabindex="-1"></a><span class="st">                  if (!id.endsWith(baseLayer)) {</span></span>
+<span id="cb21-21"><a href="#cb21-21" tabindex="-1"></a><span class="st">                    layer.getElement().style.display = &#39;none&#39;;</span></span>
+<span id="cb21-22"><a href="#cb21-22" tabindex="-1"></a><span class="st">                    layer.closePopup();</span></span>
+<span id="cb21-23"><a href="#cb21-23" tabindex="-1"></a><span class="st">                  } </span></span>
+<span id="cb21-24"><a href="#cb21-24" tabindex="-1"></a><span class="st">                  else {</span></span>
+<span id="cb21-25"><a href="#cb21-25" tabindex="-1"></a><span class="st">                    layer.getElement().style.display = &#39;block&#39;;</span></span>
+<span id="cb21-26"><a href="#cb21-26" tabindex="-1"></a><span class="st">                  }</span></span>
+<span id="cb21-27"><a href="#cb21-27" tabindex="-1"></a><span class="st">                }</span></span>
+<span id="cb21-28"><a href="#cb21-28" tabindex="-1"></a><span class="st">              });</span></span>
+<span id="cb21-29"><a href="#cb21-29" tabindex="-1"></a><span class="st">            });</span></span>
+<span id="cb21-30"><a href="#cb21-30" tabindex="-1"></a><span class="st">      </span></span>
+<span id="cb21-31"><a href="#cb21-31" tabindex="-1"></a><span class="st">            myMap.on(&#39;overlayadd&#39;, function(e) {</span></span>
+<span id="cb21-32"><a href="#cb21-32" tabindex="-1"></a><span class="st">              myMap.eachLayer(function(layer) {</span></span>
+<span id="cb21-33"><a href="#cb21-33" tabindex="-1"></a><span class="st">                var id = layer.options.layerId;</span></span>
+<span id="cb21-34"><a href="#cb21-34" tabindex="-1"></a><span class="st">                if (id) {</span></span>
+<span id="cb21-35"><a href="#cb21-35" tabindex="-1"></a><span class="st">                  if (!id.endsWith(baseLayer)) {</span></span>
+<span id="cb21-36"><a href="#cb21-36" tabindex="-1"></a><span class="st">                    layer.getElement().style.display = &#39;none&#39;;</span></span>
+<span id="cb21-37"><a href="#cb21-37" tabindex="-1"></a><span class="st">                  } else {</span></span>
+<span id="cb21-38"><a href="#cb21-38" tabindex="-1"></a><span class="st">                    layer.getElement().style.display = &#39;block&#39;;</span></span>
+<span id="cb21-39"><a href="#cb21-39" tabindex="-1"></a><span class="st">                  }</span></span>
+<span id="cb21-40"><a href="#cb21-40" tabindex="-1"></a><span class="st">                }</span></span>
+<span id="cb21-41"><a href="#cb21-41" tabindex="-1"></a><span class="st">              });</span></span>
+<span id="cb21-42"><a href="#cb21-42" tabindex="-1"></a><span class="st">            });</span></span>
+<span id="cb21-43"><a href="#cb21-43" tabindex="-1"></a><span class="st">          }&quot;</span>)</span>
+<span id="cb21-44"><a href="#cb21-44" tabindex="-1"></a>map</span></code></pre></div>
 <p>Se genera un Widget Interactivo con la función
 <code>saveWidget()</code>.</p>
 <p><strong>Consideraciones</strong></p>
@@ -2290,27 +2394,37 @@ mismo contexto podría no ser necesario. Normalmente, se elige uno u otro
 según la necesidad específica: guardar el mapa interactivo para ser
 utilizado en un sitio web (saveWidget) o capturar una imagen estática
 para propósitos de visualización o impresión (mapshot).</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="co">#saveRDS(map,  paste0(here::here(), &quot;/Output/map_2020.RDS&quot;))</span></span>
-<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a><span class="fu">saveWidget</span>(map,  <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/img/map_2010_2020.html&quot;</span>), <span class="at">selfcontained =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>map <span class="ot">&lt;-</span> map <span class="sc">%&gt;%</span> </span>
-<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a>        <span class="fu">mapshot</span>(<span class="at">url =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/map_2010_2020.html&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="co">#saveRDS(map,  paste0(here::here(), &quot;/Output/map_2020.RDS&quot;))</span></span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a><span class="fu">saveWidget</span>(map,  <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/img/map_2010_2020.html&quot;</span>), <span class="at">selfcontained =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a>map <span class="ot">&lt;-</span> map <span class="sc">%&gt;%</span> </span>
+<span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a>        <span class="fu">mapshot</span>(<span class="at">url =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/map_2010_2020.html&quot;</span>))</span></code></pre></div>
 </div>
 </div>
 <div id="opción-2" class="section level3">
 <h3>Opción 2</h3>
-<p><code>TopoJSON en Leaflet</code>: Aunque Leaflet no puede manejar
-directamente archivos TopoJSON, se pueden convertir archivos TopoJSON a
-GeoJSON utilizando herramientas como
-<code>geojsonio::geojson_read()</code> antes de cargar los datos en
-Leaflet. Esto permite aprovechar las ventajas de tamaño y rendimiento de
-<code>TopoJSON</code> mientras se trabaja con Leaflet. Es perfectamente
-compatible con la función <code>addPolygons()</code>, en este caso los
-datos que se encuentran en los objetos <code>shape_estados_</code>
-contiene los datos espaciales cargados desde el archivo TopoJSON.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="do">## Se puede trabajar directamente con el formato lineal de topojson</span></span>
-<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>shape_estados_2020 <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/capa_estados_topojson_2020.rds&quot;</span>)) </span>
-<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>shape_estados_2015 <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/capa_estados_topojson_2015.rds&quot;</span>)) </span>
-<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a>shape_estados_2010 <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/capa_estados_topojson_2010.rds&quot;</span>))</span></code></pre></div>
+<p><code>TopoJSON en Leaflet</code>: Se leen archivos
+<code>TopoJSON</code> y almacenarlos en listas anidadas según los años y
+grados especificados. La función <code>readLines</code> se utiliza para
+leer el contenido de los archivos <code>TopoJSON</code> y almacenar cada
+línea del archivo como un elemento en un vector de caracteres dentro de
+las listas correspondientes a cada año y grado. Esto facilita la
+organización y el acceso a los datos leídos en un formato
+estructurado.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="co"># Define los grados y años</span></span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;2020&quot;</span>, <span class="st">&quot;2015&quot;</span>, <span class="st">&quot;2010&quot;</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>grados <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Muy alto&quot;</span>, <span class="st">&quot;Alto&quot;</span>, <span class="st">&quot;Medio&quot;</span>, <span class="st">&quot;Bajo&quot;</span>, <span class="st">&quot;Muy bajo&quot;</span>)</span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a>shape_estados_2020 <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a>shape_estados_2015 <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a>shape_estados_2010 <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb23-8"><a href="#cb23-8" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>){</span>
+<span id="cb23-9"><a href="#cb23-9" tabindex="-1"></a> shape_estados_2020[[<span class="fu">paste0</span>(grados[i])]] <span class="ot">&lt;-</span> <span class="fu">readLines</span>(<span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/estados_2020_&quot;</span>, i, <span class="st">&quot;_topojson.topojson&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-10"><a href="#cb23-10" tabindex="-1"></a>                                              <span class="fu">paste</span>(<span class="at">collapse =</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>) </span>
+<span id="cb23-11"><a href="#cb23-11" tabindex="-1"></a> shape_estados_2015[[<span class="fu">paste0</span>(grados[i])]] <span class="ot">&lt;-</span> <span class="fu">readLines</span>(<span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/estados_2015_&quot;</span>, i, <span class="st">&quot;_topojson.topojson&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-12"><a href="#cb23-12" tabindex="-1"></a>                                              <span class="fu">paste</span>(<span class="at">collapse =</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>) </span>
+<span id="cb23-13"><a href="#cb23-13" tabindex="-1"></a> shape_estados_2010[[<span class="fu">paste0</span>(grados[i])]] <span class="ot">&lt;-</span> <span class="fu">readLines</span>(<span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/estados_2010_&quot;</span>, i, <span class="st">&quot;_topojson.topojson&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-14"><a href="#cb23-14" tabindex="-1"></a>                                              <span class="fu">paste</span>(<span class="at">collapse =</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>) </span>
+<span id="cb23-15"><a href="#cb23-15" tabindex="-1"></a>}</span></code></pre></div>
 <div id="se-definen-los-años-y-los-grados-de-marginación-1" class="section level4">
 <h4>Se definen los años y los grados de marginación</h4>
 <ul>
@@ -2323,45 +2437,72 @@ marginación.</li>
 <p>Se asigna a la lista <code>shape_estados</code> los datos de
 shapefile correspondientes a cada año, el cual a su vez cada lista
 contiene a los niveles de marginación.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
-<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a><span class="fu">library</span>(jsonlite)</span>
-<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a><span class="co"># Define los datos y años</span></span>
-<span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;2020&quot;</span>, <span class="st">&quot;2015&quot;</span>, <span class="st">&quot;2010&quot;</span>)</span>
-<span id="cb22-5"><a href="#cb22-5" tabindex="-1"></a>grados <span class="ot">&lt;-</span>  <span class="fu">c</span>(<span class="st">&quot;Muy alto&quot;</span>, <span class="st">&quot;Alto&quot;</span>, <span class="st">&quot;Medio&quot;</span>, <span class="st">&quot;Bajo&quot;</span>, <span class="st">&quot;Muy bajo&quot;</span>)</span>
-<span id="cb22-6"><a href="#cb22-6" tabindex="-1"></a></span>
-<span id="cb22-7"><a href="#cb22-7" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="fu">list</span>(shape_estados_2020, shape_estados_2015, shape_estados_2010)</span>
-<span id="cb22-8"><a href="#cb22-8" tabindex="-1"></a></span>
-<span id="cb22-9"><a href="#cb22-9" tabindex="-1"></a><span class="co"># lista de TopoJSONs:</span></span>
-<span id="cb22-10"><a href="#cb22-10" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">seq_along</span>(years), <span class="cf">function</span>(i){</span>
-<span id="cb22-11"><a href="#cb22-11" tabindex="-1"></a>                  <span class="fu">lapply</span>(<span class="fu">seq_along</span>(grados), <span class="cf">function</span>(j){</span>
-<span id="cb22-12"><a href="#cb22-12" tabindex="-1"></a>                          <span class="fu">fromJSON</span>(<span class="fu">get</span>(<span class="fu">paste0</span>(<span class="st">&quot;shape_estados_&quot;</span>, years[i]))[[j]])</span>
-<span id="cb22-13"><a href="#cb22-13" tabindex="-1"></a>              })</span>
-<span id="cb22-14"><a href="#cb22-14" tabindex="-1"></a>            })</span>
-<span id="cb22-15"><a href="#cb22-15" tabindex="-1"></a></span>
-<span id="cb22-16"><a href="#cb22-16" tabindex="-1"></a><span class="co"># Función para generar IDs:   </span></span>
-<span id="cb22-17"><a href="#cb22-17" tabindex="-1"></a>generate_ids <span class="ot">&lt;-</span> <span class="cf">function</span>(start, end) {</span>
-<span id="cb22-18"><a href="#cb22-18" tabindex="-1"></a>    <span class="fu">str_pad</span>(<span class="fu">as.character</span>(<span class="fu">seq</span>(start, end)), <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>)</span>
-<span id="cb22-19"><a href="#cb22-19" tabindex="-1"></a>}</span>
-<span id="cb22-20"><a href="#cb22-20" tabindex="-1"></a></span>
-<span id="cb22-21"><a href="#cb22-21" tabindex="-1"></a>start_id <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb22-22"><a href="#cb22-22" tabindex="-1"></a>shape_estados<span class="ot">&lt;-</span> <span class="fu">map2</span>(shape_estados, years, <span class="cf">function</span>(shape_files, year) {</span>
-<span id="cb22-23"><a href="#cb22-23" tabindex="-1"></a>                        shape_files <span class="ot">&lt;-</span> <span class="fu">map2</span>(shape_files, grados, <span class="cf">function</span>(shape_file, grado) {</span>
-<span id="cb22-24"><a href="#cb22-24" tabindex="-1"></a>                            properties <span class="ot">&lt;-</span> shape_file<span class="sc">$</span>objects<span class="sc">$</span>foo<span class="sc">$</span>geometries<span class="sc">$</span>properties</span>
-<span id="cb22-25"><a href="#cb22-25" tabindex="-1"></a>                            <span class="cf">if</span> (<span class="fu">is.data.frame</span>(properties)) {</span>
-<span id="cb22-26"><a href="#cb22-26" tabindex="-1"></a>                                end_id <span class="ot">&lt;-</span> start_id <span class="sc">+</span> <span class="fu">nrow</span>(properties) <span class="sc">-</span> <span class="dv">1</span></span>
-<span id="cb22-27"><a href="#cb22-27" tabindex="-1"></a>                                properties <span class="ot">&lt;-</span> properties <span class="sc">%&gt;%</span></span>
-<span id="cb22-28"><a href="#cb22-28" tabindex="-1"></a>                                                <span class="fu">mutate</span>(<span class="at">ID =</span> <span class="fu">generate_ids</span>(start_id, end_id),</span>
-<span id="cb22-29"><a href="#cb22-29" tabindex="-1"></a>                                                       <span class="at">ANIO =</span> year,</span>
-<span id="cb22-30"><a href="#cb22-30" tabindex="-1"></a>                                                       <span class="at">id_year =</span> <span class="fu">paste0</span>(<span class="fu">generate_ids</span>(start_id, end_id), year))</span>
-<span id="cb22-31"><a href="#cb22-31" tabindex="-1"></a>                                shape_file<span class="sc">$</span>objects<span class="sc">$</span>foo<span class="sc">$</span>geometries<span class="sc">$</span>properties <span class="ot">&lt;-</span> properties</span>
-<span id="cb22-32"><a href="#cb22-32" tabindex="-1"></a>                                start_id <span class="ot">&lt;&lt;-</span> end_id <span class="sc">+</span> <span class="dv">1</span></span>
-<span id="cb22-33"><a href="#cb22-33" tabindex="-1"></a>                            }</span>
-<span id="cb22-34"><a href="#cb22-34" tabindex="-1"></a>                            shape_file</span>
-<span id="cb22-35"><a href="#cb22-35" tabindex="-1"></a>                        })</span>
-<span id="cb22-36"><a href="#cb22-36" tabindex="-1"></a>                        shape_files</span>
-<span id="cb22-37"><a href="#cb22-37" tabindex="-1"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="co"># Define los datos y años</span></span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;2020&quot;</span>, <span class="st">&quot;2015&quot;</span>, <span class="st">&quot;2010&quot;</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>grados <span class="ot">&lt;-</span>  <span class="fu">c</span>(<span class="st">&quot;Muy alto&quot;</span>, <span class="st">&quot;Alto&quot;</span>, <span class="st">&quot;Medio&quot;</span>, <span class="st">&quot;Bajo&quot;</span>, <span class="st">&quot;Muy bajo&quot;</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" tabindex="-1"></a><span class="do">## Lista de shapefiles de todos los años</span></span>
+<span id="cb24-6"><a href="#cb24-6" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb24-7"><a href="#cb24-7" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="fu">list</span>(shape_estados_2020, shape_estados_2015, shape_estados_2010)</span>
+<span id="cb24-8"><a href="#cb24-8" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" tabindex="-1"></a><span class="co"># lista de TopoJSONs:</span></span>
+<span id="cb24-10"><a href="#cb24-10" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="fu">map</span>(<span class="fu">seq_along</span>(years), <span class="cf">function</span>(year) {</span>
+<span id="cb24-11"><a href="#cb24-11" tabindex="-1"></a>                   <span class="fu">map</span>(grados, <span class="cf">function</span>(grado) {</span>
+<span id="cb24-12"><a href="#cb24-12" tabindex="-1"></a>                                <span class="fu">fromJSON</span>(<span class="fu">get</span>(<span class="fu">paste0</span>(<span class="st">&quot;shape_estados&quot;</span>))[[year]][[grado]], <span class="at">simplifyVector =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb24-13"><a href="#cb24-13" tabindex="-1"></a>                      })</span>
+<span id="cb24-14"><a href="#cb24-14" tabindex="-1"></a>                    })</span>
+<span id="cb24-15"><a href="#cb24-15" tabindex="-1"></a></span>
+<span id="cb24-16"><a href="#cb24-16" tabindex="-1"></a></span>
+<span id="cb24-17"><a href="#cb24-17" tabindex="-1"></a><span class="co"># Función para generar IDs:   </span></span>
+<span id="cb24-18"><a href="#cb24-18" tabindex="-1"></a>generate_ids <span class="ot">&lt;-</span> <span class="cf">function</span>(start, end) {</span>
+<span id="cb24-19"><a href="#cb24-19" tabindex="-1"></a>    <span class="fu">str_pad</span>(<span class="fu">as.character</span>(<span class="fu">seq</span>(start, end)), <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>)</span>
+<span id="cb24-20"><a href="#cb24-20" tabindex="-1"></a>}</span>
+<span id="cb24-21"><a href="#cb24-21" tabindex="-1"></a></span>
+<span id="cb24-22"><a href="#cb24-22" tabindex="-1"></a>start_id <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb24-23"><a href="#cb24-23" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="fu">map2</span>(shape_estados, years, <span class="cf">function</span>(shape_files, year) {</span>
+<span id="cb24-24"><a href="#cb24-24" tabindex="-1"></a>                         shape_files <span class="ot">&lt;-</span> <span class="fu">map2</span>(shape_files, grados, <span class="cf">function</span>(shape_file, grado) {</span>
+<span id="cb24-25"><a href="#cb24-25" tabindex="-1"></a>                            properties <span class="ot">&lt;-</span> shape_file<span class="sc">$</span>objects<span class="sc">$</span>foo<span class="sc">$</span>geometries<span class="sc">$</span>properties</span>
+<span id="cb24-26"><a href="#cb24-26" tabindex="-1"></a>                            <span class="cf">if</span> (<span class="fu">is.data.frame</span>(properties)) {</span>
+<span id="cb24-27"><a href="#cb24-27" tabindex="-1"></a>                                end_id <span class="ot">&lt;-</span> start_id <span class="sc">+</span> <span class="fu">nrow</span>(properties) <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb24-28"><a href="#cb24-28" tabindex="-1"></a>                                properties <span class="ot">&lt;-</span> properties <span class="sc">%&gt;%</span></span>
+<span id="cb24-29"><a href="#cb24-29" tabindex="-1"></a>                                                <span class="fu">mutate</span>(<span class="at">ID =</span> <span class="fu">generate_ids</span>(start_id, end_id),</span>
+<span id="cb24-30"><a href="#cb24-30" tabindex="-1"></a>                                                       <span class="at">ANIO =</span> year,</span>
+<span id="cb24-31"><a href="#cb24-31" tabindex="-1"></a>                                                       <span class="at">id_year =</span> <span class="fu">paste0</span>(<span class="fu">generate_ids</span>(start_id, end_id), year))</span>
+<span id="cb24-32"><a href="#cb24-32" tabindex="-1"></a>                                shape_file<span class="sc">$</span>objects<span class="sc">$</span>foo<span class="sc">$</span>geometries<span class="sc">$</span>properties <span class="ot">&lt;-</span> properties</span>
+<span id="cb24-33"><a href="#cb24-33" tabindex="-1"></a>                                start_id <span class="ot">&lt;&lt;-</span> end_id <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb24-34"><a href="#cb24-34" tabindex="-1"></a>                            }</span>
+<span id="cb24-35"><a href="#cb24-35" tabindex="-1"></a>                            shape_file</span>
+<span id="cb24-36"><a href="#cb24-36" tabindex="-1"></a>                        })</span>
+<span id="cb24-37"><a href="#cb24-37" tabindex="-1"></a>                        shape_files</span>
+<span id="cb24-38"><a href="#cb24-38" tabindex="-1"></a>})</span>
+<span id="cb24-39"><a href="#cb24-39" tabindex="-1"></a></span>
+<span id="cb24-40"><a href="#cb24-40" tabindex="-1"></a></span>
+<span id="cb24-41"><a href="#cb24-41" tabindex="-1"></a>paleta <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;#13322B&quot;</span>, <span class="co">#Muy alto</span></span>
+<span id="cb24-42"><a href="#cb24-42" tabindex="-1"></a>            <span class="st">&quot;#086953&quot;</span>, <span class="co">#Alto </span></span>
+<span id="cb24-43"><a href="#cb24-43" tabindex="-1"></a>            <span class="st">&quot;#4C9562&quot;</span>, <span class="co">#Medio</span></span>
+<span id="cb24-44"><a href="#cb24-44" tabindex="-1"></a>            <span class="st">&quot;#D1BB9E&quot;</span>, <span class="co">#Bajo</span></span>
+<span id="cb24-45"><a href="#cb24-45" tabindex="-1"></a>            <span class="st">&quot;#C3BA6D&quot;</span>) <span class="co"># Muy bajo</span></span>
+<span id="cb24-46"><a href="#cb24-46" tabindex="-1"></a></span>
+<span id="cb24-47"><a href="#cb24-47" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="fu">map2</span>(shape_estados, years, <span class="cf">function</span>(shape_files, year) {</span>
+<span id="cb24-48"><a href="#cb24-48" tabindex="-1"></a>                      <span class="fu">map2</span>(shape_files, <span class="fu">seq_along</span>(grados), <span class="cf">function</span>(shape_file, grado_idx) {</span>
+<span id="cb24-49"><a href="#cb24-49" tabindex="-1"></a>                        <span class="co">#shape_file$objects$foo$geometries$properties$style = list(fillColor = paleta[grado_idx],</span></span>
+<span id="cb24-50"><a href="#cb24-50" tabindex="-1"></a>                         <span class="co">#                                   color = &quot;#D4D0BD&quot;</span></span>
+<span id="cb24-51"><a href="#cb24-51" tabindex="-1"></a>                          <span class="co">#                                  )</span></span>
+<span id="cb24-52"><a href="#cb24-52" tabindex="-1"></a>                        shape_file<span class="sc">$</span>style <span class="ot">=</span> <span class="fu">list</span>(</span>
+<span id="cb24-53"><a href="#cb24-53" tabindex="-1"></a>                                                <span class="at">fillOpacity =</span> <span class="fl">0.8</span>,</span>
+<span id="cb24-54"><a href="#cb24-54" tabindex="-1"></a>                                                <span class="at">stroke =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb24-55"><a href="#cb24-55" tabindex="-1"></a>                                                <span class="at">weight =</span> <span class="dv">1</span>,</span>
+<span id="cb24-56"><a href="#cb24-56" tabindex="-1"></a>                                                <span class="at">dashArray =</span> <span class="st">&quot;1&quot;</span>,</span>
+<span id="cb24-57"><a href="#cb24-57" tabindex="-1"></a>                                                <span class="at">opacity =</span> <span class="dv">1</span>,</span>
+<span id="cb24-58"><a href="#cb24-58" tabindex="-1"></a>                                                <span class="at">color =</span> <span class="st">&quot;#D4D0BD&quot;</span></span>
+<span id="cb24-59"><a href="#cb24-59" tabindex="-1"></a>                                                )</span>
+<span id="cb24-60"><a href="#cb24-60" tabindex="-1"></a>                        shape_file</span>
+<span id="cb24-61"><a href="#cb24-61" tabindex="-1"></a>                        })</span>
+<span id="cb24-62"><a href="#cb24-62" tabindex="-1"></a>                      })</span>
+<span id="cb24-63"><a href="#cb24-63" tabindex="-1"></a></span>
+<span id="cb24-64"><a href="#cb24-64" tabindex="-1"></a><span class="fu">leaflet</span>() <span class="sc">%&gt;%</span> <span class="fu">addTopoJSON</span>(shape_estados[[<span class="dv">1</span>]][[<span class="dv">2</span>]])</span></code></pre></div>
 </div>
-<div id="se-define-una-función-para-añadir-capas-de-polígonos" class="section level4">
+<div id="se-define-una-función-para-añadir-capas-de-polígonos-1" class="section level4">
 <h4>Se define una función para añadir capas de polígonos</h4>
 <p>Se define una función llamada <code>addPolygonLayer</code>, la cual
 añade una capa de polígonos a un mapa de Leaflet. Se tienen que
@@ -2382,22 +2523,23 @@ también usado para agrupar.<br />
 <li><code>paleta</code>: Paleta de colores que se usará para rellenar
 los polígonos.</li>
 </ul>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="co"># Define una función para añadir capas de polígonos</span></span>
-<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>addPolygonLayer <span class="ot">&lt;-</span> <span class="cf">function</span>(map, data, year, grado, paleta) {</span>
-<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>                            map <span class="ot">&lt;-</span> map <span class="sc">%&gt;%</span></span>
-<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a>                                    <span class="fu">addTopoJSON</span>(data,</span>
-<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a>                                                 <span class="at">fillColor =</span> paleta,</span>
-<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a>                                                  <span class="at">fillOpacity =</span> <span class="fl">0.8</span>,</span>
-<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a>                                                   <span class="at">stroke =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb23-8"><a href="#cb23-8" tabindex="-1"></a>                                                    <span class="at">weight =</span> <span class="dv">1</span>,</span>
-<span id="cb23-9"><a href="#cb23-9" tabindex="-1"></a>                                                     <span class="at">dashArray =</span> <span class="st">&quot;1&quot;</span>,</span>
-<span id="cb23-10"><a href="#cb23-10" tabindex="-1"></a>                                                      <span class="at">opacity =</span> <span class="dv">1</span>,</span>
-<span id="cb23-11"><a href="#cb23-11" tabindex="-1"></a>                                                       <span class="at">color =</span> <span class="st">&quot;#D4D0BD&quot;</span>,</span>
-<span id="cb23-12"><a href="#cb23-12" tabindex="-1"></a>                                                        <span class="at">group =</span> grado</span>
-<span id="cb23-13"><a href="#cb23-13" tabindex="-1"></a>                                                         </span>
-<span id="cb23-14"><a href="#cb23-14" tabindex="-1"></a>                                                )</span>
-<span id="cb23-15"><a href="#cb23-15" tabindex="-1"></a>                             <span class="fu">return</span>(map)</span>
-<span id="cb23-16"><a href="#cb23-16" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="co"># Define una función para añadir capas de polígonos</span></span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>addPolygonLayer <span class="ot">&lt;-</span> <span class="cf">function</span>(map, data, year, grado, paleta, id) {</span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>                            map <span class="ot">&lt;-</span> map <span class="sc">%&gt;%</span></span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a>                                    <span class="fu">addTopoJSON</span>(data,</span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a>                                                 <span class="at">fillColor =</span> paleta,</span>
+<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a>                                                  <span class="at">fillOpacity =</span> <span class="fl">0.8</span>,</span>
+<span id="cb25-7"><a href="#cb25-7" tabindex="-1"></a>                                                   <span class="at">stroke =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb25-8"><a href="#cb25-8" tabindex="-1"></a>                                                    <span class="at">weight =</span> <span class="dv">1</span>,</span>
+<span id="cb25-9"><a href="#cb25-9" tabindex="-1"></a>                                                     <span class="at">dashArray =</span> <span class="st">&quot;1&quot;</span>,</span>
+<span id="cb25-10"><a href="#cb25-10" tabindex="-1"></a>                                                      <span class="at">opacity =</span> <span class="dv">1</span>,</span>
+<span id="cb25-11"><a href="#cb25-11" tabindex="-1"></a>                                                       <span class="at">color =</span> <span class="st">&quot;#D4D0BD&quot;</span>,</span>
+<span id="cb25-12"><a href="#cb25-12" tabindex="-1"></a>                                                        <span class="at">group =</span> grado,</span>
+<span id="cb25-13"><a href="#cb25-13" tabindex="-1"></a>                                                         <span class="at">layerId =</span> id</span>
+<span id="cb25-14"><a href="#cb25-14" tabindex="-1"></a>                                                         </span>
+<span id="cb25-15"><a href="#cb25-15" tabindex="-1"></a>                                                )</span>
+<span id="cb25-16"><a href="#cb25-16" tabindex="-1"></a>                             <span class="fu">return</span>(map)</span>
+<span id="cb25-17"><a href="#cb25-17" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 <div id="se-crea-el-mapa-inicial-1" class="section level4">
 <h4>Se crea el mapa inicial</h4>
@@ -2407,18 +2549,17 @@ un nivel de zoom fijo, y establece los límites máximos para evitar que
 el usuario se desplace fuera de una región definida. El mapa utiliza
 capa de OpenStreetMap tanto en la capa base como en una capa adicional
 de tiles del mismo proveedor.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="fu">rm</span>(map)</span>
-<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a><span class="co"># Crear el mapa inicial</span></span>
-<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>base <span class="ot">&lt;-</span> <span class="fu">leaflet</span>(<span class="at">options =</span> <span class="fu">leafletOptions</span>(<span class="at">minZoom =</span> <span class="dv">5</span>, <span class="at">maxZoom =</span> <span class="dv">5</span>, <span class="at">zoomControl =</span> <span class="cn">FALSE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a>         <span class="fu">addTiles</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb24-5"><a href="#cb24-5" tabindex="-1"></a>          <span class="fu">setView</span>(<span class="at">lat =</span> <span class="fl">23.6260333</span>, <span class="at">lng =</span> <span class="sc">-</span><span class="fl">102.5375005</span>, <span class="at">zoom =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb24-6"><a href="#cb24-6" tabindex="-1"></a>           <span class="fu">setMaxBounds</span>(<span class="at">lng1 =</span> bounding_box[<span class="dv">1</span>],</span>
-<span id="cb24-7"><a href="#cb24-7" tabindex="-1"></a>                        <span class="at">lat1 =</span> bounding_box[<span class="dv">2</span>],</span>
-<span id="cb24-8"><a href="#cb24-8" tabindex="-1"></a>                        <span class="at">lng2 =</span> bounding_box[<span class="dv">3</span>],</span>
-<span id="cb24-9"><a href="#cb24-9" tabindex="-1"></a>                        <span class="at">lat2 =</span> bounding_box[<span class="dv">4</span>]) <span class="sc">%&gt;%</span></span>
-<span id="cb24-10"><a href="#cb24-10" tabindex="-1"></a>            <span class="fu">addProviderTiles</span>(providers<span class="sc">$</span>OpenStreetMap, <span class="at">options =</span> <span class="fu">providerTileOptions</span>(<span class="at">minZoom =</span> <span class="dv">5</span>, <span class="at">maxZoom =</span> <span class="dv">5</span>)) </span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="co"># Crear el mapa inicial</span></span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>base <span class="ot">&lt;-</span> <span class="fu">leaflet</span>(<span class="at">options =</span> <span class="fu">leafletOptions</span>(<span class="at">minZoom =</span> <span class="dv">5</span>, <span class="at">maxZoom =</span> <span class="dv">5</span>, <span class="at">zoomControl =</span> <span class="cn">FALSE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>         <span class="fu">addTiles</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a>          <span class="fu">setView</span>(<span class="at">lat =</span> <span class="fl">23.6260333</span>, <span class="at">lng =</span> <span class="sc">-</span><span class="fl">102.5375005</span>, <span class="at">zoom =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a>           <span class="fu">setMaxBounds</span>(<span class="at">lng1 =</span> bounding_box[<span class="dv">1</span>],</span>
+<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a>                        <span class="at">lat1 =</span> bounding_box[<span class="dv">2</span>],</span>
+<span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a>                        <span class="at">lng2 =</span> bounding_box[<span class="dv">3</span>],</span>
+<span id="cb26-8"><a href="#cb26-8" tabindex="-1"></a>                        <span class="at">lat2 =</span> bounding_box[<span class="dv">4</span>]) <span class="sc">%&gt;%</span></span>
+<span id="cb26-9"><a href="#cb26-9" tabindex="-1"></a>            <span class="fu">addProviderTiles</span>(providers<span class="sc">$</span>OpenStreetMap, <span class="at">options =</span> <span class="fu">providerTileOptions</span>(<span class="at">minZoom =</span> <span class="dv">5</span>, <span class="at">maxZoom =</span> <span class="dv">5</span>)) </span></code></pre></div>
 </div>
-<div id="función-addpolygonlayer-2" class="section level4">
+<div id="función-addpolygonlayer-1" class="section level4">
 <h4>Función <code>addPolygonLayer()</code></h4>
 <p>Se añaden las capas de polígonos al mapa de Leaflet para cada
 combinación de año y grado. Se recorren todas las combinaciones posibles
@@ -2427,24 +2568,23 @@ combinación, añade una capa de polígonos al mapa utilizando la función
 <code>addPolygonLayer</code>. La lista shape_estados contiene los datos
 geográficos organizados por año y grado, y la lista paleta proporciona
 la paleta de colores correspondiente para cada grado.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="co"># Contador de IDs</span></span>
-<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>id_counter <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a></span>
-<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a>map <span class="ot">&lt;-</span> base</span>
-<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a><span class="co"># Añadir capas de polígonos para cada año</span></span>
-<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(years)) {</span>
-<span id="cb25-7"><a href="#cb25-7" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> <span class="fu">seq_along</span>(grados)){</span>
-<span id="cb25-8"><a href="#cb25-8" tabindex="-1"></a>           map <span class="ot">&lt;-</span> <span class="fu">addPolygonLayer</span>(map, </span>
-<span id="cb25-9"><a href="#cb25-9" tabindex="-1"></a>                                   <span class="at">data =</span> shape_estados_[[i]][[j]], </span>
-<span id="cb25-10"><a href="#cb25-10" tabindex="-1"></a>                                    <span class="at">year =</span> years[i], </span>
-<span id="cb25-11"><a href="#cb25-11" tabindex="-1"></a>                                     <span class="at">grado =</span> grados[j], </span>
-<span id="cb25-12"><a href="#cb25-12" tabindex="-1"></a>                                      <span class="at">paleta =</span> paleta[j]</span>
-<span id="cb25-13"><a href="#cb25-13" tabindex="-1"></a>                                       <span class="co">#id = paste0(str_pad(id_counter, 2, &quot;left&quot;, pad = &quot;0&quot;), years[i])</span></span>
-<span id="cb25-14"><a href="#cb25-14" tabindex="-1"></a>                                  )</span>
-<span id="cb25-15"><a href="#cb25-15" tabindex="-1"></a>           id_counter <span class="ot">&lt;-</span> id_counter <span class="sc">+</span> <span class="dv">1</span></span>
-<span id="cb25-16"><a href="#cb25-16" tabindex="-1"></a>  }</span>
-<span id="cb25-17"><a href="#cb25-17" tabindex="-1"></a>}</span>
-<span id="cb25-18"><a href="#cb25-18" tabindex="-1"></a>map</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="co"># Contador de IDs</span></span>
+<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a>id_counter <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a>map <span class="ot">&lt;-</span> base</span>
+<span id="cb27-5"><a href="#cb27-5" tabindex="-1"></a><span class="co"># Añadir capas de polígonos para cada año</span></span>
+<span id="cb27-6"><a href="#cb27-6" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(years)) {</span>
+<span id="cb27-7"><a href="#cb27-7" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> <span class="fu">seq_along</span>(grados)){</span>
+<span id="cb27-8"><a href="#cb27-8" tabindex="-1"></a>           map <span class="ot">&lt;-</span> <span class="fu">addPolygonLayer</span>(map, </span>
+<span id="cb27-9"><a href="#cb27-9" tabindex="-1"></a>                                   <span class="at">data =</span> shape_estados[[i]][[j]], </span>
+<span id="cb27-10"><a href="#cb27-10" tabindex="-1"></a>                                    <span class="at">year =</span> years[i], </span>
+<span id="cb27-11"><a href="#cb27-11" tabindex="-1"></a>                                     <span class="at">grado =</span> grados[j], </span>
+<span id="cb27-12"><a href="#cb27-12" tabindex="-1"></a>                                      <span class="at">paleta =</span> paleta[j],</span>
+<span id="cb27-13"><a href="#cb27-13" tabindex="-1"></a>                                       <span class="at">id =</span> <span class="fu">paste0</span>(<span class="fu">str_pad</span>(id_counter, <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>), years[i])</span>
+<span id="cb27-14"><a href="#cb27-14" tabindex="-1"></a>                                  )</span>
+<span id="cb27-15"><a href="#cb27-15" tabindex="-1"></a>           id_counter <span class="ot">&lt;-</span> id_counter <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb27-16"><a href="#cb27-16" tabindex="-1"></a>  }</span>
+<span id="cb27-17"><a href="#cb27-17" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 <div id="se-añade-la-leyenda-y-control-de-capas-1" class="section level4">
 <h4>Se añade la leyenda y control de capas</h4>
@@ -2471,18 +2611,17 @@ significa que el control de capas estará expandido por defecto,
 mostrando todas las opciones disponibles sin necesidad de expandirlo
 manualmente.</li>
 </ul>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a>map <span class="ot">&lt;-</span> map <span class="sc">%&gt;%</span></span>
-<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>        <span class="fu">addControl</span>(title, <span class="at">position =</span> <span class="st">&quot;bottomright&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>         <span class="fu">addLegend</span>(<span class="st">&quot;bottomright&quot;</span>, </span>
-<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a>                    <span class="at">colors =</span> paleta, </span>
-<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a>                    <span class="at">labels =</span> grados,</span>
-<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a>                    <span class="at">title =</span> stringr<span class="sc">::</span><span class="fu">str_wrap</span>(<span class="st">&quot;Grado de marginación&quot;</span>, <span class="dv">15</span>), </span>
-<span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a>                    <span class="at">opacity =</span> <span class="fl">0.7</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb26-8"><a href="#cb26-8" tabindex="-1"></a>          <span class="fu">addLayersControl</span>(</span>
-<span id="cb26-9"><a href="#cb26-9" tabindex="-1"></a>           <span class="at">overlayGroups =</span> <span class="fu">c</span>(<span class="st">&quot;Muy alto&quot;</span>, <span class="st">&quot;Alto&quot;</span>, <span class="st">&quot;Medio&quot;</span>, <span class="st">&quot;Bajo&quot;</span>, <span class="st">&quot;Muy bajo&quot;</span>),</span>
-<span id="cb26-10"><a href="#cb26-10" tabindex="-1"></a>           <span class="co"># baseGroups = c(&quot;2010&quot;), </span></span>
-<span id="cb26-11"><a href="#cb26-11" tabindex="-1"></a>             <span class="at">options =</span> <span class="fu">layersControlOptions</span>(<span class="at">collapsed =</span> <span class="cn">FALSE</span>))</span>
-<span id="cb26-12"><a href="#cb26-12" tabindex="-1"></a>map</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a>map <span class="ot">&lt;-</span> map <span class="sc">%&gt;%</span></span>
+<span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a>        <span class="fu">addControl</span>(title, <span class="at">position =</span> <span class="st">&quot;bottomright&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a>         <span class="fu">addLegend</span>(<span class="st">&quot;bottomright&quot;</span>, </span>
+<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a>                    <span class="at">colors =</span> paleta, </span>
+<span id="cb28-5"><a href="#cb28-5" tabindex="-1"></a>                    <span class="at">labels =</span> grados,</span>
+<span id="cb28-6"><a href="#cb28-6" tabindex="-1"></a>                    <span class="at">title =</span> stringr<span class="sc">::</span><span class="fu">str_wrap</span>(<span class="st">&quot;Grado de marginación&quot;</span>, <span class="dv">15</span>), </span>
+<span id="cb28-7"><a href="#cb28-7" tabindex="-1"></a>                    <span class="at">opacity =</span> <span class="fl">0.7</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb28-8"><a href="#cb28-8" tabindex="-1"></a>          <span class="fu">addLayersControl</span>(</span>
+<span id="cb28-9"><a href="#cb28-9" tabindex="-1"></a>           <span class="at">overlayGroups =</span> <span class="fu">c</span>(<span class="st">&quot;Muy alto&quot;</span>, <span class="st">&quot;Alto&quot;</span>, <span class="st">&quot;Medio&quot;</span>, <span class="st">&quot;Bajo&quot;</span>, <span class="st">&quot;Muy bajo&quot;</span>),</span>
+<span id="cb28-10"><a href="#cb28-10" tabindex="-1"></a>            <span class="at">baseGroups =</span> <span class="fu">c</span>(<span class="st">&quot;2020&quot;</span>, <span class="st">&quot;2015&quot;</span>, <span class="st">&quot;2010&quot;</span>), </span>
+<span id="cb28-11"><a href="#cb28-11" tabindex="-1"></a>             <span class="at">options =</span> <span class="fu">layersControlOptions</span>(<span class="at">collapsed =</span> <span class="cn">FALSE</span>))</span></code></pre></div>
 </div>
 <div id="se-configura-el-control-de-capas-1" class="section level4">
 <h4>Se configura el control de capas</h4>
@@ -2505,50 +2644,49 @@ usuario cambia la capa base del mapa.</li>
 <li><code>overlayadd</code>: Este evento se activa cuando se añade una
 capa superpuesta al mapa.</li>
 </ul>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a>map <span class="ot">&lt;-</span> map <span class="sc">%&gt;%</span></span>
-<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a>        htmlwidgets<span class="sc">::</span><span class="fu">onRender</span>(<span class="st">&quot;</span></span>
-<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a><span class="st">          function(el, x) {</span></span>
-<span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a><span class="st">            var myMap = this;</span></span>
-<span id="cb27-5"><a href="#cb27-5" tabindex="-1"></a><span class="st">            var baseLayer = &#39;2020&#39;;</span></span>
-<span id="cb27-6"><a href="#cb27-6" tabindex="-1"></a><span class="st">            myMap.eachLayer(function(layer) {</span></span>
-<span id="cb27-7"><a href="#cb27-7" tabindex="-1"></a><span class="st">              var id = layer.options.layerId;</span></span>
-<span id="cb27-8"><a href="#cb27-8" tabindex="-1"></a><span class="st">              if (id) {</span></span>
-<span id="cb27-9"><a href="#cb27-9" tabindex="-1"></a><span class="st">                if (!id.endsWith(baseLayer)) {</span></span>
-<span id="cb27-10"><a href="#cb27-10" tabindex="-1"></a><span class="st">                  layer.getElement().style.display = &#39;none&#39;;</span></span>
-<span id="cb27-11"><a href="#cb27-11" tabindex="-1"></a><span class="st">                }</span></span>
-<span id="cb27-12"><a href="#cb27-12" tabindex="-1"></a><span class="st">              }</span></span>
-<span id="cb27-13"><a href="#cb27-13" tabindex="-1"></a><span class="st">            });</span></span>
-<span id="cb27-14"><a href="#cb27-14" tabindex="-1"></a><span class="st">      </span></span>
-<span id="cb27-15"><a href="#cb27-15" tabindex="-1"></a><span class="st">            myMap.on(&#39;baselayerchange&#39;, function(e) {</span></span>
-<span id="cb27-16"><a href="#cb27-16" tabindex="-1"></a><span class="st">              baseLayer = e.name;</span></span>
-<span id="cb27-17"><a href="#cb27-17" tabindex="-1"></a><span class="st">              myMap.eachLayer(function(layer) {</span></span>
-<span id="cb27-18"><a href="#cb27-18" tabindex="-1"></a><span class="st">                var id = layer.options.layerId;</span></span>
-<span id="cb27-19"><a href="#cb27-19" tabindex="-1"></a><span class="st">                if (id) {</span></span>
-<span id="cb27-20"><a href="#cb27-20" tabindex="-1"></a><span class="st">                  if (!id.endsWith(baseLayer)) {</span></span>
-<span id="cb27-21"><a href="#cb27-21" tabindex="-1"></a><span class="st">                    layer.getElement().style.display = &#39;none&#39;;</span></span>
-<span id="cb27-22"><a href="#cb27-22" tabindex="-1"></a><span class="st">                    layer.closePopup();</span></span>
-<span id="cb27-23"><a href="#cb27-23" tabindex="-1"></a><span class="st">                  } </span></span>
-<span id="cb27-24"><a href="#cb27-24" tabindex="-1"></a><span class="st">                  else {</span></span>
-<span id="cb27-25"><a href="#cb27-25" tabindex="-1"></a><span class="st">                    layer.getElement().style.display = &#39;block&#39;;</span></span>
-<span id="cb27-26"><a href="#cb27-26" tabindex="-1"></a><span class="st">                  }</span></span>
-<span id="cb27-27"><a href="#cb27-27" tabindex="-1"></a><span class="st">                }</span></span>
-<span id="cb27-28"><a href="#cb27-28" tabindex="-1"></a><span class="st">              });</span></span>
-<span id="cb27-29"><a href="#cb27-29" tabindex="-1"></a><span class="st">            });</span></span>
-<span id="cb27-30"><a href="#cb27-30" tabindex="-1"></a><span class="st">      </span></span>
-<span id="cb27-31"><a href="#cb27-31" tabindex="-1"></a><span class="st">            myMap.on(&#39;overlayadd&#39;, function(e) {</span></span>
-<span id="cb27-32"><a href="#cb27-32" tabindex="-1"></a><span class="st">              myMap.eachLayer(function(layer) {</span></span>
-<span id="cb27-33"><a href="#cb27-33" tabindex="-1"></a><span class="st">                var id = layer.options.layerId;</span></span>
-<span id="cb27-34"><a href="#cb27-34" tabindex="-1"></a><span class="st">                if (id) {</span></span>
-<span id="cb27-35"><a href="#cb27-35" tabindex="-1"></a><span class="st">                  if (!id.endsWith(baseLayer)) {</span></span>
-<span id="cb27-36"><a href="#cb27-36" tabindex="-1"></a><span class="st">                    layer.getElement().style.display = &#39;none&#39;;</span></span>
-<span id="cb27-37"><a href="#cb27-37" tabindex="-1"></a><span class="st">                  } else {</span></span>
-<span id="cb27-38"><a href="#cb27-38" tabindex="-1"></a><span class="st">                    layer.getElement().style.display = &#39;block&#39;;</span></span>
-<span id="cb27-39"><a href="#cb27-39" tabindex="-1"></a><span class="st">                  }</span></span>
-<span id="cb27-40"><a href="#cb27-40" tabindex="-1"></a><span class="st">                }</span></span>
-<span id="cb27-41"><a href="#cb27-41" tabindex="-1"></a><span class="st">              });</span></span>
-<span id="cb27-42"><a href="#cb27-42" tabindex="-1"></a><span class="st">            });</span></span>
-<span id="cb27-43"><a href="#cb27-43" tabindex="-1"></a><span class="st">          }&quot;</span>)</span>
-<span id="cb27-44"><a href="#cb27-44" tabindex="-1"></a>map</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a>map <span class="ot">&lt;-</span> map <span class="sc">%&gt;%</span></span>
+<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a>        htmlwidgets<span class="sc">::</span><span class="fu">onRender</span>(<span class="st">&quot;</span></span>
+<span id="cb29-3"><a href="#cb29-3" tabindex="-1"></a><span class="st">          function(el, x) {</span></span>
+<span id="cb29-4"><a href="#cb29-4" tabindex="-1"></a><span class="st">            var myMap = this;</span></span>
+<span id="cb29-5"><a href="#cb29-5" tabindex="-1"></a><span class="st">            var baseLayer = &#39;2020&#39;;</span></span>
+<span id="cb29-6"><a href="#cb29-6" tabindex="-1"></a><span class="st">            myMap.eachLayer(function(layer) {</span></span>
+<span id="cb29-7"><a href="#cb29-7" tabindex="-1"></a><span class="st">              var id = layer.options.layerId;</span></span>
+<span id="cb29-8"><a href="#cb29-8" tabindex="-1"></a><span class="st">              if (id) {</span></span>
+<span id="cb29-9"><a href="#cb29-9" tabindex="-1"></a><span class="st">                if (!id.endsWith(baseLayer)) {</span></span>
+<span id="cb29-10"><a href="#cb29-10" tabindex="-1"></a><span class="st">                  layer.getElement().style.display = &#39;none&#39;;</span></span>
+<span id="cb29-11"><a href="#cb29-11" tabindex="-1"></a><span class="st">                }</span></span>
+<span id="cb29-12"><a href="#cb29-12" tabindex="-1"></a><span class="st">              }</span></span>
+<span id="cb29-13"><a href="#cb29-13" tabindex="-1"></a><span class="st">            });</span></span>
+<span id="cb29-14"><a href="#cb29-14" tabindex="-1"></a><span class="st">      </span></span>
+<span id="cb29-15"><a href="#cb29-15" tabindex="-1"></a><span class="st">            myMap.on(&#39;baselayerchange&#39;, function(e) {</span></span>
+<span id="cb29-16"><a href="#cb29-16" tabindex="-1"></a><span class="st">              baseLayer = e.name;</span></span>
+<span id="cb29-17"><a href="#cb29-17" tabindex="-1"></a><span class="st">              myMap.eachLayer(function(layer) {</span></span>
+<span id="cb29-18"><a href="#cb29-18" tabindex="-1"></a><span class="st">                var id = layer.options.layerId;</span></span>
+<span id="cb29-19"><a href="#cb29-19" tabindex="-1"></a><span class="st">                if (id) {</span></span>
+<span id="cb29-20"><a href="#cb29-20" tabindex="-1"></a><span class="st">                  if (!id.endsWith(baseLayer)) {</span></span>
+<span id="cb29-21"><a href="#cb29-21" tabindex="-1"></a><span class="st">                    layer.getElement().style.display = &#39;none&#39;;</span></span>
+<span id="cb29-22"><a href="#cb29-22" tabindex="-1"></a><span class="st">                    layer.closePopup();</span></span>
+<span id="cb29-23"><a href="#cb29-23" tabindex="-1"></a><span class="st">                  } </span></span>
+<span id="cb29-24"><a href="#cb29-24" tabindex="-1"></a><span class="st">                  else {</span></span>
+<span id="cb29-25"><a href="#cb29-25" tabindex="-1"></a><span class="st">                    layer.getElement().style.display = &#39;block&#39;;</span></span>
+<span id="cb29-26"><a href="#cb29-26" tabindex="-1"></a><span class="st">                  }</span></span>
+<span id="cb29-27"><a href="#cb29-27" tabindex="-1"></a><span class="st">                }</span></span>
+<span id="cb29-28"><a href="#cb29-28" tabindex="-1"></a><span class="st">              });</span></span>
+<span id="cb29-29"><a href="#cb29-29" tabindex="-1"></a><span class="st">            });</span></span>
+<span id="cb29-30"><a href="#cb29-30" tabindex="-1"></a><span class="st">      </span></span>
+<span id="cb29-31"><a href="#cb29-31" tabindex="-1"></a><span class="st">            myMap.on(&#39;overlayadd&#39;, function(e) {</span></span>
+<span id="cb29-32"><a href="#cb29-32" tabindex="-1"></a><span class="st">              myMap.eachLayer(function(layer) {</span></span>
+<span id="cb29-33"><a href="#cb29-33" tabindex="-1"></a><span class="st">                var id = layer.options.layerId;</span></span>
+<span id="cb29-34"><a href="#cb29-34" tabindex="-1"></a><span class="st">                if (id) {</span></span>
+<span id="cb29-35"><a href="#cb29-35" tabindex="-1"></a><span class="st">                  if (!id.endsWith(baseLayer)) {</span></span>
+<span id="cb29-36"><a href="#cb29-36" tabindex="-1"></a><span class="st">                    layer.getElement().style.display = &#39;none&#39;;</span></span>
+<span id="cb29-37"><a href="#cb29-37" tabindex="-1"></a><span class="st">                  } else {</span></span>
+<span id="cb29-38"><a href="#cb29-38" tabindex="-1"></a><span class="st">                    layer.getElement().style.display = &#39;block&#39;;</span></span>
+<span id="cb29-39"><a href="#cb29-39" tabindex="-1"></a><span class="st">                  }</span></span>
+<span id="cb29-40"><a href="#cb29-40" tabindex="-1"></a><span class="st">                }</span></span>
+<span id="cb29-41"><a href="#cb29-41" tabindex="-1"></a><span class="st">              });</span></span>
+<span id="cb29-42"><a href="#cb29-42" tabindex="-1"></a><span class="st">            });</span></span>
+<span id="cb29-43"><a href="#cb29-43" tabindex="-1"></a><span class="st">          }&quot;</span>)</span></code></pre></div>
 <p>Se genera un Widget Interactivo con la función
 <code>saveWidget()</code>,</p>
 <p><strong>Consideraciones</strong></p>
@@ -2570,11 +2708,149 @@ mismo contexto podría no ser necesario. Normalmente, se elige uno u otro
 según la necesidad específica: guardar el mapa interactivo para ser
 utilizado en un sitio web (saveWidget) o capturar una imagen estática
 para propósitos de visualización o impresión (mapshot).</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="co">#saveRDS(map,  paste0(here::here(), &quot;/Output/map_2020.RDS&quot;))</span></span>
-<span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a><span class="fu">saveWidget</span>(map,  <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/index.html&quot;</span>), <span class="at">selfcontained =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a></span>
-<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a>map <span class="ot">&lt;-</span> map <span class="sc">%&gt;%</span> </span>
-<span id="cb28-5"><a href="#cb28-5" tabindex="-1"></a>        <span class="fu">mapshot</span>(<span class="at">url =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/index.html&quot;</span>)) </span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a><span class="co">#saveRDS(map,  paste0(here::here(), &quot;/Output/map_2020.RDS&quot;))</span></span>
+<span id="cb30-2"><a href="#cb30-2" tabindex="-1"></a><span class="fu">saveWidget</span>(map,  <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/index.html&quot;</span>), <span class="at">selfcontained =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb30-3"><a href="#cb30-3" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" tabindex="-1"></a>map <span class="ot">&lt;-</span> map <span class="sc">%&gt;%</span> </span>
+<span id="cb30-5"><a href="#cb30-5" tabindex="-1"></a>        <span class="fu">mapshot</span>(<span class="at">url =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/index.html&quot;</span>)) </span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a><span class="fu">library</span>(jsonlite)</span>
+<span id="cb31-3"><a href="#cb31-3" tabindex="-1"></a><span class="co"># Define los datos y años</span></span>
+<span id="cb31-4"><a href="#cb31-4" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;2020&quot;</span>, <span class="st">&quot;2015&quot;</span>, <span class="st">&quot;2010&quot;</span>)</span>
+<span id="cb31-5"><a href="#cb31-5" tabindex="-1"></a>grados <span class="ot">&lt;-</span>  <span class="fu">c</span>(<span class="st">&quot;Muy alto&quot;</span>, <span class="st">&quot;Alto&quot;</span>, <span class="st">&quot;Medio&quot;</span>, <span class="st">&quot;Bajo&quot;</span>, <span class="st">&quot;Muy bajo&quot;</span>)</span>
+<span id="cb31-6"><a href="#cb31-6" tabindex="-1"></a></span>
+<span id="cb31-7"><a href="#cb31-7" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb31-8"><a href="#cb31-8" tabindex="-1"></a>shape_estados <span class="ot">&lt;-</span> <span class="fu">list</span>(shape_estados_2020, shape_estados_2015, shape_estados_2010)</span>
+<span id="cb31-9"><a href="#cb31-9" tabindex="-1"></a></span>
+<span id="cb31-10"><a href="#cb31-10" tabindex="-1"></a><span class="co"># lista de TopoJSONs:</span></span>
+<span id="cb31-11"><a href="#cb31-11" tabindex="-1"></a>shape_estados_1 <span class="ot">&lt;-</span> <span class="fu">map</span>(<span class="fu">seq_along</span>(years), <span class="cf">function</span>(year) {</span>
+<span id="cb31-12"><a href="#cb31-12" tabindex="-1"></a>                      <span class="fu">map</span>(grados, <span class="cf">function</span>(grado) {</span>
+<span id="cb31-13"><a href="#cb31-13" tabindex="-1"></a>                             <span class="fu">fromJSON</span>(<span class="fu">get</span>(<span class="fu">paste0</span>(<span class="st">&quot;shape_estados&quot;</span>))[[year]][[grado]], <span class="at">simplifyVector =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb31-14"><a href="#cb31-14" tabindex="-1"></a>                      })</span>
+<span id="cb31-15"><a href="#cb31-15" tabindex="-1"></a>                    })</span>
+<span id="cb31-16"><a href="#cb31-16" tabindex="-1"></a></span>
+<span id="cb31-17"><a href="#cb31-17" tabindex="-1"></a><span class="co"># Función para generar IDs:   </span></span>
+<span id="cb31-18"><a href="#cb31-18" tabindex="-1"></a>generate_ids <span class="ot">&lt;-</span> <span class="cf">function</span>(start, end) {</span>
+<span id="cb31-19"><a href="#cb31-19" tabindex="-1"></a>    <span class="fu">str_pad</span>(<span class="fu">as.character</span>(<span class="fu">seq</span>(start, end)), <span class="dv">2</span>, <span class="st">&quot;left&quot;</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>)</span>
+<span id="cb31-20"><a href="#cb31-20" tabindex="-1"></a>}</span>
+<span id="cb31-21"><a href="#cb31-21" tabindex="-1"></a></span>
+<span id="cb31-22"><a href="#cb31-22" tabindex="-1"></a><span class="co"># Aplicar transformaciones a las propiedades de cada geometría</span></span>
+<span id="cb31-23"><a href="#cb31-23" tabindex="-1"></a>start_id <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb31-24"><a href="#cb31-24" tabindex="-1"></a>shape_estados_1 <span class="ot">&lt;-</span> <span class="fu">map2</span>(shape_estados_1, years, <span class="cf">function</span>(shape_files, year) {</span>
+<span id="cb31-25"><a href="#cb31-25" tabindex="-1"></a>                    <span class="fu">map2</span>(shape_files, <span class="fu">seq_along</span>(grados), <span class="cf">function</span>(shape_file, grado_idx) {</span>
+<span id="cb31-26"><a href="#cb31-26" tabindex="-1"></a>                          geometries <span class="ot">&lt;-</span> shape_file<span class="sc">$</span>objects<span class="sc">$</span>foo<span class="sc">$</span>geometries</span>
+<span id="cb31-27"><a href="#cb31-27" tabindex="-1"></a>                            geometries <span class="ot">&lt;-</span> <span class="fu">map</span>(geometries, <span class="cf">function</span>(geom) {</span>
+<span id="cb31-28"><a href="#cb31-28" tabindex="-1"></a>                                            properties <span class="ot">&lt;-</span> geom<span class="sc">$</span>properties</span>
+<span id="cb31-29"><a href="#cb31-29" tabindex="-1"></a>                                              <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(properties) <span class="sc">&amp;&amp;</span> <span class="fu">length</span>(properties) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb31-30"><a href="#cb31-30" tabindex="-1"></a>                                                end_id <span class="ot">&lt;-</span> start_id <span class="sc">+</span> <span class="fu">length</span>(properties<span class="sc">$</span>CVE_ENT) <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb31-31"><a href="#cb31-31" tabindex="-1"></a>                                                properties[[<span class="st">&quot;ID&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">generate_ids</span>(start_id, end_id)</span>
+<span id="cb31-32"><a href="#cb31-32" tabindex="-1"></a>                                                properties[[<span class="st">&quot;ANIO&quot;</span>]] <span class="ot">&lt;-</span> year</span>
+<span id="cb31-33"><a href="#cb31-33" tabindex="-1"></a>                                                properties[[<span class="st">&quot;id_year&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="fu">generate_ids</span>(start_id, end_id), year)</span>
+<span id="cb31-34"><a href="#cb31-34" tabindex="-1"></a>                                                geom<span class="sc">$</span>properties <span class="ot">&lt;-</span> properties</span>
+<span id="cb31-35"><a href="#cb31-35" tabindex="-1"></a>                                                start_id <span class="ot">&lt;&lt;-</span> end_id <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb31-36"><a href="#cb31-36" tabindex="-1"></a>                                                  }</span>
+<span id="cb31-37"><a href="#cb31-37" tabindex="-1"></a>                                                geom</span>
+<span id="cb31-38"><a href="#cb31-38" tabindex="-1"></a>                                              })</span>
+<span id="cb31-39"><a href="#cb31-39" tabindex="-1"></a>                          shape_file<span class="sc">$</span>objects<span class="sc">$</span>foo<span class="sc">$</span>geometries <span class="ot">&lt;-</span> geometries</span>
+<span id="cb31-40"><a href="#cb31-40" tabindex="-1"></a>                          shape_file</span>
+<span id="cb31-41"><a href="#cb31-41" tabindex="-1"></a>                    })</span>
+<span id="cb31-42"><a href="#cb31-42" tabindex="-1"></a>})</span>
+<span id="cb31-43"><a href="#cb31-43" tabindex="-1"></a></span>
+<span id="cb31-44"><a href="#cb31-44" tabindex="-1"></a>paleta <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;#13322B&quot;</span>, <span class="co">#Muy alto</span></span>
+<span id="cb31-45"><a href="#cb31-45" tabindex="-1"></a>            <span class="st">&quot;#086953&quot;</span>, <span class="co">#Alto </span></span>
+<span id="cb31-46"><a href="#cb31-46" tabindex="-1"></a>            <span class="st">&quot;#4C9562&quot;</span>, <span class="co">#Medio</span></span>
+<span id="cb31-47"><a href="#cb31-47" tabindex="-1"></a>            <span class="st">&quot;#D1BB9E&quot;</span>, <span class="co">#Bajo</span></span>
+<span id="cb31-48"><a href="#cb31-48" tabindex="-1"></a>            <span class="st">&quot;#C3BA6D&quot;</span>) <span class="co"># Muy bajo</span></span>
+<span id="cb31-49"><a href="#cb31-49" tabindex="-1"></a></span>
+<span id="cb31-50"><a href="#cb31-50" tabindex="-1"></a>shape_estados_1 <span class="ot">&lt;-</span> <span class="fu">map2</span>(shape_estados_1, years, <span class="cf">function</span>(shape_files, year) {</span>
+<span id="cb31-51"><a href="#cb31-51" tabindex="-1"></a>                      <span class="fu">map2</span>(shape_files, <span class="fu">seq_along</span>(grados), <span class="cf">function</span>(shape_file, grado_idx) {</span>
+<span id="cb31-52"><a href="#cb31-52" tabindex="-1"></a>                        shape_file<span class="sc">$</span>style <span class="ot">=</span> <span class="fu">list</span>(<span class="at">fillColor =</span> paleta[grado_idx],</span>
+<span id="cb31-53"><a href="#cb31-53" tabindex="-1"></a>                                                <span class="at">fillOpacity =</span> <span class="fl">0.8</span>,</span>
+<span id="cb31-54"><a href="#cb31-54" tabindex="-1"></a>                                                <span class="at">stroke =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb31-55"><a href="#cb31-55" tabindex="-1"></a>                                                <span class="at">weight =</span> <span class="dv">1</span>,</span>
+<span id="cb31-56"><a href="#cb31-56" tabindex="-1"></a>                                                <span class="at">dashArray =</span> <span class="st">&quot;1&quot;</span>,</span>
+<span id="cb31-57"><a href="#cb31-57" tabindex="-1"></a>                                                <span class="at">opacity =</span> <span class="dv">1</span>,</span>
+<span id="cb31-58"><a href="#cb31-58" tabindex="-1"></a>                                                <span class="at">color =</span> <span class="st">&quot;#D4D0BD&quot;</span></span>
+<span id="cb31-59"><a href="#cb31-59" tabindex="-1"></a>                                                )</span>
+<span id="cb31-60"><a href="#cb31-60" tabindex="-1"></a>                        shape_file</span>
+<span id="cb31-61"><a href="#cb31-61" tabindex="-1"></a>                        })</span>
+<span id="cb31-62"><a href="#cb31-62" tabindex="-1"></a>                      })</span></code></pre></div>
+</div>
+<div id="se-define-una-función-para-añadir-capas-de-polígonos-2" class="section level4">
+<h4>Se define una función para añadir capas de polígonos</h4>
+<p>Se define una función llamada <code>addPolygonLayer</code>, la cual
+añade una capa de polígonos a un mapa de Leaflet. Se tienen que
+especificar los argumentos:</p>
+<ul>
+<li><code>map</code>: El objeto de mapa de Leaflet al que se le añadirá
+la nueva capa de polígonos.<br />
+</li>
+<li><code>data</code>: Los datos que contienen la información geográfica
+de los polígonos.<br />
+</li>
+<li><code>year</code>: Año asociado con los datos de los polígonos,
+usado para agrupar.<br />
+</li>
+<li><code>grado</code>: Grado asociado con los datos de los polígonos,
+también usado para agrupar.<br />
+</li>
+<li><code>paleta</code>: Paleta de colores que se usará para rellenar
+los polígonos.</li>
+</ul>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a><span class="co"># Define una función para añadir capas de polígonos</span></span>
+<span id="cb32-2"><a href="#cb32-2" tabindex="-1"></a>addPolygonLayer <span class="ot">&lt;-</span> <span class="cf">function</span>(map, data, year, grado) {</span>
+<span id="cb32-3"><a href="#cb32-3" tabindex="-1"></a>                            map <span class="ot">&lt;-</span> map <span class="sc">%&gt;%</span></span>
+<span id="cb32-4"><a href="#cb32-4" tabindex="-1"></a>                                    <span class="fu">addTopoJSON</span>(data,</span>
+<span id="cb32-5"><a href="#cb32-5" tabindex="-1"></a>                                                 <span class="at">group =</span> grado</span>
+<span id="cb32-6"><a href="#cb32-6" tabindex="-1"></a>                                                  <span class="co">#layerId = id</span></span>
+<span id="cb32-7"><a href="#cb32-7" tabindex="-1"></a>                                                         </span>
+<span id="cb32-8"><a href="#cb32-8" tabindex="-1"></a>                                                )</span>
+<span id="cb32-9"><a href="#cb32-9" tabindex="-1"></a>                             <span class="fu">return</span>(map)</span>
+<span id="cb32-10"><a href="#cb32-10" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<div id="se-crea-el-mapa-inicial-2" class="section level4">
+<h4>Se crea el mapa inicial</h4>
+<p>Se crea un mapa centrado en unas coordenadas específicas
+(<code>lat = 23.6260333</code> y <code>lng = -102.5375005</code>), con
+un nivel de zoom fijo, y establece los límites máximos para evitar que
+el usuario se desplace fuera de una región definida. El mapa utiliza
+capa de OpenStreetMap tanto en la capa base como en una capa adicional
+de tiles del mismo proveedor.</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a><span class="co"># Crear el mapa inicial</span></span>
+<span id="cb33-2"><a href="#cb33-2" tabindex="-1"></a>base <span class="ot">&lt;-</span> <span class="fu">leaflet</span>(<span class="at">options =</span> <span class="fu">leafletOptions</span>(<span class="at">minZoom =</span> <span class="dv">5</span>, <span class="at">maxZoom =</span> <span class="dv">5</span>, <span class="at">zoomControl =</span> <span class="cn">FALSE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb33-3"><a href="#cb33-3" tabindex="-1"></a>         <span class="fu">addTiles</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb33-4"><a href="#cb33-4" tabindex="-1"></a>          <span class="fu">setView</span>(<span class="at">lat =</span> <span class="fl">23.6260333</span>, <span class="at">lng =</span> <span class="sc">-</span><span class="fl">102.5375005</span>, <span class="at">zoom =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb33-5"><a href="#cb33-5" tabindex="-1"></a>           <span class="fu">setMaxBounds</span>(<span class="at">lng1 =</span> bounding_box[<span class="dv">1</span>],</span>
+<span id="cb33-6"><a href="#cb33-6" tabindex="-1"></a>                        <span class="at">lat1 =</span> bounding_box[<span class="dv">2</span>],</span>
+<span id="cb33-7"><a href="#cb33-7" tabindex="-1"></a>                        <span class="at">lng2 =</span> bounding_box[<span class="dv">3</span>],</span>
+<span id="cb33-8"><a href="#cb33-8" tabindex="-1"></a>                        <span class="at">lat2 =</span> bounding_box[<span class="dv">4</span>]) <span class="sc">%&gt;%</span></span>
+<span id="cb33-9"><a href="#cb33-9" tabindex="-1"></a>            <span class="fu">addProviderTiles</span>(providers<span class="sc">$</span>OpenStreetMap, <span class="at">options =</span> <span class="fu">providerTileOptions</span>(<span class="at">minZoom =</span> <span class="dv">5</span>, <span class="at">maxZoom =</span> <span class="dv">5</span>)) </span></code></pre></div>
+</div>
+<div id="función-addpolygonlayer-2" class="section level4">
+<h4>Función <code>addPolygonLayer()</code></h4>
+<p>Se añaden las capas de polígonos al mapa de Leaflet para cada
+combinación de año y grado. Se recorren todas las combinaciones posibles
+de años (<code>years</code>) y grados (<code>grados</code>), y para cada
+combinación, añade una capa de polígonos al mapa utilizando la función
+<code>addPolygonLayer</code>. La lista shape_estados contiene los datos
+geográficos organizados por año y grado, y la lista paleta proporciona
+la paleta de colores correspondiente para cada grado.</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a><span class="co"># Contador de IDs</span></span>
+<span id="cb34-2"><a href="#cb34-2" tabindex="-1"></a>id_counter <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb34-3"><a href="#cb34-3" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="#cb34-4" tabindex="-1"></a>map <span class="ot">&lt;-</span> base</span>
+<span id="cb34-5"><a href="#cb34-5" tabindex="-1"></a><span class="co"># Añadir capas de polígonos para cada año</span></span>
+<span id="cb34-6"><a href="#cb34-6" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(years)[<span class="dv">1</span>]) {</span>
+<span id="cb34-7"><a href="#cb34-7" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> <span class="fu">seq_along</span>(grados)){</span>
+<span id="cb34-8"><a href="#cb34-8" tabindex="-1"></a>           map <span class="ot">&lt;-</span> <span class="fu">addPolygonLayer</span>(map, </span>
+<span id="cb34-9"><a href="#cb34-9" tabindex="-1"></a>                                   <span class="at">data =</span> shape_estados_1[[i]][[j]], </span>
+<span id="cb34-10"><a href="#cb34-10" tabindex="-1"></a>                                    <span class="at">year =</span> years[i], </span>
+<span id="cb34-11"><a href="#cb34-11" tabindex="-1"></a>                                     <span class="at">grado =</span> grados[j]</span>
+<span id="cb34-12"><a href="#cb34-12" tabindex="-1"></a>                                  )</span>
+<span id="cb34-13"><a href="#cb34-13" tabindex="-1"></a>           id_counter <span class="ot">&lt;-</span> id_counter <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb34-14"><a href="#cb34-14" tabindex="-1"></a>  }</span>
+<span id="cb34-15"><a href="#cb34-15" tabindex="-1"></a>}</span>
+<span id="cb34-16"><a href="#cb34-16" tabindex="-1"></a>map</span></code></pre></div>
 </div>
 </div>
 </div>
