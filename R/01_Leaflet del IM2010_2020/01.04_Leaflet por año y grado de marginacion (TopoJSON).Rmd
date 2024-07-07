@@ -27,17 +27,24 @@ font-family: "Montserrat";
 font-size: 14px
 }
 h1.title {
-  font-size: 40px;
+  font-size: 35px;
   color: #1C3BA4;
 }
 h1 {
   color: #B6854D;
+  font-size: 30px;
 }
 h2 {
   color: #172984;
+  font-size: 25px;
 }
 h3 {
   color: #172984;
+  font-size: 20px;
+}
+h4 {
+  color: #174EC5;
+  font-size: 18px;
 }
 h5 {
   color: #B6854D;
@@ -63,7 +70,7 @@ h5 {
 ```{r, include=FALSE}
 # automatically create a bib database for R packages
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = FALSE,
-                         eval = FALSE)
+                       eval = FALSE)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 setwd(here::here())
 options(digits = 2)
@@ -73,22 +80,17 @@ options(digits = 2)
 ```{r, echo = FALSE, results=FALSE, eval = TRUE}
 require(dplyr)
 require(forcats)
+library(jsonlite)
+require(sf)
 require(sp)
 require(stringr)
 require(spdplyr)
 require(htmltools)
 require(leaflet)
 require(htmlwidgets)
-require(ggmap)
-require(ggplot2)
-require(ggridges)
 require(grDevices)
-require(ggpubr)
-require(forcats)
 require(rgdal)
 require(tibble)
-require(sf)
-require(stringr)
 require(RColorBrewer)
 require(leafgl)
 require(leaflet.extras)
@@ -292,7 +294,6 @@ for(i in 1:5){
 Se convierten los datos `GeoJSON` en datos `TopoJSON`, utilizando la función `geo2topo` del paquete `geojsonio`. Sin embargo, hay un pequeño ajuste que se debe hacer para que funcione correctamente.     
 
 ```{r, eval = FALSE}
-require(geojsonio)
 capa_estados_2020_topojson <- list()
 capa_estados_2015_topojson <- list()
 capa_estados_2010_topojson <- list()
@@ -309,15 +310,17 @@ saveRDS(capa_estados_2015_topojson, file = paste0(here::here(), "/Output/capa_es
 saveRDS(capa_estados_2010_topojson, file = paste0(here::here(), "/Output/capa_estados_topojson_2010.rds"))
 ```
 
+
 ### `topojson_write()`
 
-La función` geojson_write` del paquete `geojsonio` para escribir archivos `GeoJSON` a partir de los datos en las listas.  Este código permitirá generar múltiples archivos GeoJSON, uno para cada combinación de año (`2020`, `2015`, `2010`) y  dentro cada grado de marginación.   
+La función `topojson_write()` del paquete `geojsonio` para escribir archivos `GeoJSON` a partir de los datos en las listas.  Este código permitirá generar múltiples archivos GeoJSON, uno para cada combinación de año (`2020`, `2015`, `2010`) y  dentro cada grado de marginación.   
 
 ```{r, eval = FALSE}
+grados <- c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
 for(i in 1:5){
  topojson_write(capa_estados_2020_topojson[[i]], 
-                geometry = "polygon",
-                file = paste0(here::here(), "/Output/estados_2020_", i, "_topojson.geojson")) 
+                 geometry = "polygon",
+                file = paste0(here::here(), "/Output/estados_2020_", i, "_topojson.geojson"), )
  topojson_write(capa_estados_2015_topojson[[i]], 
                 geometry = "polygon", 
                 file = paste0(here::here(), "/Output/estados_2015_", i, "_topojson.geojson")) 
@@ -326,6 +329,21 @@ for(i in 1:5){
                 file = paste0(here::here(), "/Output/estados_2010_", i, "_topojson.geojson")) 
 }
 ```
+
+### `writeLines()`   
+
+La función `writeLines` escribe las líneas de texto de un objeto en un archivo. En este caso, los objetos `TopoJSON`, generar múltiples archivos uno para cada combinación de año (`2020`, `2015`, `2010`) y  dentro cada grado de marginación, donde se escriben directamente en archivos con formato .topojson.   
+
+```{r, eval = FALSE}
+grados <- c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
+
+for(i in 1:5){
+ writeLines(capa_estados_2020_topojson[[i]], paste0(here::here(), "/Output/estados_2020_", i, "_topojson.topojson")) 
+ writeLines(capa_estados_2015_topojson[[i]], paste0(here::here(), "/Output/estados_2015_", i, "_topojson.topojson")) 
+ writeLines(capa_estados_2010_topojson[[i]], paste0(here::here(), "/Output/estados_2010_", i, "_topojson.topojson")) 
+}
+```
+
 
 La diferencia principal entre `GeoJSON` y `TopoJSON` radica en cómo representan y manejan la información geoespacial:   
 
@@ -337,14 +355,14 @@ La diferencia principal entre `GeoJSON` y `TopoJSON` radica en cómo representan
 
 `TopoJSON`:    
 
-`Optimización de datos`: `TopoJSON` es un formato más eficiente que optimiza la representación de datos geoespaciales.   
-`Topología compartida`: En lugar de representar cada geometría directamente, `TopoJSON` utiliza una estructura de topología compartida. Esto significa que las fronteras comunes entre polígonos se comparten, lo que reduce la redundancia de datos y, por lo tanto, el tamaño del archivo.    
-`Proceso de conversión`: `TopoJSON` necesita ser convertido a `GeoJSON` o a otros formatos compatibles antes de ser utilizado en la mayoría de las aplicaciones GIS y bibliotecas de visualización, incluyendo Leaflet.     
+- `Optimización de datos`: `TopoJSON` es un formato más eficiente que optimiza la representación de datos geoespaciales.     
+- `Topología compartida`: En lugar de representar cada geometría directamente, `TopoJSON` utiliza una estructura de topología compartida. Esto significa que las fronteras comunes entre polígonos se comparten, lo que reduce la redundancia de datos y, por lo tanto, el tamaño del archivo.       
+- `Proceso de conversión`: `TopoJSON` necesita ser convertido a `GeoJSON` o a otros formatos compatibles antes de ser utilizado en la mayoría de las aplicaciones GIS y bibliotecas de visualización, incluyendo Leaflet.       
 
 
 ## GeoJson (Estados)   
 
-Se vuelve a leer un archivo `GeoJSON ` y realizan algunas operaciones adicionales en el objeto espacial resultante:   
+👇  Se vuelve a leer un archivo `GeoJSON ` y realizan algunas operaciones adicionales en el objeto espacial resultante:    
 
 - `geojsonio::geojson_read()`: Esta función lee un archivo GeoJSON y lo convierte en un objeto espacial.    
 - `what = "sp"`: Especifica que el resultado debe ser un objeto Spatial (de la clase `sp`) y no un formato lineal `.json`.   
@@ -357,23 +375,31 @@ shape_estados_2020 <- list()
 shape_estados_2015 <- list()
 shape_estados_2010 <- list()
 for (i in 1:5){
-  shape_estados_2020[[paste0(grados[i])]] <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2020_", i, "_topojson.geojson"), what = "sp") %>%
-                                    sp::spChFIDs(.,  str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))
-  shape_estados_2015[[paste0(grados[i])]] <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2015_", i, "_topojson.geojson"), what = "sp") %>%
-                                    sp::spChFIDs(.,  str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))
-  shape_estados_2010[[paste0(grados[i])]] <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2010_", i, "_topojson.geojson"), what = "sp") %>% 
-                                    sp::spChFIDs(., str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))
+  shape_estados_2020[[paste0(grados[i])]] <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2020_", i, "_topojson.geojson"), 
+                                                                      what = "sp", parse = TRUE, stringsAsFactors = TRUE) %>%
+                                                         sp::spChFIDs(.,  str_pad(.@data$CVE_ENT, 2, "left", pad = "0")) %>%
+                                                          mutate(id = str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))    
+  shape_estados_2015[[paste0(grados[i])]] <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2015_", i, "_topojson.geojson"), 
+                                                                      what = "sp") %>%
+                                                         sp::spChFIDs(.,  str_pad(.@data$CVE_ENT, 2, "left", pad = "0")) %>%
+                                                          mutate(id = str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))    
+  shape_estados_2010[[paste0(grados[i])]] <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2010_", i, "_topojson.geojson"), 
+                                                                      what = "sp") %>% 
+                                                         sp::spChFIDs(., str_pad(.@data$CVE_ENT, 2, "left", pad = "0")) %>%
+                                                          mutate(id = str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))    
 }
 
-shape_estados <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2020_json.geojson"), what = "sp") %>%
-                                          sp::spChFIDs(., str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))
+shape_estados <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2020_json.geojson"), 
+                                         what = "sp") %>%
+                                        sp::spChFIDs(., str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))
 ```
+
 
 ## Leaflet 
 
-- `GeoJSON en Leaflet`: Leaflet puede manejar directamente archivos GeoJSON para la visualización de datos geoespaciales. Es compatible de manera nativa con GeoJSON, lo que significa que puedes agregar capas de GeoJSON directamente al mapa Leaflet usando funciones como addGeoJSON.     
+- `GeoJSON en Leaflet`: Leaflet puede manejar directamente archivos GeoJSON para la visualización de datos geoespaciales. Es compatible de manera nativa con GeoJSON, lo que significa que puedes agregar capas de GeoJSON directamente al mapa Leaflet usando funciones como `addGeoJSON`.      
 
-- `TopoJSON en Leaflet`: Aunque Leaflet no puede manejar directamente archivos TopoJSON, puedes convertir archivos TopoJSON a GeoJSON utilizando herramientas como `geojsonio::geojson_read()` en R antes de cargar los datos en Leaflet. Esto permite aprovechar las ventajas de tamaño y rendimiento de TopoJSON mientras se trabaja con Leaflet.     
+- `TopoJSON en Leaflet`: Aunque Leaflet no puede manejar directamente archivos TopoJSON, puedes convertir archivos TopoJSON a GeoJSON utilizando herramientas como `geojsonio::geojson_read()` en R antes de cargar los datos en Leaflet. Esto permite aprovechar las ventajas de tamaño y rendimiento de TopoJSON mientras se trabaja con Leaflet.      
 
 ### Paleta de colores  
 
@@ -450,9 +476,13 @@ bounding_box
 - `years`: Un vector que contiene los años para los que tenemos datos de shapefiles.  
 - `grados`: Un vector que contiene los niveles de marginación.  
 
-Se asigna a la lista `shape_estados` con una estrcutura de listas de data frames geoespaciales correspondientes a diferentes años y grados de marginación. Para cada data frame de los `SpatiaPolygonsDataFrame`, se le añaden varias columnas nuevas: una con IDs únicos, otra con el año correspondiente, otra con una combinación de ID y año.     
+Se asigna a la lista `shape_estados` con una estrcutura de listas de data frames geoespaciales correspondientes a diferentes años y grados de marginación. Para cada data frame de los `SpatiaPolygonsDataFrame`, se le añaden varias columnas nuevas: una con IDs únicos, otra con el año correspondiente, otra con una combinación de ID y año.   
 
-**Vector y función**   
+**Transformación de Coordenadas**    
+
+Se asegura que cada shapefile tenga un sistema de coordenadas uniforme. Utilizando la función `map2()` de `purrr` para iterar sobre las listas anidadas de shapefiles y sus años correspondientes. Dentro de la función anidada, se itera sobre cada shapefile y sus grados correspondientes, asignandoles el sistema de coordenadas `CRS "+init=epsg:4326" `a cada shapefile y se transforma a este sistema de coordenadas.      
+
+**Vectores y funciónes**    
 - `years`: Se define un vector con los años `2020`, `2015` y `2010`.     
 - `generate_ids`: Es una función que genera una secuencia de números que los convierte en caracteres y les agrega ceros a la izquierda para que tengan al menos dos dígitos.      - `map2(shape_estados, years, ...)`: La función en conjunto transforma los shapefiles de cada año y grado, generando IDs únicos y añadiendo columnas adicionales que ayudan a identificar cada observación con un ID y un año específicos.     
 
@@ -462,6 +492,7 @@ Se generan algunas variables que van a ayudar a integrar los años y los grados 
 - `ANIO`: Agrega una columna con el año correspondiente (`2020`, `2015` o `2010`).     
 - `id_year`: Crea una columna que combina el ID generado con el año correspondiente, por ejemplo, 0102020, 0202020, etc.   
 
+
 ```{r}
 # Define los grados y años
 years <- c("2020", "2015", "2010")
@@ -470,7 +501,34 @@ grados <- c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
 shape_estados <- NULL
 shape_estados <- list(shape_estados_2020, shape_estados_2015, shape_estados_2010)
 
-# Función para generar el ID del 1 a 96
+# Aplicar la transformación a cada elemento en las listas anidadas usando map2
+shape_estados <- map2(shape_estados, years, function(shape_files, year) {
+                       map2(shape_files, grados, function(shape_file, grado) {
+                             proj4string(shape_file) <- CRS("+init=epsg:4326")
+                             shape_file  = spTransform(shape_file, CRS("+init=epsg:4326"))
+                             shape_file
+                      })
+})
+
+#shape_estados_coords <- map2(shape_estados, years, function(shape_files, year) {
+#                         map2(shape_files, grados, function(shape_file, grado) {
+#                           # Extraer y renombrar coordenadas
+#                           # Extraer y renombrar coordenadas
+#                           shape_file@polygons <- lapply(shape_file@polygons, function(polygon) {
+#                             polygon@Polygons <- lapply(polygon@Polygons, function(sub_polygon) {
+#                               coords <- as.data.frame(sub_polygon@coords)
+#                               colnames(coords) <- c("lng", "lat")
+#                               sub_polygon@coords <- as.matrix(coords)
+#                               sub_polygon
+#                             })
+#                             polygon
+#                           })
+#                           
+#                           shape_file
+#                         })
+#})
+
+## Función para generar IDs:  
 generate_ids <- function(start, end) {
                   str_pad(as.character(seq(start, end)), 2, "left", pad = "0")
 }
@@ -478,22 +536,57 @@ generate_ids <- function(start, end) {
 # Aplicar la transformación a cada lista de shape_estados
 start_id <- 1
 shape_estados <- map2(shape_estados, years, function(shape_files, year) {
-                            shape_files <- map2(shape_files, grados, function(shape_file, grado) {
-                                                 if (is.data.frame(shape_file@data)) {
-                                                      end_id <- start_id + nrow(shape_file) - 1
-                                                      shape_file <- shape_file %>%
-                                                                     mutate(ID = generate_ids(start_id, end_id),
-                                                                            ANIO = year,
-                                                                            id_year = paste0(generate_ids(start_id, end_id), year))
-                                                      start_id <<- end_id + 1
-                                                     }
-                                                 shape_file
-                                                  }
-                                                )
-                            shape_files
+                       shape_files <- map2(shape_files, grados, function(shape_file, grado) {
+                                            if (is.data.frame(shape_file@data)) {
+                                                 end_id <- start_id + nrow(shape_file) - 1
+                                                 shape_file <- shape_file %>%
+                                                                mutate(ID = generate_ids(start_id, end_id),
+                                                                       ANIO = year,
+                                                                       id_year = paste0(generate_ids(start_id, end_id), year))
+                                                 start_id <<- end_id + 1
+                                                }
+                                       shape_file
+                                       })
+                       shape_files
   }
 )
 ```
+
+#### Se define una función para añadir capas de polígonos   
+
+Se define una función llamada `addPolygonLayer`, la cual añade una capa de polígonos a un mapa de Leaflet. Se tienen que especificar los argumentos:   
+
+- `map`: El objeto de mapa de Leaflet al que se le añadirá la nueva capa de polígonos.   
+- `data`: Los datos que contienen la información geográfica de los polígonos.   
+- `year`: Año asociado con los datos de los polígonos, usado para agrupar.    
+- `grado`: Grado asociado con los datos de los polígonos, también usado para agrupar.   
+- `paleta`: Paleta de colores que se usará para rellenar los polígonos.
+- `id`: Es el identificador único para esta capa de polígonos en el mapa. Puede ser útil para identificar y manipular específicamente esta capa en operaciones posteriores.    
+
+```{r}
+# Define una función para añadir capas de polígonos
+addPolygonLayer <- function(map, data, year, grado, paleta, id) {
+                            map <- map %>%
+                                    addPolygons(data = data,
+                                                 fillColor = paleta,
+                                                  fillOpacity = 0.8,
+                                                   stroke = TRUE,
+                                                    weight = 1,
+                                                     dashArray = "1",
+                                                      opacity = 1.3,
+                                                       color = "#DBDBDB",  # line colour 
+                                                        highlight = highlightOptions(weight = 2,
+                                                                                     color = "red", # Color de selección
+                                                                                     dashArray = "",
+                                                                                     fillOpacity = 0.6,
+                                                                                     bringToFront = TRUE),
+                                                         group = grado,
+                                                          layerId = id
+                                                )
+                             return(map)
+}
+```
+
 
 ####  Se crea el mapa inicial   
 
@@ -501,20 +594,15 @@ Se crea un mapa centrado en unas coordenadas específicas (`lat = 23.6260333` y 
 
 ```{r}
 # Crear el mapa inicial
-map <- leaflet(options = leafletOptions(minZoom = 5, maxZoom = 5, zoomControl = FALSE)) %>%
-        addTiles() %>%
-         setView(lat = 23.6260333, lng = -102.5375005, zoom = 5) %>%
-          setMaxBounds(lng1 = bounding_box[1],
-                       lat1 = bounding_box[2],
-                       lng2 = bounding_box[3],
-                       lat2 = bounding_box[4]) %>%
-           addProviderTiles(providers$OpenStreetMap, options = providerTileOptions(minZoom = 5, maxZoom = 5))
+map  <- leaflet() %>%
+         addTiles() %>%
+          setView(lat = 23.6260333, lng = -102.5375005, zoom = 5) %>%
+           setMaxBounds(lng1 = bounding_box[1],
+                        lat1 = bounding_box[2],
+                        lng2 = bounding_box[3],
+                        lat2 = bounding_box[4]) %>%
+            addProviderTiles(providers$OpenStreetMap, options = providerTileOptions(minZoom = 5, maxZoom = 5))
 ```
-
-
-#### Función `addPolygonLayer()`   
-
-Se añaden las capas de polígonos al mapa de Leaflet para cada combinación de año y grado. Se recorren todas las combinaciones posibles de años (`years`) y grados (`grados`), y para cada combinación, añade una capa de polígonos al mapa utilizando la función `addPolygonLayer`. La lista shape_estados contiene los datos geográficos organizados por año y grado, y la lista paleta proporciona la paleta de colores correspondiente para cada grado.    
 
 
 #### Función `addPolygonLayer()`   
@@ -529,11 +617,11 @@ grados <- c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
 # Añadir capas de polígonos para cada año
 for (i in seq_along(years)) {
   for(j in seq_along(grados)){
-           map <- addPolygonLayer(map, 
-                                  data = shape_estados[[i]][[j]], 
+           map <- addPolygonLayer(map,
+                                  data = shape_estados[[i]][[grados[j]]], 
                                   year = ~ANIO, 
                                   grado = ~get(paste0("GM_", years[i])), 
-                                  paleta = ~mypalette(get(paste0("GM_", years[i]))), 
+                                  paleta = paleta[j], 
                                   id = ~id_year
                                   )
   }
@@ -641,13 +729,24 @@ map <- map %>%
 
 ### Opción 2   
 
-`TopoJSON en Leaflet`: Aunque Leaflet no puede manejar directamente archivos TopoJSON, se pueden convertir archivos TopoJSON a GeoJSON utilizando herramientas como `geojsonio::geojson_read()` antes de cargar los datos en Leaflet. Esto permite aprovechar las ventajas de tamaño y rendimiento de `TopoJSON` mientras se trabaja con Leaflet.  Es perfectamente compatible con la función `addPolygons()`, en este caso los datos que se encuentran en los objetos `shape_estados_` contiene los datos espaciales cargados desde el archivo TopoJSON.    
+`TopoJSON en Leaflet`:  Se leen archivos `TopoJSON` y almacenarlos en listas anidadas según los años y grados especificados. La función `readLines` se utiliza para leer el contenido de los archivos `TopoJSON` y almacenar cada línea del archivo como un elemento en un vector de caracteres dentro de las listas correspondientes a cada año y grado. Esto facilita la organización y el acceso a los datos leídos en un formato estructurado.    
 
 ```{r}
-## Se puede trabajar directamente con el formato lineal de topojson
-shape_estados_2020 <- readRDS(file = paste0(here::here(), "/Output/capa_estados_topojson_2020.rds")) 
-shape_estados_2015 <- readRDS(file = paste0(here::here(), "/Output/capa_estados_topojson_2015.rds")) 
-shape_estados_2010 <- readRDS(file = paste0(here::here(), "/Output/capa_estados_topojson_2010.rds"))
+# Define los grados y años
+years <- c("2020", "2015", "2010")
+grados <- c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
+
+shape_estados_2020 <- list()
+shape_estados_2015 <- list()
+shape_estados_2010 <- list()
+for(i in 1:5){
+ shape_estados_2020[[paste0(grados[i])]] <- readLines(paste0(here::here(), "/Output/estados_2020_", i, "_topojson.topojson")) %>% 
+                                              paste(collapse = "\n") 
+ shape_estados_2015[[paste0(grados[i])]] <- readLines(paste0(here::here(), "/Output/estados_2015_", i, "_topojson.topojson")) %>% 
+                                              paste(collapse = "\n") 
+ shape_estados_2010[[paste0(grados[i])]] <- readLines(paste0(here::here(), "/Output/estados_2010_", i, "_topojson.topojson")) %>% 
+                                              paste(collapse = "\n") 
+}
 ```
 
 
@@ -659,20 +758,21 @@ shape_estados_2010 <- readRDS(file = paste0(here::here(), "/Output/capa_estados_
 Se asigna a la lista `shape_estados` los datos de shapefile correspondientes a cada año, el cual a su vez cada lista contiene a los niveles de marginación.     
 
 ```{r}
-library(purrr)
-library(jsonlite)
 # Define los datos y años
 years <- c("2020", "2015", "2010")
 grados <-  c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
 
+## Lista de shapefiles de todos los años
+shape_estados <- NULL
 shape_estados <- list(shape_estados_2020, shape_estados_2015, shape_estados_2010)
 
 # lista de TopoJSONs:
-shape_estados <- lapply(seq_along(years), function(i){
-                  lapply(seq_along(grados), function(j){
-                          fromJSON(get(paste0("shape_estados_", years[i]))[[j]])
-              })
-            })
+shape_estados <- map(seq_along(years), function(year) {
+                   map(grados, function(grado) {
+                                fromJSON(get(paste0("shape_estados"))[[year]][[grado]], simplifyVector = FALSE)
+                      })
+                    })
+
 
 # Función para generar IDs:   
 generate_ids <- function(start, end) {
@@ -680,8 +780,8 @@ generate_ids <- function(start, end) {
 }
 
 start_id <- 1
-shape_estados<- map2(shape_estados, years, function(shape_files, year) {
-                        shape_files <- map2(shape_files, grados, function(shape_file, grado) {
+shape_estados <- map2(shape_estados, years, function(shape_files, year) {
+                         shape_files <- map2(shape_files, grados, function(shape_file, grado) {
                             properties <- shape_file$objects$foo$geometries$properties
                             if (is.data.frame(properties)) {
                                 end_id <- start_id + nrow(properties) - 1
@@ -696,6 +796,32 @@ shape_estados<- map2(shape_estados, years, function(shape_files, year) {
                         })
                         shape_files
 })
+
+
+paleta <- c("#13322B", #Muy alto
+            "#086953", #Alto 
+            "#4C9562", #Medio
+            "#D1BB9E", #Bajo
+            "#C3BA6D") # Muy bajo
+
+shape_estados <- map2(shape_estados, years, function(shape_files, year) {
+                      map2(shape_files, seq_along(grados), function(shape_file, grado_idx) {
+                        #shape_file$objects$foo$geometries$properties$style = list(fillColor = paleta[grado_idx],
+                         #                                   color = "#D4D0BD"
+                          #                                  )
+                        shape_file$style = list(
+                                                fillOpacity = 0.8,
+                                                stroke = TRUE,
+                                                weight = 1,
+                                                dashArray = "1",
+                                                opacity = 1,
+                                                color = "#D4D0BD"
+                                                )
+                        shape_file
+                        })
+                      })
+
+leaflet() %>% addTopoJSON(shape_estados[[1]][[2]])
 ```
 
 #### Se define una función para añadir capas de polígonos   
@@ -710,7 +836,7 @@ Se define una función llamada `addPolygonLayer`, la cual añade una capa de pol
 
 ```{r}
 # Define una función para añadir capas de polígonos
-addPolygonLayer <- function(map, data, year, grado, paleta) {
+addPolygonLayer <- function(map, data, year, grado, paleta, id) {
                             map <- map %>%
                                     addTopoJSON(data,
                                                  fillColor = paleta,
@@ -720,7 +846,8 @@ addPolygonLayer <- function(map, data, year, grado, paleta) {
                                                      dashArray = "1",
                                                       opacity = 1,
                                                        color = "#D4D0BD",
-                                                        group = grado
+                                                        group = grado,
+                                                         layerId = id
                                                          
                                                 )
                              return(map)
@@ -732,7 +859,6 @@ addPolygonLayer <- function(map, data, year, grado, paleta) {
 Se crea un mapa centrado en unas coordenadas específicas (`lat = 23.6260333` y `lng = -102.5375005`), con un nivel de zoom fijo, y establece los límites máximos para evitar que el usuario se desplace fuera de una región definida. El mapa utiliza capa de OpenStreetMap tanto en la capa base como en una capa adicional de tiles del mismo proveedor.    
 
 ```{r}
-rm(map)
 # Crear el mapa inicial
 base <- leaflet(options = leafletOptions(minZoom = 5, maxZoom = 5, zoomControl = FALSE)) %>%
          addTiles() %>%
@@ -759,16 +885,15 @@ map <- base
 for (i in seq_along(years)) {
   for(j in seq_along(grados)){
            map <- addPolygonLayer(map, 
-                                   data = shape_estados_[[i]][[j]], 
+                                   data = shape_estados[[i]][[j]], 
                                     year = years[i], 
                                      grado = grados[j], 
-                                      paleta = paleta[j]
-                                       #id = paste0(str_pad(id_counter, 2, "left", pad = "0"), years[i])
+                                      paleta = paleta[j],
+                                       id = paste0(str_pad(id_counter, 2, "left", pad = "0"), years[i])
                                   )
            id_counter <- id_counter + 1
   }
 }
-map
 ```
 
 #### Se añade la leyenda y control de capas    
@@ -790,9 +915,8 @@ map <- map %>%
                     opacity = 0.7) %>%
           addLayersControl(
            overlayGroups = c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"),
-           # baseGroups = c("2010"), 
+            baseGroups = c("2020", "2015", "2010"), 
              options = layersControlOptions(collapsed = FALSE))
-map
 ```
 
 
@@ -849,7 +973,6 @@ map <- map %>%
               });
             });
           }")
-map
 ```
 
 
@@ -873,3 +996,132 @@ map <- map %>%
 ```
 
 
+
+```{r}
+library(purrr)
+library(jsonlite)
+# Define los datos y años
+years <- c("2020", "2015", "2010")
+grados <-  c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
+
+shape_estados <- NULL
+shape_estados <- list(shape_estados_2020, shape_estados_2015, shape_estados_2010)
+
+# lista de TopoJSONs:
+shape_estados_1 <- map(seq_along(years), function(year) {
+                      map(grados, function(grado) {
+                             fromJSON(get(paste0("shape_estados"))[[year]][[grado]], simplifyVector = FALSE)
+                      })
+                    })
+
+# Función para generar IDs:   
+generate_ids <- function(start, end) {
+    str_pad(as.character(seq(start, end)), 2, "left", pad = "0")
+}
+
+# Aplicar transformaciones a las propiedades de cada geometría
+start_id <- 1
+shape_estados_1 <- map2(shape_estados_1, years, function(shape_files, year) {
+                    map2(shape_files, seq_along(grados), function(shape_file, grado_idx) {
+                          geometries <- shape_file$objects$foo$geometries
+                            geometries <- map(geometries, function(geom) {
+                                            properties <- geom$properties
+                                              if (!is.null(properties) && length(properties) > 0) {
+                                                end_id <- start_id + length(properties$CVE_ENT) - 1
+                                                properties[["ID"]] <- generate_ids(start_id, end_id)
+                                                properties[["ANIO"]] <- year
+                                                properties[["id_year"]] <- paste0(generate_ids(start_id, end_id), year)
+                                                geom$properties <- properties
+                                                start_id <<- end_id + 1
+                                                  }
+                                                geom
+                                              })
+                          shape_file$objects$foo$geometries <- geometries
+                          shape_file
+                    })
+})
+
+paleta <- c("#13322B", #Muy alto
+            "#086953", #Alto 
+            "#4C9562", #Medio
+            "#D1BB9E", #Bajo
+            "#C3BA6D") # Muy bajo
+
+shape_estados_1 <- map2(shape_estados_1, years, function(shape_files, year) {
+                      map2(shape_files, seq_along(grados), function(shape_file, grado_idx) {
+                        shape_file$style = list(fillColor = paleta[grado_idx],
+                                                fillOpacity = 0.8,
+                                                stroke = TRUE,
+                                                weight = 1,
+                                                dashArray = "1",
+                                                opacity = 1,
+                                                color = "#D4D0BD"
+                                                )
+                        shape_file
+                        })
+                      })
+```
+
+#### Se define una función para añadir capas de polígonos   
+
+Se define una función llamada `addPolygonLayer`, la cual añade una capa de polígonos a un mapa de Leaflet. Se tienen que especificar los argumentos:   
+
+- `map`: El objeto de mapa de Leaflet al que se le añadirá la nueva capa de polígonos.   
+- `data`: Los datos que contienen la información geográfica de los polígonos.   
+- `year`: Año asociado con los datos de los polígonos, usado para agrupar.    
+- `grado`: Grado asociado con los datos de los polígonos, también usado para agrupar.   
+- `paleta`: Paleta de colores que se usará para rellenar los polígonos.    
+
+```{r}
+# Define una función para añadir capas de polígonos
+addPolygonLayer <- function(map, data, year, grado) {
+                            map <- map %>%
+                                    addTopoJSON(data,
+                                                 group = grado
+                                                  #layerId = id
+                                                         
+                                                )
+                             return(map)
+}
+```
+
+####  Se crea el mapa inicial   
+
+Se crea un mapa centrado en unas coordenadas específicas (`lat = 23.6260333` y `lng = -102.5375005`), con un nivel de zoom fijo, y establece los límites máximos para evitar que el usuario se desplace fuera de una región definida. El mapa utiliza capa de OpenStreetMap tanto en la capa base como en una capa adicional de tiles del mismo proveedor.    
+
+```{r}
+# Crear el mapa inicial
+base <- leaflet(options = leafletOptions(minZoom = 5, maxZoom = 5, zoomControl = FALSE)) %>%
+         addTiles() %>%
+          setView(lat = 23.6260333, lng = -102.5375005, zoom = 5) %>%
+           setMaxBounds(lng1 = bounding_box[1],
+                        lat1 = bounding_box[2],
+                        lng2 = bounding_box[3],
+                        lat2 = bounding_box[4]) %>%
+            addProviderTiles(providers$OpenStreetMap, options = providerTileOptions(minZoom = 5, maxZoom = 5)) 
+```
+
+
+#### Función `addPolygonLayer()`   
+
+Se añaden las capas de polígonos al mapa de Leaflet para cada combinación de año y grado. Se recorren todas las combinaciones posibles de años (`years`) y grados (`grados`), y para cada combinación, añade una capa de polígonos al mapa utilizando la función `addPolygonLayer`. La lista shape_estados contiene los datos geográficos organizados por año y grado, y la lista paleta proporciona la paleta de colores correspondiente para cada grado.    
+
+
+```{r}
+# Contador de IDs
+id_counter <- 1
+
+map <- base
+# Añadir capas de polígonos para cada año
+for (i in seq_along(years)[1]) {
+  for(j in seq_along(grados)){
+           map <- addPolygonLayer(map, 
+                                   data = shape_estados_1[[i]][[j]], 
+                                    year = years[i], 
+                                     grado = grados[j]
+                                  )
+           id_counter <- id_counter + 1
+  }
+}
+map
+```
