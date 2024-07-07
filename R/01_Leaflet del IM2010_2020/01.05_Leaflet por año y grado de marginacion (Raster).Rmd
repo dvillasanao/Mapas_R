@@ -1,0 +1,420 @@
+---
+title: "Leaflet a nivel estatal por grados de marginación, 2010 - 2020"
+subtitle: "Utilizando capas `Raster`"
+author: "Diana Villasana Ocampo"
+output:
+   html_document:
+      highlight: tango
+      theme: flatly
+      toc: yes
+      toc_depth: 4
+      toc_float:
+        collapsed: yes
+knit: (function(input, ...) {
+    rmarkdown::render(
+      input,
+      output_dir = "../../docs"
+    )
+  })
+---
+
+```{=html}
+<style type="text/css">
+body {
+text-align: justify;
+font-style: normal;
+font-family: "Montserrat";
+font-size: 14px
+}
+h1.title {
+  font-size: 30px;
+  color: #1C3BA4;
+}
+h1 {
+  color: #B6854D;
+  font-size: 30px;
+}
+h2 {
+  color: #172984;
+  font-size: 25px;
+}
+h3 {
+  color: #172984;
+  font-size: 20px;
+}
+h4 {
+  color: #174EC5;
+  font-size: 18px;
+}
+h5 {
+  color: #B6854D;
+}
+</style>
+```
+
+```{=html}
+<style>
+.nav>li>a {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    color: #1C3BA4
+}
+.nav-pills>li.active>a, .nav-pills>li.active>a:hover, .nav-pills>li>a:focus {
+    color: #ffffff;
+    background-color: #09C2BC
+}
+</style>
+```
+
+```{r, include=FALSE}
+# automatically create a bib database for R packages
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = FALSE,  
+                      eval = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+setwd(here::here())
+options(digits = 2)
+``` 
+
+
+```{r, echo = FALSE, results=FALSE, eval = TRUE}
+require(dplyr)
+require(forcats)
+library(jsonlite)
+require(sf)
+require(sp)
+require(stringr)
+require(spdplyr)
+require(htmltools)
+require(leaflet)
+require(htmlwidgets)
+require(grDevices)
+require(rgdal)
+require(tibble)
+require(RColorBrewer)
+require(leafgl)
+require(leaflet.extras)
+require(mapview)
+require(leaflet.providers)
+require(rmapshaper)
+require(geojsonio)
+require(purrr)
+require(raster)
+#tempdir <- tempdir()
+#unlink(tempdir, recursive = TRUE)
+```
+
+# Sistema de Información Geográfica
+
+El Instituto Nacional de Estadística, Geografía e Informática (INEGI) tiene puestos a disposición del público los shapefiles con los distintos niveles de información geográfica. Estos archivos digitales se encuentran disponibles en el [`Marco Geoestadístico Nacional (MGN)`](https://www.inegi.org.mx/temas/mg/#Descargas), el cual es un sistema único y se presenta la división del territorio nacional en diferentes niveles de desagregación para referir geográficamente la información estadística de los censos y encuestas. Se integra al Sistema Nacional de Información Estadística y Geográfica (SNIEG).
+
+
+## Índice de marginación 2010 - 2020
+
+Se cargan las bases de datos del índice de marginación a nivel estatal para los años `2010`, `2015` y `2020`. Las cuales se encuentran en formato `.RData`.   
+
+**Bases de datos**   
+- Nivel estatal    
+- Nivel municipal   
+- Nivel localidad   
+- Nivel AGEB  
+- Nivel Colonia    
+
+**Base de datos** de los tres años se encuentran disponibles en la página oficial de [CONAPO](https://www.gob.mx/conapo/documentos/indices-de-marginacion-2020-284372)   
+
+**Datos abiertos de México** [datos.gob.mx](https://datos.gob.mx/busca/dataset/indice-de-marginacion-carencias-poblacionales-por-localidad-municipio-y-entidad)   
+
+**Publicación** [Índice De Marginación Por Entidad Federativa Y Municipio 2020](https://www.gob.mx/conapo/documentos/indices-de-marginacion-2020-284372).    
+
+
+```{r}
+tablas <- c("2010", "2015", "2020")
+for(i in tablas){
+load(file = paste0(here::here(), "/Output/IME_", i, ".RData"))
+}
+```
+
+
+## Shapefiles
+
+A continuación, se leen y se transforman los shapefiles de las divisiones geográficas de los estados de México correspondientes a los años `2020`, `2015` y `2010`.   
+
+Utilizando la paquetería `rgdal`, se definen los siguientes parámetros:      
+ 
+- `readOGR`: Esta función se usa para leer shapefiles.   
+- `dsn`: Especifica la ruta al directorio que contiene el shapefile.  
+- `layer`: Especifica el nombre de la capa dentro del shapefile.  
+- `encoding`: Especifica la codificación de los caracteres, en este caso, UTF-8.  
+- `use_iconv`: Se usa para convertir la codificación si es necesario.  
+
+Una vez cargados los sahpefiles, se transforman los sistemas de coordenadas:     
+
+- `spTransform`: Esta función se usa para transformar las coordenadas del shapefile a un nuevo sistema de referencia.    
+- `CRSobj`: Especifica el sistema de referencia de coordenadas de destino. En este caso, se usa el sistema de coordenadas geográficas (latitud y longitud) basado en el elipsoide y `datum WGS84`.    
+
+
+Estos pasos son cruciales para asegurar que los datos geoespaciales sean consistentes y compatibles para su uso en análisis geográficos y visualización, por ejemplo, en aplicaciones de Leaflet o cualquier otro software de mapeo.   
+
+**Shapefile estados 2020**
+
+```{r, eval = FALSE}
+shape_estados_2020 <- readOGR(dsn = "D:/MGN/MGN 2020/MGN 2020/conjunto_de_datos",
+                               layer = "00ent",
+                                encoding = "UTF-8",
+                                 use_iconv = TRUE)
+
+shape_estados_2020 <- spTransform(shape_estados_2020, CRSobj = CRS('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'))
+```
+
+**Shapefile estados 2015**
+
+```{r, eval = FALSE}
+shape_estados_2015 <- readOGR(dsn ="D:/MGN/MGN Junio 2016/conjunto_de_datos", 
+                               layer = "areas_geoestadisticas_estatales",
+                                encoding = "UTF-8",
+                                 use_iconv = TRUE)
+
+shape_estados_2015 <- spTransform(shape_estados_2015, CRSobj = CRS('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'))
+```
+
+**Shapefile estados 2010**
+
+```{r, eval = FALSE}
+shape_estados_2010 <- readOGR(dsn ="D:/MGN/MGN 2010 Version 4.3 (Jul-Dic 2009)/32_Entidades_Federativas", 
+                               layer = "ESTADOS",
+                                encoding = "UTF-8",
+                                 use_iconv = TRUE)
+shape_estados_2010 <- spTransform(shape_estados_2010, CRSobj = CRS('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'))
+```
+
+
+
+### ShapefilesDataFrame
+
+Se cambian de `IDs` de los Features del Shapefile; de esta manera si se hace alguna manipulación al shapefile directamente los polígonos tendrán el ID de la clave de la entidad y conservarán el orden. Además de que es útil cuando se necesita asegurar que los IDs de las entidades geográficas sean consistentes en longitud y formato para su posterior análisis o visualización.     
+
+- `sp::spChFIDs` cambia los IDs de las features del objeto Spatial.
+- `str_pad(shape_estados_2020@data$CVE_ENT, 2, "left", pad = "0")`: Utiliza la función `str_pad()` para rellenar con ceros a la izquierda (si es necesario) para asegurarse de que cada ID tenga al menos 2 dígitos.     
+
+
+```{r, eval = FALSE}
+shape_estados_2020 <- shape_estados_2020 %>%
+                       select(CVE_ENT) %>%
+                         sp::spChFIDs(., str_pad(shape_estados_2020@data$CVE_ENT, 2, "left", pad = "0"))
+
+shape_estados_2015 <- shape_estados_2015 %>%
+                       select(CVE_ENT) %>%
+                         sp::spChFIDs(., str_pad(shape_estados_2015@data$CVE_ENT, 2, "left", pad = "0"))
+
+shape_estados_2010 <- shape_estados_2010 %>%
+                       select(CVE_ENT) %>%
+                         sp::spChFIDs(., str_pad(shape_estados_2010@data$CVE_ENT, 2, "left", pad = "0"))
+```
+
+
+
+**Se insertan los datos del índice de marginación y se seccionan por grado de marginación**  
+
+Este código realiza las siguientes acciones:
+
+- Selecciona las columnas `CVE_ENT` y `GM_` del dataframe `DP2_`.   
+- `stringr::str_trim(.$GM_, "both")`: Elimina los espacios en blanco al principio y al final de los valores en `GM_`.   
+- `fct_relevel(..., c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))`: Reordena los niveles del factor `GM_` en el orden especificado.   
+- `spdplyr:::left_join.Spatial()`,  Realiza un merge entre shape_estados_ y el dataframe modificado, usando `CVE_ENT` como clave.   
+
+El resultado es un nuevo objeto Spatial (capa_estados_2020) que combina la geometría de shape_estados_2020 con la información adicional de `DP2_`, incluyendo la columna `GM_` con niveles reordenados.    
+
+
+
+```{r, eval = FALSE}
+capa_estados_2020 <- shape_estados_2020 %>%
+                      spdplyr:::left_join.Spatial(., DP2_2020 %>% 
+                                                      select(CVE_ENT, ANIO, GM_2020) %>%  
+                                                       mutate(GM_2020 = fct_relevel(stringr::str_trim(.$GM_2020, "both"), c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))),
+                                                        by = c("CVE_ENT")) 
+
+capa_estados_2015 <- shape_estados_2015 %>%
+                      spdplyr:::left_join.Spatial(., DP2_2015 %>% 
+                                                      select(CVE_ENT, ANIO, GM_2015) %>%  
+                                                       mutate(GM_2015 = fct_relevel(stringr::str_trim(.$GM_2015, "both"), c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))),
+                                                        by = c("CVE_ENT")) 
+
+capa_estados_2010 <- shape_estados_2010 %>%
+                      spdplyr:::left_join.Spatial(., DP2_2010 %>% 
+                                                      select(CVE_ENT, ANIO, GM_2010) %>%  
+                                                       mutate(GM_2010 = fct_relevel(stringr::str_trim(.$GM_2010, "both"), c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))),
+                                                        by = c("CVE_ENT")) 
+```
+
+### Capas de estados separados por el grado de marginación   
+ 
+Se crean listas de capas de polígonos filtrados por los grados de marginación para los años `2020`, `2015` y `2010`.   
+- Las listas (`layers_estados_2020`, `layers_estados_2015`, `layers_estados_2010`), cada una con cinco elementos. Cada elemento es una capa de polígonos filtrada por un grado de marginación específico.
+
+```{r, eval = FALSE}
+grados <- c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
+
+layers_estados_2020 <- list()
+layers_estados_2015 <- list()
+layers_estados_2010 <- list()
+for(i in 1:5){
+  layers_estados_2020[[i]] <- capa_estados_2020  %>%
+                               filter(GM_2020 == grados[i])
+  layers_estados_2015[[i]] <- capa_estados_2015  %>%
+                               filter(GM_2015 == grados[i])
+  layers_estados_2010[[i]] <- capa_estados_2010  %>%
+                               filter(GM_2010 == grados[i])
+}
+```
+
+
+### Rester (Por grados de marginación)    
+
+La conversión de shapefiles a raster puede ser necesaria para varios tipos de análisis geoespacial. La mejor manera de hacerlo depende del propósito específico y las características del shapefile. Aquí te presento algunas consideraciones y métodos alternativos que podrían ser mejores según el contexto:  
+
+**Consideraciones**    
+- Propósito del Análisis: La precisión y el detalle que necesitas pueden afectar la elección del tamaño de los píxeles y el método de rasterización.   
+- Tamaño del Dataset: Si estás trabajando con datasets muy grandes, la eficiencia computacional puede ser un factor importante.   
+- Tipo de Datos: El tipo de datos en el shapefile (puntos, líneas, polígonos) puede influir en el método de rasterización.  
+
+#### Obtener las extensiones    
+
+Se obtienen las extensiones de los shapefiles utilizando `bbox()` para obtener el bounding box (caja envolvente) de cada shapefile y `extent()` para convertirlo en un objeto de extensión. Esta función devuelve un objeto a partir de una matriz 2x2 (primera fila: `xmin`, `xmax`; segunda fila: `ymin`, `ymax`), vector (longitud=4; orden= xmin, xmax, ymin, ymax) o lista (con al menos dos elementos, con nombres 'x' e 'y') 
+
+```{r}
+# Define los años
+years <- c("2020", "2015", "2010")
+grados <- c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
+extend_2020 <- lapply(1:5, function(x){
+                            extent(bbox(layers_estados_2020[[x]]))
+})
+extend_2015 <- lapply(1:5, function(x){
+                            extent(bbox(layers_estados_2015[[x]]))
+})
+extend_2010 <- lapply(1:5, function(x){
+                            extent(bbox(layers_estados_2010[[x]]))
+})
+```
+
+El paquete terra es una versión moderna del paquete raster y a menudo proporciona un rendimiento mejorado y funcionalidades adicionales.
+
+```{r}
+## Tamaño de los pixeles
+gridsize <- 0.005
+
+spatial_grid_2020 <- map2(extend_2020, seq_along(grados), function(extend, grado) {
+                          raster(extend_2020[[grado]], res = gridsize)
+})
+
+spatial_grid_2015 <- map2(extend_2015, seq_along(grados), function(extend, grado) {
+                          raster(extend_2015[[grado]], res = gridsize)
+})
+
+spatial_grid_2010 <- map2(extend_2010, seq_along(grados), function(extend, grado) {
+                          raster(extend_2010[[grado]], res = gridsize)
+})
+```
+
+```{r}
+require(terra)
+## Rasterize the shapefile
+raster_estados_2020 <- map2(layers_estados_2020, seq_along(grados), function(layer_file, grado) {
+                             rasterize(x = layer_file, y = spatial_grid_2020[[grado]])
+})
+
+raster_estados_2015 <- map2(layers_estados_2015, seq_along(grados), function(layer_file, grado) {
+                             rasterize(x = layer_file, y = spatial_grid_2015[[grado]])
+})
+
+
+raster_estados_2010 <- map2(layers_estados_2010, seq_along(grados), function(layer_file, grado) {
+                             rasterize(x = layer_file, y = spatial_grid_2010[[grado]])
+})
+```
+
+```{r}
+saveRDS(raster_estados_2020, file = paste0(here::here(), "/Output/raster_estados_2020.RDS"))
+saveRDS(raster_estados_2015, file = paste0(here::here(), "/Output/raster_estados_2015.RDS"))
+saveRDS(raster_estados_2010, file = paste0(here::here(), "/Output/raster_estados_2010.RDS"))
+```
+
+
+```{r}
+# Se convierten en estructura de lineas 
+sldf_estados_2020 <- map2(layers_estados_2020, seq_along(grados), function(layer_file, grado) {
+                              as(layer_file, 'SpatialLinesDataFrame')
+})
+
+sldf_estados_2015 <- map2(layers_estados_2015, seq_along(grados), function(layer_file, grado) {
+                              as(layer_file, 'SpatialLinesDataFrame')
+})
+
+
+sldf_estados_2010 <- map2(layers_estados_2010, seq_along(grados), function(layer_file, grado) {
+                              as(layer_file, 'SpatialLinesDataFrame')
+})
+```
+
+```{r}
+saveRDS(sldf_estados_2020, file = paste0(here::here(), "/Output/sldf_estados_2020.RDS"))
+saveRDS(sldf_estados_2015, file = paste0(here::here(), "/Output/sldf_estados_2015.RDS"))
+saveRDS(sldf_estados_2010, file = paste0(here::here(), "/Output/sldf_estados_2010.RDS"))
+```
+
+```{r}
+## Tamaño de los pixeles
+gridsize <- 0.005
+
+spatial_grid_2020 <- map2(sldf_estados_2020, seq_along(grados), function(sldf_file, grado) {
+                           raster(sldf_file, res = gridsize)
+})
+
+spatial_grid_2015 <- map2(sldf_estados_2015, seq_along(grados), function(sldf_file, grado) {
+                           raster(sldf_file, res = gridsize)
+})
+
+spatial_grid_2010 <- map2(sldf_estados_2010, seq_along(grados), function(sldf_file, grado) {
+                           raster(sldf_file, res = gridsize)
+})
+```
+
+```{r}
+## Rasterize the shapelinesdataframe
+raster_l_estados_1 <- rasterize(sldf_capa1, spatialgrid_1)
+
+require(terra)
+## Rasterize the shapefile
+raster_lines_estados_2020 <- map2(sldf_estados_2020, seq_along(grados), function(layer_file, grado) {
+                                   rasterize(x = layer_file, y = spatial_grid_2020[[grado]])
+})
+
+raster_lines_estados_2015 <- map2(sldf_estados_2015, seq_along(grados), function(layer_file, grado) {
+                                   rasterize(x = layer_file, y = spatial_grid_2015[[grado]])
+})
+
+
+raster_lines_estados_2010 <- map2(sldf_estados_2010, seq_along(grados), function(layer_file, grado) {
+                                   rasterize(x = layer_file, y = spatial_grid_2010[[grado]])
+})
+```
+
+
+```{r}
+saveRDS(raster_lines_estados_2020, file = paste0(here::here(), "/Output/raster_lines_estados_2020.RDS"))
+saveRDS(raster_lines_estados_2015, file = paste0(here::here(), "/Output/raster_lines_estados_2015.RDS"))
+saveRDS(raster_lines_estados_2010, file = paste0(here::here(), "/Output/raster_lines_estados_2010.RDS"))
+```
+
+# Librerías
+
+**Librerías que se usaron en el trabajo**
+
+```{r, echo = FALSE, eval = TRUE}
+sesion_info <- devtools::session_info()
+knitr::kable(dplyr::select(tibble::as_tibble(sesion_info$packages %>% dplyr::filter(attached == TRUE)),
+                    c(package, loadedversion, source))) %>%
+ kableExtra::kable_classic(full_width = TRUE, html_font = 'Montserrat Medium', font_size = 10) 
+```
+
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img src="https://i.creativecommons.org/l/by/4.0/88x31.png" alt="Creative Commons Licence" style="border-width:0"/></a><br />This work by [**Diana Villasana Ocampo**]{xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName"} is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.  
