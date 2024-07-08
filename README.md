@@ -61,6 +61,7 @@ Tomando como base a el índice de marginación 2020.
 - [Mapas en formato RMapshaper](#RMapshaper)
 - [Mapas en formato TopoJSON](#TopoJSON)
 - [Mapas en formato Raster](#Raster)
+- [Mapas con Shiny](#Shiny)
 
 ### Manejo de diferentes datos en formato `JSON`
 
@@ -174,5 +175,29 @@ visualización de modelos espaciales y análisis de datos geoespaciales.
 <body>
 <a href="https://dvillasanao.github.io/Mapas_R/docs/01.05_Leaflet-por-año-y-grado-de-marginacion--Raster-.html" target="_blank">
 <img src="img/06_img.png" width="50%" height="50%"> </a>
+</body>
+</html>
+
+#### `Shiny` <a id = "Shiny"></a>
+
+Usar Shiny junto con Leaflet proporciona una poderosa herramienta para
+crear aplicaciones web interactivas y visualmente atractivas para
+explorar y comunicar datos geoespaciales de manera efectiva y eficiente.
+
+- `Integración`: Tanto Shiny como Leaflet ofrecen numerosas opciones de
+  personalización. Puedes controlar el diseño, los estilos, las capas
+  base, las capas superpuestas, las leyendas y otros aspectos visuales
+  del mapa para adaptarlo específicamente a necesidades de visualización
+  de datos geoespaciales.
+
+#### IMx2020 (Shiny)
+
+**Enlace:**
+<https://dvillasanao.github.io/Mapas_R/docs/01.06_Shiny_Leaflet-2010_2020.html>
+
+<html>
+<body>
+<a href="https://dvillasanao.github.io/Mapas_R/docs/01.06_Shiny_Leaflet-2010_2020.html" target="_blank">
+<img src="img/07_img.png" width="50%" height="50%"> </a>
 </body>
 </html>
