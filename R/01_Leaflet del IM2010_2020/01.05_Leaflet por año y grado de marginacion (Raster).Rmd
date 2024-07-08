@@ -268,23 +268,28 @@ for(i in 1:5){
 ```
 
 
-### Rester (Por grados de marginación)    
+### Raster (Por grados de marginación)    
 
-La conversión de shapefiles a raster puede ser necesaria para varios tipos de análisis geoespacial. La mejor manera de hacerlo depende del propósito específico y las características del shapefile. Aquí te presento algunas consideraciones y métodos alternativos que podrían ser mejores según el contexto:  
+La conversión de shapefiles a raster puede ser necesaria para varios tipos de análisis geoespacial. La mejor manera de hacerlo depende del propósito específico y las características del shapefile. Aquí se´presentan algunas consideraciones y métodos alternativos que podrían ser mejores según el contexto:  
 
 **Consideraciones**    
-- Propósito del Análisis: La precisión y el detalle que necesitas pueden afectar la elección del tamaño de los píxeles y el método de rasterización.   
-- Tamaño del Dataset: Si estás trabajando con datasets muy grandes, la eficiencia computacional puede ser un factor importante.   
-- Tipo de Datos: El tipo de datos en el shapefile (puntos, líneas, polígonos) puede influir en el método de rasterización.  
+- `Propósito del Análisis`: La precisión y el detalle que se necesitan pueden afectar la elección del tamaño de los píxeles y el método de rasterización.    
+- `Tamaño del Dataset`: Si se esta trabajando con datasets muy grandes, la eficiencia computacional puede ser un factor importante.    
+- `Tipo de Datos`: El tipo de datos en el shapefile (`puntos`, `líneas`, `polígonos`) puede influir en el método de rasterización. Más adelante se trabará con la conversión de cada uno de estos datos. 
 
-#### Obtener las extensiones    
+#### Extensión espacial de los shapefiles     
 
-Se obtienen las extensiones de los shapefiles utilizando `bbox()` para obtener el bounding box (caja envolvente) de cada shapefile y `extent()` para convertirlo en un objeto de extensión. Esta función devuelve un objeto a partir de una matriz 2x2 (primera fila: `xmin`, `xmax`; segunda fila: `ymin`, `ymax`), vector (longitud=4; orden= xmin, xmax, ymin, ymax) o lista (con al menos dos elementos, con nombres 'x' e 'y') 
+Se obtienen las extensiones de los shapefiles utilizando `bbox()` para obtener el bounding box (caja delimitadora) de cada shapefile y `extent()` para convertirlo en un objeto de extensión. Esta función devuelve un objeto a partir de una matriz 2x2 (primera fila: `xmin`, `xmax`; segunda fila: `ymin`, `ymax`).    
+
+- Se definen los años y grados de marginación: Se crean dos vectores, `years` con los años de interés y `grados` con los niveles del grado de marginación.    
+
+- `extend_2020`, `extend_2015` y `extend_2010` almacenan la extensión espacial de cada shapefile correspondiente a los distintos grados para cada año.     
 
 ```{r}
 # Define los años
 years <- c("2020", "2015", "2010")
 grados <- c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
+
 extend_2020 <- lapply(1:5, function(x){
                             extent(bbox(layers_estados_2020[[x]]))
 })
@@ -296,7 +301,37 @@ extend_2010 <- lapply(1:5, function(x){
 })
 ```
 
-El paquete terra es una versión moderna del paquete raster y a menudo proporciona un rendimiento mejorado y funcionalidades adicionales.
+
+#### Resolución del raster {#Resolucion}   
+
+La mejor resolución para un raster, definida por el parámetro `gridsize`, depende de varios factores, incluyendo el propósito del análisis, la extensión del área de estudio, la resolución de los datos originales, y la capacidad computacional disponible. Aquí hay algunas consideraciones para determinar la resolución adecuada:    
+
+**Propósito del Análisis**:     
+
+- **Detallado (Análisis Fino)**: Si necesitas un análisis muy detallado, como estudios de microhábitats o planificación urbana detallada, una resolución más alta (píxeles más pequeños) es más apropiada.    
+
+- **Macroescala (Análisis General)**: Para estudios regionales o nacionales, donde se necesita una vista general del área, una resolución más baja (píxeles más grandes) puede ser suficiente.       
+
+**Extensión del Área de Estudio**:   
+
+- **Áreas Pequeñas**: Si el área de estudio es pequeña, puedes usar una resolución más alta sin que el tamaño del archivo raster resultante sea demasiado grande.   
+- **Áreas Grandes**: Para áreas muy grandes, una resolución muy alta puede generar archivos enormes y difíciles de manejar, por lo que podría ser más práctico usar una resolución más baja.    
+
+**Resolución de los Datos Originales**: 
+
+- La resolución del raster no debe exceder la resolución de los datos originales. Si los shapefiles tienen detalles finos, una resolución alta tiene sentido. Si los datos originales son más generales, una resolución alta **NO** añadirá valor y solo aumentará el tamaño del archivo.     
+
+**Capacidad Computacional**:    
+
+- Considerar la capacidad de procesamiento y almacenamiento del sistema. Los rasters de alta resolución pueden ser muy exigentes en términos de memoria y tiempo de procesamiento.   
+
+**Ejemplos de Resoluciones Comunes**       
+
+`Alta Resolución`: 0.0001 a 0.001 grados (~10 a 100 metros en la latitud/longitud). Útil para estudios locales detallados.   
+`Media Resolución`: 0.001 a 0.01 grados (~100 metros a 1 km). Adecuado para estudios regionales.   
+`Baja Resolución`: 0.01 a 0.1 grados (~1 km a 10 km). Adecuado para estudios nacionales o continentales.   
+
+- `Tamaño de los píxeles`: Se establece un tamaño de píxel (gridsize) de 0.005.    
 
 ```{r}
 ## Tamaño de los pixeles
@@ -315,6 +350,20 @@ spatial_grid_2010 <- map2(extend_2010, seq_along(grados), function(extend, grado
 })
 ```
 
+
+#### Rasterización de los shapefiles {#Rasterizacion}  
+
+La función `rasterize()` del paquete `terra`, se utiliza para convertir datos vectoriales (como shapefiles) en datos raster (una cuadrícula de celdas o píxeles). Este proceso es útil para muchas aplicaciones de análisis espacial porque los datos raster pueden ser más fáciles de manejar y analizar en ciertas situaciones. 
+
+**Argumentos**   
+- `x`: La capa vectorial que se desea rasterizar.   
+- `y`: El raster base que define la extensión, resolución y proyección del raster resultante.   
+- `field`: El nombre del campo (atributo) en la capa vectorial cuyos valores se asignarán a las celdas raster.    
+- `fun`: Una función opcional para determinar cómo se asignan los valores si hay múltiples elementos vectoriales que caen en una sola celda raster (por ejemplo, `mean`, `sum`, etc.).     
+
+- `raster_estados_2020`, `raster_estados_2015` y `raster_estados_2010`,  almacenan los datos rasterizados de los shapefiles para cada grado y año.  
+- `rasterize(x = layer_file, y = spatial_grid)` convierte cada shapefile (layer_file) en un objeto raster usando la cuadrícula espacial (spatial_grid) previamente creada.      
+
 ```{r}
 require(terra)
 ## Rasterize the shapefile
@@ -332,12 +381,79 @@ raster_estados_2010 <- map2(layers_estados_2010, seq_along(grados), function(lay
 })
 ```
 
+
+**Evaluación Práctica** 
+
+```{r, eval = FALSE}
+# Se definen varias resoluciones para probar
+resolutions <- c(0.001, 0.005, 0.01)
+
+# Función para crear raster y medir tiempo de procesamiento
+test_resolution <- function(res) {
+                    start_time <- Sys.time()
+                    spatial_grid_test <- raster(extent(layers_estados_2020[[1]]), res = res)
+                    rasterized_test <- rasterize(x = layers_estados_2020[[1]], y = spatial_grid_test)
+                    end_time <- Sys.time()
+                    processing_time <- end_time - start_time
+                    list(resolution = res, processing_time = processing_time, raster = rasterized_test)
+}
+
+# Probar cada resolución y guardar resultados
+results <- lapply(resolutions, test_resolution)
+
+# Ver los resultados
+for (result in results) {
+  print(paste("Resolution:", result$resolution, "Processing Time:", result$processing_time))
+}
+```
+
+
+#### Archivos `.TIFF ` {#TIFF}  
+
+Se guardan los rasters generados en archivos TIFF con información de georreferenciación. Utilizando un bucle  para iterar sobre los diferentes grados y años, generando nombres de archivos dinámicamente y asegurando que los archivos resultantes estén bien organizados.  
+
+- `options = c('TFW=YES')`: Se especifica que se debe crear un archivo de world file (`TFW`) para el raster. Esto es útil para mantener la información de georreferenciación.  
+
+ Opciones de GDAL específicas del formato de archivo:  
+ 
+Los archivos auxiliares para georreferenciación y visualización, no forman parte de `GTiff` como `.shx` o `.dbf` en un shapefile [writeRaster {raster} **Description**].     
+
+- `.tfw` es un archivo ESRI World,  
+- `.ovr `son capas piramidales,  
+- `.xml` es el aspecto del esquema y el histograma,   
+- `.cpg` es para interpretación TIFF,   
+- `.dbf` es para la tabla de atributos raster.      
+
 ```{r}
+for (i in 1:5){
+  writeRaster(get(paste0("raster_estados_2020"))[[i]], filename = paste0(here::here(), "/Output/raster_estados_2020_", i, ".tif"), 
+               options = c('TFW=YES'))
+  writeRaster(get(paste0("raster_estados_2015"))[[i]], filename = paste0(here::here(), "/Output/raster_estados_2015_", i, ".tif"), 
+               options = c('TFW=YES'))
+  writeRaster(get(paste0("raster_estados_2010"))[[i]], filename = paste0(here::here(), "/Output/raster_estados_2010_", i, ".tif"), 
+               options = c('TFW=YES'))
+}
+```
+
+
+```{r, echo = FALSE}
 saveRDS(raster_estados_2020, file = paste0(here::here(), "/Output/raster_estados_2020.RDS"))
 saveRDS(raster_estados_2015, file = paste0(here::here(), "/Output/raster_estados_2015.RDS"))
 saveRDS(raster_estados_2010, file = paste0(here::here(), "/Output/raster_estados_2010.RDS"))
 ```
 
+
+```{r, echo = FALSE}
+raster_estados_2020 <- readRDS(file = paste0(here::here(), "/Output/raster_estados_2020.RDS"))
+raster_estados_2015 <- readRDS(file = paste0(here::here(), "/Output/raster_estados_2015.RDS"))
+raster_estados_2010 <- readRDS(file = paste0(here::here(), "/Output/raster_estados_2010.RDS"))
+```
+
+#### Conversión a `SpatialLinesDataFrame`    
+
+Se realiza la conversión de los datos vectoriales de polígonos a líneas, se crean las cuadrículas espaciales `gridsize` y luego se rasterizan esas líneas en celdas con una resolución definida. Esto permite una fácil visualización y análisis de los datos espaciales.
+
+- `as(layer_file, 'SpatialLinesDataFrame')` convierte cada shapefile de polígonos a una estructura de datos de líneas espaciales (`SpatialLinesDataFrame`).   
 
 ```{r}
 # Se convierten en estructura de lineas 
@@ -355,55 +471,616 @@ sldf_estados_2010 <- map2(layers_estados_2010, seq_along(grados), function(layer
 })
 ```
 
-```{r}
-saveRDS(sldf_estados_2020, file = paste0(here::here(), "/Output/sldf_estados_2020.RDS"))
-saveRDS(sldf_estados_2015, file = paste0(here::here(), "/Output/sldf_estados_2015.RDS"))
-saveRDS(sldf_estados_2010, file = paste0(here::here(), "/Output/sldf_estados_2010.RDS"))
-```
+#### Resolución de `SpatialLinesDataFrame`   
+
+La mejor resolución para un raster, definida por el parámetro `gridsize`, depende de varios factores, incluyendo el propósito del análisis, la extensión del área de estudio, la resolución de los datos originales, y la capacidad computacional disponible. Véase, [Resolución del raster](#Resolucion).        
+
+- `Tamaño de los píxeles`: Se establece un tamaño de píxel (gridsize) de 0.005.    
 
 ```{r}
 ## Tamaño de los pixeles
 gridsize <- 0.005
 
-spatial_grid_2020 <- map2(sldf_estados_2020, seq_along(grados), function(sldf_file, grado) {
-                           raster(sldf_file, res = gridsize)
-})
-
-spatial_grid_2015 <- map2(sldf_estados_2015, seq_along(grados), function(sldf_file, grado) {
-                           raster(sldf_file, res = gridsize)
-})
-
-spatial_grid_2010 <- map2(sldf_estados_2010, seq_along(grados), function(sldf_file, grado) {
-                           raster(sldf_file, res = gridsize)
-})
+# Creación de cuadrículas espaciales
+spatial_grid_2020 <- map(sldf_estados_2020, ~raster(.x, res = gridsize))
+spatial_grid_2015 <- map(sldf_estados_2015, ~raster(.x, res = gridsize))
+spatial_grid_2010 <- map(sldf_estados_2010, ~raster(.x, res = gridsize))
 ```
 
+####  Rasterización de `SpatialLinesDataFrame`  
+
+La función `rasterize()` del paquete `terra`, se utiliza para convertir datos vectoriales (como shapefiles) en datos raster (una cuadrícula de celdas o píxeles). Este proceso es útil para muchas aplicaciones de análisis espacial porque los datos raster pueden ser más fáciles de manejar y analizar en ciertas situaciones. Veáse, [Rasterización de los shapefiles](#Rasterizacion). 
+
+- `raster_lines_estados_2020`, `raster_lines_estados_2015` y `raster_lines_estados_2010` almacenan los datos rasterizados de los SpatialLinesDataFrame para cada grado y año.    
+- `rasterize(x = layer_file, y = spatial_grid)` convierte cada SpatialLinesDataFrame (layer_file) en un objeto raster usando la cuadrícula espacial (spatial_grid) previamente creada.      
+
 ```{r}
-## Rasterize the shapelinesdataframe
-raster_l_estados_1 <- rasterize(sldf_capa1, spatialgrid_1)
+# Rasterización de los shapelines dataframes
+raster_lines_estados_2020 <- map2(sldf_estados_2020, spatial_grid_2020, ~rasterize(.x, .y))
+raster_lines_estados_2015 <- map2(sldf_estados_2015, spatial_grid_2015, ~rasterize(.x, .y))
+raster_lines_estados_2010 <- map2(sldf_estados_2010, spatial_grid_2010, ~rasterize(.x, .y))
+```
 
-require(terra)
-## Rasterize the shapefile
-raster_lines_estados_2020 <- map2(sldf_estados_2020, seq_along(grados), function(layer_file, grado) {
-                                   rasterize(x = layer_file, y = spatial_grid_2020[[grado]])
-})
+#### Archivos `.TIFF `  
 
-raster_lines_estados_2015 <- map2(sldf_estados_2015, seq_along(grados), function(layer_file, grado) {
-                                   rasterize(x = layer_file, y = spatial_grid_2015[[grado]])
-})
+Se guardan los rasters generados en archivos TIFF con información de georreferenciación. Utilizando un bucle  para iterar sobre los diferentes grados y años, generando nombres de archivos dinámicamente y asegurando que los archivos resultantes estén bien organizados. Véase, [Archivos `.TIFF ](#TIFF).    
 
-
-raster_lines_estados_2010 <- map2(sldf_estados_2010, seq_along(grados), function(layer_file, grado) {
-                                   rasterize(x = layer_file, y = spatial_grid_2010[[grado]])
-})
+```{r}
+for (i in 1:5){
+  writeRaster(get(paste0("raster_lines_estados_2020"))[[i]], filename = paste0(here::here(), "/Output/raster_lines_estados_2020_", i, ".tif"), 
+               options = c('TFW=YES'))
+  writeRaster(get(paste0("raster_lines_estados_2015"))[[i]], filename = paste0(here::here(), "/Output/raster_lines_estados_2015_", i, ".tif"), 
+               options = c('TFW=YES'))
+  writeRaster(get(paste0("raster_lines_estados_2010"))[[i]], filename = paste0(here::here(), "/Output/raster_lines_estados_2010_", i, ".tif"), 
+               options = c('TFW=YES'))
+}
 ```
 
 
-```{r}
+
+```{r, echo = FALSE}
 saveRDS(raster_lines_estados_2020, file = paste0(here::here(), "/Output/raster_lines_estados_2020.RDS"))
 saveRDS(raster_lines_estados_2015, file = paste0(here::here(), "/Output/raster_lines_estados_2015.RDS"))
 saveRDS(raster_lines_estados_2010, file = paste0(here::here(), "/Output/raster_lines_estados_2010.RDS"))
 ```
+
+```{r, echo = FALSE}
+raster_lines_estados_2020 <- readRDS(file = paste0(here::here(), "/Output/raster_lines_estados_2020.RDS"))
+raster_lines_estados_2015 <- readRDS(file = paste0(here::here(), "/Output/raster_lines_estados_2015.RDS"))
+raster_lines_estados_2010 <- readRDS(file = paste0(here::here(), "/Output/raster_lines_estados_2010.RDS"))
+```
+
+#### Conversión a `SpatialPointsDataFrame`    
+
+Se realiza la conversión de los datos vectoriales de líneas a puntos, se crean las cuadrículas espaciales `gridsize` y luego se rasterizan esas líneas en celdas con una resolución definida. Esto permite una fácil visualización y análisis de los datos espaciales.
+
+- `as(layer_file, 'SpatialPointsDataFrame')` convierte cada shapefile de líneas a una estructura de datos de puntos espaciales (`SpatialPointsDataFrame`).    
+
+
+```{r}
+# Se convierten en estructura de puntos
+spdf_estados_2020 <- map2(sldf_estados_2020, seq_along(grados), function(layer_file, grado) {
+                              as(layer_file, 'SpatialPointsDataFrame')
+})
+
+spdf_estados_2015 <- map2(sldf_estados_2015, seq_along(grados), function(layer_file, grado) {
+                              as(layer_file, 'SpatialPointsDataFrame')
+})
+
+
+spdf_estados_2010 <- map2(sldf_estados_2010, seq_along(grados), function(layer_file, grado) {
+                              as(layer_file, 'SpatialPointsDataFrame')
+})
+```
+
+#### Resolución de `SpatialPointsDataFrame`   
+
+La mejor resolución para un raster, definida por el parámetro `gridsize`, depende de varios factores, incluyendo el propósito del análisis, la extensión del área de estudio, la resolución de los datos originales, y la capacidad computacional disponible. Véase, [Resolución del raster](#Resolucion).        
+
+- `Tamaño de los píxeles`: Se establece un tamaño de píxel (gridsize) de 0.005.    
+
+```{r}
+## Tamaño de los pixeles
+gridsize <- 0.005
+
+# Creación de cuadrículas espaciales
+spatial_grid_2020 <- map(spdf_estados_2020, ~raster(.x, res = gridsize))
+spatial_grid_2015 <- map(spdf_estados_2015, ~raster(.x, res = gridsize))
+spatial_grid_2010 <- map(spdf_estados_2010, ~raster(.x, res = gridsize))
+```
+
+####  Rasterización de `SpatialPointsDataFrame`  
+
+La función `rasterize()` del paquete `terra`, se utiliza para convertir datos vectoriales (como shapefiles) en datos raster (una cuadrícula de celdas o píxeles). Este proceso es útil para muchas aplicaciones de análisis espacial porque los datos raster pueden ser más fáciles de manejar y analizar en ciertas situaciones. Veáse, [Rasterización de los shapefiles](#Rasterizacion).    
+
+- `raster_points_estados_2020`, `raster_points_estados_2015` y `raster_points_estados_2010` almacenan los datos rasterizados de los SpatialPointsDataFrame para cada grado y año.        
+- `rasterize(x = layer_file, y = spatial_grid, field = 1, update = TRUE, updateValue = "NA")` convierte cada SpatialPointsDataFrame (layer_file) en un objeto raster usando la cuadrícula espacial (spatial_grid) previamente creada.     
+
+```{r}
+# Rasterización de los ShapePointsDataFrame
+raster_points_estados_2020 <- map2(spdf_estados_2020, spatial_grid_2020, ~rasterize(.x, .y, field = 1, update = TRUE, updateValue = "NA"))
+raster_points_estados_2015 <- map2(spdf_estados_2015, spatial_grid_2015, ~rasterize(.x, .y, field = 1, update = TRUE, updateValue = "NA"))
+raster_points_estados_2010 <- map2(spdf_estados_2010, spatial_grid_2010, ~rasterize(.x, .y, field = 1, update = TRUE, updateValue = "NA"))
+```
+
+#### Archivos `.TIFF `  
+
+Se guardan los rasters generados en archivos TIFF con información de georreferenciación. Utilizando un bucle  para iterar sobre los diferentes grados y años, generando nombres de archivos dinámicamente y asegurando que los archivos resultantes estén bien organizados. Véase, [Archivos `.TIFF ](#TIFF).    
+
+```{r}
+for (i in 1:5){
+  writeRaster(get(paste0("raster_points_estados_2020"))[[i]], filename = paste0(here::here(), "/Output/raster_points_estados_2020_", i, ".tif"), 
+               options = c('TFW=YES'))
+  writeRaster(get(paste0("raster_points_estados_2015"))[[i]], filename = paste0(here::here(), "/Output/raster_points_estados_2015_", i, ".tif"), 
+               options = c('TFW=YES'))
+  writeRaster(get(paste0("raster_points_estados_2010"))[[i]], filename = paste0(here::here(), "/Output/raster_points_estados_2010_", i, ".tif"), 
+               options = c('TFW=YES'))
+}
+```
+
+```{r, echo = FALSE}
+saveRDS(raster_points_estados_2020, file = paste0(here::here(), "/Output/raster_points_estados_2020.RDS"))
+saveRDS(raster_points_estados_2015, file = paste0(here::here(), "/Output/raster_points_estados_2015.RDS"))
+saveRDS(raster_points_estados_2010, file = paste0(here::here(), "/Output/raster_points_estados_2010.RDS"))
+```
+
+```{r, echo = FALSE}
+raster_points_estados_2020 <- readRDS(file = paste0(here::here(), "/Output/raster_points_estados_2020.RDS"))
+raster_points_estados_2015 <- readRDS(file = paste0(here::here(), "/Output/raster_points_estados_2015.RDS"))
+raster_points_estados_2010 <- readRDS(file = paste0(here::here(), "/Output/raster_points_estados_2010.RDS"))
+```
+
+## Leaflet 
+
+- `GeoJSON en Leaflet`: Leaflet puede manejar directamente archivos GeoJSON para la visualización de datos geoespaciales. Es compatible de manera nativa con GeoJSON, lo que significa que puedes agregar capas de GeoJSON directamente al mapa Leaflet usando funciones como `addGeoJSON`.      
+
+- `TopoJSON en Leaflet`: Aunque Leaflet no puede manejar directamente archivos TopoJSON, puedes convertir archivos TopoJSON a GeoJSON utilizando herramientas como `geojsonio::geojson_read()` en R antes de cargar los datos en Leaflet. Esto permite aprovechar las ventajas de tamaño y rendimiento de TopoJSON mientras se trabaja con Leaflet.      
+
+### Paleta de colores  
+
+Se crea una paleta de colores que se usará para mapear valores de una variable categórica a colores en una visualización de Leaflet.  
+
+```{r}
+paleta <- c("#13322B", #Muy alto
+            "#086953", #Alto 
+            "#4C9562", #Medio
+            "#D1BB9E", #Bajo
+            "#C3BA6D") # Muy bajo
+
+            
+## Paleta de colores                         
+mypalette <- leaflet::colorFactor(palette = paleta, 
+                                            domain = forcats::fct_relevel(DP2_2020$GM_2020, c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")), 
+                                            na.color = "transparent")
+```
+
+
+### Título 
+
+Se define el estilo y el contenido de un título para un mapa Leaflet utilizando `HTML` y `CSS` dentro de `R`.    
+
+- `tags$style(HTML("..."))`: Esta función permite incluir estilos CSS en el documento.   
+- `.leaflet-control.map-title`: Define una clase CSS que se aplicará al título del mapa.  
+- `tags$div(...)`: Crea un contenedor div en el cual se coloca el título del mapa.  
+- `tag.map.title`: Aplica los estilos definidos anteriormente a este contenedor div.  
+
+```{r}
+# Estructura del título
+tag.map.title <- tags$style(HTML("
+  .leaflet-control.map-title { 
+    transform: translate(-50%,20%);
+    position: fixed !important;
+    left: 50%;
+    text-align: center;
+    padding-left: 10px; 
+    padding-right: 10px; 
+    background: rgba(255,255,255,0.75);
+    font-weight: bold;
+    font-size: 28px;
+  }
+ ")) 
+
+# Nota de página
+title <- tags$div(
+  tag.map.title, HTML("Fuentes:Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020.")
+)  
+```
+
+### Límites del mapa    
+
+Se calcula el cuadro delimitador que contiene las coordenadas de los límitesde un objeto espacial utilizando la función `st_bbox()` de la librería `sf`.     
+
+- `xmin`: La coordenada mínima en el eje x (longitud mínima).   
+- `ymin`: La coordenada mínima en el eje y (latitud mínima).   
+- `xmax`: La coordenada máxima en el eje x (longitud máxima).   
+- `ymax`: La coordenada máxima en el eje y (latitud máxima).     
+
+```{r}
+bounding_box <- st_bbox(shape_estados)
+bounding_box 
+bounding_box <- c(-118.4, 14.5, -86.7, 32.7)
+```
+
+### Leaflet estructura {.tabset .tabset-fade .tabset-pills}   
+
+#### (Raster líneas) 
+
+Se definen dos listas que organizan los datos rasterizados por año y tipo de datos (polígonos y líneas). Estas listas permiten un acceso estructurado y organizado a los datos rasterizados, lo cual facilita su manejo en posteriores análisis o visualizaciones.
+
+##### Se definen los años y los grados de marginación    
+
+- `years`: Un vector que contiene los años para los que tenemos datos de shapefiles.  
+- `grados`: Un vector que contiene los niveles de marginación.   
+
+- `shape_estados_raster`: Asignado como una lista que contiene los objetos rasterizados correspondientes a cada año (raster_estados_2010, raster_estados_2015, raster_estados_2020).  
+- `shape_estados_raster_lines`: Asignado como una lista que contiene los objetos rasterizados de las líneas correspondientes a cada año (raster_lines_estados_2010, raster_lines_estados_2015, raster_lines_estados_2020).    
+
+```{r}
+# Define los grados y años
+years <- c("2020", "2015", "2010")
+grados <- c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
+
+shape_estados_raster <- NULL
+shape_estados_raster <- list(raster_estados_2010, raster_estados_2015, raster_estados_2020)
+
+shape_estados_raster_lines <- NULL
+shape_estados_raster_lines <- list(raster_lines_estados_2010, raster_lines_estados_2015, raster_lines_estados_2020)
+```
+
+
+##### Se define una función para añadir capas de imagen     
+
+Se define una función llamada `addPolygonLayer`, la cual añade una capa de imagen raster a un mapa de Leaflet. Se tienen que especificar los argumentos:   
+
+- `map`: El objeto de mapa de Leaflet al que se le añadirá la nueva capa de polígonos.   
+- `data`: Los datos que contienen la información geográfica de los polígonos.   
+- `year`: Año asociado con los datos de los polígonos, usado para agrupar.    
+- `grado`: Grado asociado con los datos de los polígonos, también usado para agrupar.   
+- `paleta`: Paleta de colores que se usará para rellenar los polígonos.
+- `id`: Es el identificador único para esta capa de polígonos en el mapa. Puede ser útil para identificar y manipular específicamente esta capa en operaciones posteriores.    
+
+```{r}
+# Define una función para añadir capas de polígonos
+addPolygonLayer <- function(map, data, year, grado, paleta, id_year) {
+                            map <- map %>%
+                                    addRasterImage(x = data,
+                                                   colors = paleta, 
+                                                   opacity = 0.5, 
+                                                   group = grado,
+                                                   layerId = id_year
+                                                   )
+                             return(map)
+}
+```
+
+#####  Se crea el mapa inicial   
+
+Se crea un mapa centrado en unas coordenadas específicas (`lat = 23.6260333` y `lng = -102.5375005`), con un nivel de zoom fijo, y establece los límites máximos para evitar que el usuario se desplace fuera de una región definida. El mapa utiliza capa de OpenStreetMap tanto en la capa base como en una capa adicional de tiles del mismo proveedor. 
+
+```{r}
+# Crear el mapa inicial
+map <- leaflet() %>%
+        addTiles() %>%
+         setView(lat = 23.6260333, lng = -102.5375005, zoom = 5) %>%
+          setMaxBounds(lng1 = bounding_box[1],
+                       lat1 = bounding_box[2],
+                       lng2 = bounding_box[3],
+                       lat2 = bounding_box[4]) %>%
+           addProviderTiles(providers$OpenStreetMap, options = providerTileOptions(minZoom = 5, maxZoom = 5))
+```
+
+
+##### Función `addPolygonLayer()`   
+
+Se construye dinámicamente un mapa interactivo que muestra diferentes capas de rasters para los años `2020`, `2015` y `2010`, utilizando funciones y enfoques que permiten manejar de manera flexible los datos geoespaciales. Cada iteración del bucle añade una nueva capa de imágenes al mapa `map`, lo que permite visualizar los datos geoespaciales para cada año de manera superpuesta en el mismo mapa interactivo. Se recorren todas las combinaciones posibles de años (`years`), y se añade una capa de imágenes al mapa utilizando la función `addPolygonLayer`. La función contiene, los shape_estados que son los datos geográficos organizados por año y grado, la paleta de colores correspondiente para cada grado y el ID unico de cada observación correspondiente a cada año.   
+
+```{r}
+# Define los datos y años
+years <- c("2020", "2015", "2010")
+grados <- c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
+start_id <- 1
+
+# Añadir capas de polígonos para cada año
+for (i in seq_along(years)) {
+  for(j in seq_along(grados)){
+            # Obtener el número de observaciones en el shapefile actual
+            num_obs <- nrow(shape_estados_raster[[i]][[j]]@data@attributes[[1]])
+            map <- addPolygonLayer(map,
+                                   shape_estados_raster[[i]][[j]], 
+                                   year = years[i], 
+                                   grado = grados[j], 
+                                   paleta = paleta[j],
+                                   id_year = paste0(str_pad(as.character(start_id + (i - 1) * 5), 2, pad = "0"), years[i])
+                                  ) %>%
+                   addPolygonLayer(shape_estados_raster_lines[[i]][[j]], 
+                                   year = years[i], 
+                                   grado = grados[j], 
+                                   paleta = "white",
+                                   id_year = paste0(str_pad(as.character(start_id + i * 5), 2, pad = "0"), years[i])
+                                  )
+            # Incrementar el contador de IDs únicos
+            start_id <- start_id + 1
+  }
+}
+```
+
+##### Se añade la leyenda y control de capas    
+
+Se añaden los controles adicionales y una leyenda al mapa de Leaflet. Permitiendo al usuario explorar diferentes capas de datos y visualizar información geoespacial de manera organizada y comprensible.     
+
+- `addLayersControl()`: Agrega un control de capas al mapa para permitir al usuario seleccionar qué capas base u overlay (superpuestas) desea visualizar.   
+- `overlayGroups = c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")`: Define los grupos de capas superpuestas que se mostrarán en el control de capas. En este caso, parecen ser categorías de grado de marginación.   
+- `baseGroups = c("2020", "2015", "2010")`: Define los grupos de capas base que se mostrarán en el control de capas. Estos podrían ser los años para los cuales se están visualizando datos.    
+- `options = layersControlOptions(collapsed = FALSE)`:  Especifica las opciones del control de capas. collapsed = FALSE significa que el control de capas estará expandido por defecto, mostrando todas las opciones disponibles sin necesidad de expandirlo manualmente.         
+
+```{r}
+map <- map %>%
+        addControl(title, position = "bottomright") %>%
+         addLegend("bottomright", 
+                    colors = paleta, 
+                    labels = grados,
+                    title = stringr::str_wrap("Grado de marginación", 15), 
+                    opacity = 0.7) %>%
+          addLayersControl(
+           overlayGroups = c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"),
+            baseGroups = c("2020", "2015", "2010"), 
+             options = layersControlOptions(collapsed = FALSE))
+```
+
+##### Se configura el control de capas     
+
+El bloque de este código JavaScript se utiliza junto con el paquete `htmlwidgets`  para controlar la visibilidad y la interactividad de las capas en un mapa Leaflet. Este código JavaScript personalizado mejora la funcionalidad de un mapa Leaflet al permitir que el usuario controle dinámicamente qué capas base y superpuestas están visibles en el mapa. Al cambiar la capa base o añadir capas superpuestas, las capas que no corresponden se ocultan automáticamente, manteniendo así una visualización clara y organizada de los datos geoespaciales.     
+
+Los eventos `baselayerchange`, `overlayadd`, `overlayremove`: Añaden eventos para actualizar las capas visibles cuando el usuario cambia la capa base o añade/remueve capas superpuestas.   
+
+- `baselayerchange`: Este evento se activa cuando el usuario cambia la capa base del mapa.
+- `overlayadd`: Este evento se activa cuando se añade una capa superpuesta al mapa.
+
+```{r}
+map <- map %>%
+        htmlwidgets::onRender("
+          function(el, x) {
+            var myMap = this;
+            var baseLayer = '2020';
+            myMap.eachLayer(function(layer) {
+              var id = layer.options.layerId;
+              if (id) {
+                if (!id.endsWith(baseLayer)) {
+                  layer.getElement().style.display = 'none';
+                }
+              }
+            });
+      
+            myMap.on('baselayerchange', function(e) {
+              baseLayer = e.name;
+              myMap.eachLayer(function(layer) {
+                var id = layer.options.layerId;
+                if (id) {
+                  if (!id.endsWith(baseLayer)) {
+                    layer.getElement().style.display = 'none';
+                    layer.closePopup();
+                  } 
+                  else {
+                    layer.getElement().style.display = 'block';
+                  }
+                }
+              });
+            });
+      
+            myMap.on('overlayadd', function(e) {
+              myMap.eachLayer(function(layer) {
+                var id = layer.options.layerId;
+                if (id) {
+                  if (!id.endsWith(baseLayer)) {
+                    layer.getElement().style.display = 'none';
+                  } else {
+                    layer.getElement().style.display = 'block';
+                  }
+                }
+              });
+            });
+          }")
+map
+```
+
+Se genera un Widget Interactivo con la función `saveWidget()`.     
+  
+**Consideraciones**   
+
+- `saveWidget`: Guarda el mapa interactivo como un archivo HTML, ideal para ser compartido y visualizado en navegadores web.    
+- `selfcontained = TRUE`: Indica que el archivo `HTML` generado incluirá todos los recursos necesarios (como `JavaScript` y `CSS`)  en él, haciendo que sea autocontenido y no dependiente de recursos externos.  
+- `mapshot`: Captura una imagen estática del mapa interactivo, útil para generar vistas previas o miniaturas sin necesidad de interacción directa.    
+
+Es importante que el uso combinado de saveWidget y mapshot en el mismo contexto podría no ser necesario. Normalmente, se elige uno u otro según la necesidad específica: guardar el mapa interactivo para ser utilizado en un sitio web (saveWidget) o capturar una imagen estática para propósitos de visualización o impresión (mapshot).    
+ 
+```{r}
+#saveRDS(map,  paste0(here::here(), "/Output/map_2020.RDS"))
+saveWidget(map,  paste0(here::here(), "/img/map_2010_2020.html"), selfcontained = TRUE)
+map <- map %>% 
+        mapshot(url = paste0(here::here(), "/map_2010_2020.html"))
+```
+
+
+#### (Raster puntos)  
+
+Se definen dos listas que organizan los datos rasterizados por año y tipo de datos (polígonos y puntos). Estas listas permiten un acceso estructurado y organizado a los datos rasterizados, lo cual facilita su manejo en posteriores análisis o visualizaciones.
+
+##### Se definen los años y los grados de marginación    
+
+- `years`: Un vector que contiene los años para los que tenemos datos de shapefiles.  
+- `grados`: Un vector que contiene los niveles de marginación.   
+
+- `shape_estados_raster`: Asignado como una lista que contiene los objetos rasterizados correspondientes a cada año (raster_estados_2010, raster_estados_2015, raster_estados_2020).    
+- `shape_estados_raster_points`: Asignado como una lista que contiene los objetos rasterizados de las líneas correspondientes a cada año (raster_points_estados_2010, raster_points_estados_2015, raster_points_estados_2020).     
+
+```{r}
+# Define los grados y años
+years <- c("2020", "2015", "2010")
+grados <- c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
+
+shape_estados_raster <- NULL
+shape_estados_raster <- list(raster_estados_2010, raster_estados_2015, raster_estados_2020)
+
+shape_estados_raster_ponits <- NULL
+shape_estados_raster_points <- list(raster_points_estados_2010, raster_points_estados_2015, raster_points_estados_2020)
+```
+
+
+##### Se define una función para añadir capas de imagen     
+
+Se define una función llamada `addPolygonLayer`, la cual añade una capa de imagen raster a un mapa de Leaflet. Se tienen que especificar los argumentos:   
+
+- `map`: El objeto de mapa de Leaflet al que se le añadirá la nueva capa de polígonos.   
+- `data`: Los datos que contienen la información geográfica de los polígonos.   
+- `year`: Año asociado con los datos de los polígonos, usado para agrupar.    
+- `grado`: Grado asociado con los datos de los polígonos, también usado para agrupar.   
+- `paleta`: Paleta de colores que se usará para rellenar los polígonos.
+- `id`: Es el identificador único para esta capa de polígonos en el mapa. Puede ser útil para identificar y manipular específicamente esta capa en operaciones posteriores.     
+
+```{r}
+# Define una función para añadir capas de polígonos
+addPolygonLayer <- function(map, data, year, grado, paleta, id_year) {
+                            map <- map %>%
+                                    addRasterImage(x = data,
+                                                   colors = paleta, 
+                                                   opacity = 0.5, 
+                                                   group = grado,
+                                                   layerId = id_year
+                                                   )
+                             return(map)
+}
+```
+
+#####  Se crea el mapa inicial   
+
+Se crea un mapa centrado en unas coordenadas específicas (`lat = 23.6260333` y `lng = -102.5375005`), con un nivel de zoom fijo, y establece los límites máximos para evitar que el usuario se desplace fuera de una región definida. El mapa utiliza capa de OpenStreetMap tanto en la capa base como en una capa adicional de tiles del mismo proveedor. 
+
+```{r}
+# Crear el mapa inicial
+base  <- leaflet() %>%
+         addTiles() %>%
+          setView(lat = 23.6260333, lng = -102.5375005, zoom = 5) %>%
+           setMaxBounds(lng1 = bounding_box[1],
+                        lat1 = bounding_box[2],
+                        lng2 = bounding_box[3],
+                        lat2 = bounding_box[4]) %>%
+            addProviderTiles(providers$OpenStreetMap, options = providerTileOptions(minZoom = 5, maxZoom = 5))
+```
+
+
+##### Función `addPolygonLayer()`   
+
+Se construye dinámicamente un mapa interactivo que muestra diferentes capas de rasters para los años `2020`, `2015` y `2010`, utilizando funciones y enfoques que permiten manejar de manera flexible los datos geoespaciales. Cada iteración del bucle añade una nueva capa de imágenes al mapa `map`, lo que permite visualizar los datos geoespaciales para cada año de manera superpuesta en el mismo mapa interactivo. Se recorren todas las combinaciones posibles de años (`years`), y se añade una capa de imágenes al mapa utilizando la función `addPolygonLayer`. La función contiene, los shape_estados que son los datos geográficos organizados por año y grado, la paleta de colores correspondiente para cada grado y el ID unico de cada observación correspondiente a cada año.   
+
+```{r}
+# Define los datos y años
+years <- c("2020", "2015", "2010")
+grados <- c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
+rm(map)
+map <- base
+start_id <- 1
+
+# Añadir capas de polígonos para cada año
+for (i in seq_along(years)) {
+  for(j in seq_along(grados)){
+            # Obtener el número de observaciones en el shapefile actual
+            num_obs <- nrow(shape_estados_raster[[i]][[j]]@data@attributes[[1]])
+            map <- addPolygonLayer(map,
+                                   shape_estados_raster[[i]][[j]], 
+                                   year = years[i], 
+                                   grado = grados[j], 
+                                   paleta = paleta[j],
+                                   id_year = paste0(str_pad(as.character(start_id + (i - 1) * 5), 2, pad = "0"), years[i])
+                                  ) %>%
+                   addPolygonLayer(shape_estados_raster_points[[i]][[j]], 
+                                   year = years[i], 
+                                   grado = grados[j], 
+                                   paleta = "white",
+                                   id_year = paste0(str_pad(as.character(start_id + i * 5), 2, pad = "0"), years[i])
+                                  )
+            # Incrementar el contador de IDs únicos
+            start_id <- start_id + 1
+  }
+}
+map
+```
+
+##### Se añade la leyenda y control de capas    
+
+Se añaden los controles adicionales y una leyenda al mapa de Leaflet. Permitiendo al usuario explorar diferentes capas de datos y visualizar información geoespacial de manera organizada y comprensible.     
+
+- `addLayersControl()`: Agrega un control de capas al mapa para permitir al usuario seleccionar qué capas base u overlay (superpuestas) desea visualizar.   
+- `overlayGroups = c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")`: Define los grupos de capas superpuestas que se mostrarán en el control de capas. En este caso, parecen ser categorías de grado de marginación.   
+- `baseGroups = c("2020", "2015", "2010")`: Define los grupos de capas base que se mostrarán en el control de capas. Estos podrían ser los años para los cuales se están visualizando datos.    
+- `options = layersControlOptions(collapsed = FALSE)`:  Especifica las opciones del control de capas. collapsed = FALSE significa que el control de capas estará expandido por defecto, mostrando todas las opciones disponibles sin necesidad de expandirlo manualmente.         
+
+```{r}
+map <- map %>%
+        addControl(title, position = "bottomright") %>%
+         addLegend("bottomright", 
+                    colors = paleta, 
+                    labels = grados,
+                    title = stringr::str_wrap("Grado de marginación", 15), 
+                    opacity = 0.7) %>%
+          addLayersControl(
+           overlayGroups = c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"),
+            baseGroups = c("2020", "2015", "2010"), 
+             options = layersControlOptions(collapsed = FALSE))
+```
+
+##### Se configura el control de capas     
+
+El bloque de este código JavaScript se utiliza junto con el paquete `htmlwidgets`  para controlar la visibilidad y la interactividad de las capas en un mapa Leaflet. Este código JavaScript personalizado mejora la funcionalidad de un mapa Leaflet al permitir que el usuario controle dinámicamente qué capas base y superpuestas están visibles en el mapa. Al cambiar la capa base o añadir capas superpuestas, las capas que no corresponden se ocultan automáticamente, manteniendo así una visualización clara y organizada de los datos geoespaciales.     
+
+Los eventos `baselayerchange`, `overlayadd`, `overlayremove`: Añaden eventos para actualizar las capas visibles cuando el usuario cambia la capa base o añade/remueve capas superpuestas.   
+
+- `baselayerchange`: Este evento se activa cuando el usuario cambia la capa base del mapa.
+- `overlayadd`: Este evento se activa cuando se añade una capa superpuesta al mapa.
+
+```{r}
+map <- map %>%
+        htmlwidgets::onRender("
+          function(el, x) {
+            var myMap = this;
+            var baseLayer = '2020';
+            myMap.eachLayer(function(layer) {
+              var id = layer.options.layerId;
+              if (id) {
+                if (!id.endsWith(baseLayer)) {
+                  layer.getElement().style.display = 'none';
+                }
+              }
+            });
+      
+            myMap.on('baselayerchange', function(e) {
+              baseLayer = e.name;
+              myMap.eachLayer(function(layer) {
+                var id = layer.options.layerId;
+                if (id) {
+                  if (!id.endsWith(baseLayer)) {
+                    layer.getElement().style.display = 'none';
+                    layer.closePopup();
+                  } 
+                  else {
+                    layer.getElement().style.display = 'block';
+                  }
+                }
+              });
+            });
+      
+            myMap.on('overlayadd', function(e) {
+              myMap.eachLayer(function(layer) {
+                var id = layer.options.layerId;
+                if (id) {
+                  if (!id.endsWith(baseLayer)) {
+                    layer.getElement().style.display = 'none';
+                  } else {
+                    layer.getElement().style.display = 'block';
+                  }
+                }
+              });
+            });
+          }")
+map
+```
+
+Se genera un Widget Interactivo con la función `saveWidget()`.     
+  
+**Consideraciones**   
+
+- `saveWidget`: Guarda el mapa interactivo como un archivo HTML, ideal para ser compartido y visualizado en navegadores web.    
+- `selfcontained = TRUE`: Indica que el archivo `HTML` generado incluirá todos los recursos necesarios (como `JavaScript` y `CSS`)  en él, haciendo que sea autocontenido y no dependiente de recursos externos.  
+- `mapshot`: Captura una imagen estática del mapa interactivo, útil para generar vistas previas o miniaturas sin necesidad de interacción directa.    
+
+Es importante que el uso combinado de saveWidget y mapshot en el mismo contexto podría no ser necesario. Normalmente, se elige uno u otro según la necesidad específica: guardar el mapa interactivo para ser utilizado en un sitio web (saveWidget) o capturar una imagen estática para propósitos de visualización o impresión (mapshot).    
+ 
+```{r}
+#saveRDS(map,  paste0(here::here(), "/Output/map_2020.RDS"))
+saveWidget(map,  paste0(here::here(), "/img/map_2010_2020.html"), selfcontained = TRUE)
+map <- map %>% 
+        mapshot(url = paste0(here::here(), "/map_2010_2020.html"))
+```
+
 
 # Librerías
 
