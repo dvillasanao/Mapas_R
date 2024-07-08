@@ -1,0 +1,399 @@
+---
+title: "Leaflet a nivel estatal por grados de marginación, 2010 - 2020"
+subtitle: "Utilizando `shiny`"
+author: "Diana Villasana Ocampo"
+output:
+   html_document:
+      highlight: tango
+      theme: flatly
+      toc: yes
+      toc_depth: 4
+      toc_float:
+        collapsed: yes
+knit: (function(input, ...) {
+    rmarkdown::render(
+      input,
+      output_dir = "../../docs"
+    )
+  })
+---
+
+```{=html}
+<style type="text/css">
+body {
+text-align: justify;
+font-style: normal;
+font-family: "Montserrat";
+font-size: 14px
+}
+h1.title {
+  font-size: 30px;
+  color: #1C3BA4;
+}
+h1 {
+  color: #B6854D;
+  font-size: 30px;
+}
+h2 {
+  color: #172984;
+  font-size: 25px;
+}
+h3 {
+  color: #172984;
+  font-size: 20px;
+}
+h4 {
+  color: #174EC5;
+  font-size: 18px;
+}
+h5 {
+  color: #B6854D;
+}
+</style>
+```
+
+```{=html}
+<style>
+.nav>li>a {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    color: #1C3BA4
+}
+.nav-pills>li.active>a, .nav-pills>li.active>a:hover, .nav-pills>li>a:focus {
+    color: #ffffff;
+    background-color: #09C2BC
+}
+</style>
+```
+
+
+
+```{r, include=FALSE}
+# automatically create a bib database for R packages
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = FALSE,
+                       eval = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+setwd(here::here())
+``` 
+
+
+```{r, echo = FALSE, results=FALSE, eval = TRUE}
+require(dplyr)
+require(sp)
+require(stringr)
+require(spdplyr)
+require(htmltools)
+require(leaflet)
+require(htmlwidgets)
+require(grDevices)
+require(forcats)
+require(rgdal)
+require(tibble)
+require(sf)
+require(RColorBrewer)
+require(leafgl)
+require(leaflet.extras)
+require(mapview)
+require(leaflet.providers)
+#tempdir <- tempdir()
+#unlink(tempdir, recursive = TRUE)
+```
+
+# Sistema de Información Geográfica
+
+El Instituto Nacional de Estadística, Geografía e Informática (INEGI) tiene puestos a disposición del público los shapefiles con los distintos niveles de información geográfica. Estos archivos digitales se encuentran disponibles en el [`Marco Geoestadístico Nacional (MGN)`](https://www.inegi.org.mx/temas/mg/#Descargas), el cual es un sistema único y se presenta la división del territorio nacional en diferentes niveles de desagregación para referir geográficamente la información estadística de los censos y encuestas. Se integra al Sistema Nacional de Información Estadística y Geográfica (SNIEG).
+
+
+## Índice de marginación 2010 - 2020
+
+Se cargan las bases de datos del índice de marginación a nivel estatal para los años `2010`, `2015` y `2020`. Las cuales se encuentran en formato `.RData`.   
+
+**Bases de datos**   
+- Nivel estatal    
+- Nivel municipal   
+- Nivel localidad   
+- Nivel AGEB  
+- Nivel Colonia    
+
+**Base de datos** de los tres años se encuentran disponibles en la página oficial de [CONAPO](https://www.gob.mx/conapo/documentos/indices-de-marginacion-2020-284372)   
+
+**Datos abiertos de México** [datos.gob.mx](https://datos.gob.mx/busca/dataset/indice-de-marginacion-carencias-poblacionales-por-localidad-municipio-y-entidad)   
+
+**Publicación** [Índice De Marginación Por Entidad Federativa Y Municipio 2020](https://www.gob.mx/conapo/documentos/indices-de-marginacion-2020-284372).    
+
+
+```{r}
+tablas <- c("2010", "2015", "2020")
+for(i in tablas){
+load(file = paste0(here::here(), "/Output/IME_", i, ".RData"))
+}
+```
+
+
+## Shapefile (Estados)   
+
+A continuación, se leen las transformaciones de los shapefiles a formato GeoJSON de las divisiones geográficas de los estados de México correspondientes a los años `2020`, `2015` y `2010`.     
+
+- Dentro del bucle, se carga un archivo GeoJSON específico para cada combinación de año y grado utilizando la función  `geojsonio::geojson_read`.    
+- `sp::spChFIDs` se utiliza para asignar IDs únicos a cada polígono en los datos espaciales, para asegurar que los IDs estén formateados correctamente.    
+- Los datos cargados se asignan a las listas `shape_estados_2020`, `shape_estados_2015` y `shape_estados_2010` según corresponda.   
+
+
+Enlace: [Mapas utilizando capas `geojson](https://dvillasanao.github.io/Mapas_R/docs/01.01_Leaflet-por-a%C3%B1o-2010_2020--GeoJSON-.html)   
+
+Enlace: [Mapas utilizando capas `geojson, por grado de marginación](https://dvillasanao.github.io/Mapas_R/docs/01.02_Leaflet-por-año-y-grado-de-marginacion--GeoJSON-.html)
+
+```{r}
+years <- c("2020", "2015", "2010")
+grados <- c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
+
+shape_estados_2020 <- list()
+shape_estados_2015 <- list()
+shape_estados_2010 <- list()
+for (i in 1:5){
+  shape_estados_2020[[paste0(grados[i])]] <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2020_", i, "_json.geojson"), what = "sp") %>%
+                                    sp::spChFIDs(.,  str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))
+  shape_estados_2015[[paste0(grados[i])]] <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2015_", i, "_json.geojson"), what = "sp") %>%
+                                    sp::spChFIDs(.,  str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))
+  shape_estados_2010[[paste0(grados[i])]] <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2010_", i, "_json.geojson"), what = "sp") %>%                                                  sp::spChFIDs(.,                                      str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))
+}
+
+shape_estados <- geojsonio::geojson_read(paste0(here::here(), "/Output/estados_2020_json.geojson"), what = "sp") %>%
+                                          sp::spChFIDs(., str_pad(.@data$CVE_ENT, 2, "left", pad = "0"))
+```
+
+## Estructura Leaflet 
+
+### Paleta de colores 
+
+Se crea una paleta de colores que se usará para mapear valores de una variable categórica a colores en una visualización de Leaflet. 
+
+```{r}
+paleta <- c("#13322B", #Muy alto
+            "#086953", #Alto 
+            "#4C9562", #Medio
+            "#D1BB9E", #Bajo
+            "#C3BA6D") # Muy bajo
+
+            
+## Paleta de colores                         
+mypalette <- leaflet::colorFactor(palette = paleta, 
+                                            domain = forcats::fct_relevel(DP2_2020$GM_2020, c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")), 
+                                            na.color = "transparent")
+```
+
+
+### Título
+
+Se define el estilo y el contenido de un título para un mapa Leaflet utilizando `HTML` y `CSS` dentro de `R`.    
+
+- `tags$style(HTML("..."))`: Esta función permite incluir estilos CSS en el documento.   
+- `.leaflet-control.map-title`: Define una clase CSS que se aplicará al título del mapa.  
+- `tags$div(...)`: Crea un contenedor div en el cual se coloca el título del mapa.  
+- `tag.map.title`: Aplica los estilos definidos anteriormente a este contenedor div.  
+
+
+```{r}
+# Estructura del título
+tag.map.title <- tags$style(HTML("
+  .leaflet-control.map-title { 
+    transform: translate(-50%,20%);
+    position: fixed !important;
+    left: 50%;
+    text-align: center;
+    padding-left: 10px; 
+    padding-right: 10px; 
+    background: rgba(255,255,255,0.75);
+    font-weight: bold;
+    font-size: 28px;
+  }
+ ")) 
+
+# Nota de página
+title <- tags$div(
+  tag.map.title, HTML("Fuentes:Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020.")
+)  
+```
+
+### Límites del mapa    
+
+Se calcula el cuadro delimitador que contiene las coordenadas de los límitesde un objeto espacial utilizando la función `st_bbox()` de la librería `sf`.     
+
+- `xmin`: La coordenada mínima en el eje x (longitud mínima).   
+- `ymin`: La coordenada mínima en el eje y (latitud mínima).   
+- `xmax`: La coordenada máxima en el eje x (longitud máxima).   
+- `ymax`: La coordenada máxima en el eje y (latitud máxima).     
+
+
+```{r}
+bounding_box <- st_bbox(shape_estados)
+bounding_box
+```
+### Se definen los años y los grados de marginación    
+
+- `years`: Un vector que contiene los años para los que tenemos datos de shapefiles.  
+- `grados`: Un vector que contiene los niveles de marginación.  
+
+Se asigna a la lista `shape_estados` con una estrcutura de listas de data frames geoespaciales correspondientes a diferentes años y grados de marginación. 
+
+
+```{r}
+# Se definen los datos de marginación y años
+years <- c("2020", "2015", "2010")
+grados <- c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
+
+shape_estados <- list(shape_estados_2020, shape_estados_2015, shape_estados_2010)
+```
+
+### Se define una función para añadir capas de polígonos   
+
+Se define una función llamada `addPolygonLayer`, la cual añade una capa de polígonos a un mapa de Leaflet. Se tienen que especificar los argumentos:   
+
+- `map`: El objeto de mapa de Leaflet al que se le añadirá la nueva capa de polígonos.   
+- `data`: Los datos que contienen la información geográfica de los polígonos.   
+- `year`: Año asociado con los datos de los polígonos, usado para agrupar.    
+- `paleta`: Paleta de colores que se usará para rellenar los polígonos de acuerdo al grado de marginación.   
+- `grado`: Representa el grupo al que pertenecen estos polígonos.    
+
+```{r}
+# Define una función para añadir las capas de polígonos
+addPolygonLayer <- function(map, data, year, grado, paleta) {
+  map <- map %>%
+          addPolygons(
+                      data = data,
+                       fillColor = paleta,
+                        fillOpacity = 0.8,
+                         stroke = TRUE,
+                          weight = 1,
+                           dashArray = "1",
+                            opacity = 1,
+                             color = "#D4D0BD",
+                              group = paste(year, grado)
+          )
+  return(map)
+}
+```
+
+
+## Estructura Shiny  
+
+Se crea una interfaz de usuario (UI) y un servidor (server) en un entorno Shiny.   
+
+### `ui`
+
+```{r}
+ui <- fluidPage(
+        # Título de la página.
+        titlePanel("Mapa del índice de marginación a nivel, estatal,  2020 - 2020"),
+        
+        #CSS personalizado 
+        tags$head(
+                  includeCSS("style.css"),
+                 ),
+        #Contenedor del mapa Leaflet
+        # If not using custom CSS, set height of leafletOutput to a number instead of percent
+        leafletOutput("map", width = "100vw", height = "90vh"),  # Ajusta el ancho y alto
+        
+        # Panel fijo en la interfaz que selecciona el año (selected_year), el grado de marginación (selected_grades), y un botón de reset (reset).
+        absolutePanel(id = "controls", 
+                      class = "panel panel-default", 
+                      fixed = TRUE,
+                      draggable = TRUE, 
+                      top = 60, 
+                      left = "auto", 
+                      right = 20, 
+                      bottom = "auto",
+                      width = 330, 
+                      height = "auto",
+      
+                      h2("Mapa de marginación"),
+                    
+                      selectInput("selected_year", "Selecciona el Año:", 
+                                  choices = years, 
+                                  selected = "2020"),
+                      checkboxGroupInput("selected_grades", "Selecciona el Grado de Marginación:", 
+                                         choices = grados, 
+                                         selected = grados),
+                      actionButton("reset", "Reset")  # Botón de reset
+                      )
+        )
+```
+
+### `server`
+
+```{r}
+# Server
+server <- function(input, output, session) {
+
+            output$map <- renderLeaflet({
+                              # Mapa Base 
+                              map <- leaflet(options = leafletOptions(minZoom = 5, maxZoom = 5, zoomControl = FALSE)) %>%
+                                      addTiles() %>%
+                                       setView(lat = 23.6260333, lng = -102.5375005, zoom = 5) %>%
+                                        setMaxBounds(lng1 = bounding_box[1],
+                                                     lat1 = bounding_box[2],
+                                                     lng2 = bounding_box[3],
+                                                     lat2 = bounding_box[4]) %>%
+                                         addProviderTiles(providers$OpenStreetMap, 
+                                                          options = providerTileOptions(minZoom = 5, maxZoom = 5))
+              
+                              # Se añaden las capas de polígonos para cada año y grado
+                              for (i in seq_along(years)) {
+                                for (j in seq_along(grados)) {
+                                        map <- addPolygonLayer(map = map, 
+                                                               data = shape_estados[[i]][[paste0(grados[j])]], 
+                                                               year = years[i], 
+                                                               grado = grados[j], 
+                                                               paleta = paleta[j])
+                                 }
+                                }
+                              #Se añade la leyenda y control de capas  
+                              map %>%
+                               addControl(title, position = "bottomright") %>%
+                                addLegend("bottomright", 
+                                          colors = paleta, 
+                                          labels = grados,
+                                          title = stringr::str_wrap("Grado de marginación", 15), opacity = 0.7)
+                            })
+            
+            # Observador para actualizar el mapa según las selecciones input$selected_year y input$selected_grades
+            observe({
+                     selected_year <- input$selected_year
+                     selected_grades <- input$selected_grades
+                     
+                     #Actualiza dinámicamente el mapa Leaflet 
+                     leafletProxy("map") %>%
+                      hideGroup(paste(rep(years, each = length(grados)), grados)) %>%
+                       showGroup(paste(selected_year, selected_grades))  
+                     })
+            
+            # Observador para el botón de reset
+            observeEvent(input$reset, {
+                                       updateSelectInput(session, "selected_year", selected = "2020")
+                                       updateCheckboxGroupInput(session, "selected_grades", selected = grados)
+            })
+}
+```
+
+### `shinyApp` 
+
+```{r}
+# Ejecutar la aplicación
+shinyApp(ui, server)
+```
+
+
+# Librerías
+
+**Librerías que se usaron en el trabajo**
+
+```{r, echo = FALSE, eval = TRUE}
+sesion_info <- devtools::session_info()
+knitr::kable(dplyr::select(tibble::as_tibble(sesion_info$packages %>% dplyr::filter(attached == TRUE)),
+                    c(package, loadedversion, source))) %>%
+ kableExtra::kable_classic(full_width = TRUE, html_font = 'Montserrat Medium', font_size = 10) 
+```
+
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img src="https://i.creativecommons.org/l/by/4.0/88x31.png" alt="Creative Commons Licence" style="border-width:0"/></a><br />This work by [**Diana Villasana Ocampo**]{xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName"} is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.  
