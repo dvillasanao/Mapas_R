@@ -57,11 +57,19 @@ Tomando como base a el índice de marginación 2020.
 ### Contenido
 
 - [Mapas por desagregaciones geográficas de México](#Mapas_Mexico)
+  \[[Enlace](https://dvillasanao.github.io/Mapas_R/R/01_Mapas%20por%20desagregaciones%20geograficas%20de%20Mexico.nb.html)\]
 - [Mapas en formato GeoJSON](#GeoJSON)
+  \[[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.01_Leaflet-por-a%C3%B1o-2010_2020--GeoJSON-.html)\]
+- [Mapas desagregado por categorías en formato GeoJSON](#GeoJSON)
+  \[[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.02_Leaflet-por-año-y-grado-de-marginacion--GeoJSON-.html)\]
 - [Mapas en formato RMapshaper](#RMapshaper)
+  \[[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.03_Leaflet-por-año-y-grado-de-marginacion--RMapshaper-.html)\]
 - [Mapas en formato TopoJSON](#TopoJSON)
+  \[[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.04_Leaflet-por-año-y-grado-de-marginacion--TopoJSON-.html)\]
 - [Mapas en formato Raster](#Raster)
+  \[[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.05_Leaflet-por-año-y-grado-de-marginacion--Raster-.html)\]
 - [Mapas con Shiny](#Shiny)
+  \[[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.06_Shiny_Leaflet-2010_2020.html)\]
 
 ### Manejo de diferentes datos en formato `JSON`
 
@@ -80,9 +88,6 @@ decimales como unidades.
 
 #### IMx2020 (Nivel entidad federativa, 2010 - 2020)
 
-**Enlace:**
-<https://dvillasanao.github.io/Mapas_R/docs/01.01_Leaflet-por-a%C3%B1o-2010_2020--GeoJSON-.html>
-
 <html>
 <body>
 <a href="https://dvillasanao.github.io/Mapas_R/docs/01.01_Leaflet-por-a%C3%B1o-2010_2020--GeoJSON-.html" target="_blank">
@@ -91,9 +96,6 @@ decimales como unidades.
 </html>
 
 #### IMx2020 (Nivel entidad federativa desagregado por grado de marginación, 2010 - 2020)
-
-**Enlace:**
-<https://dvillasanao.github.io/Mapas_R/docs/01.02_Leaflet-por-año-y-grado-de-marginacion--GeoJSON-.html>
 
 <html>
 <body>
@@ -113,9 +115,6 @@ la complejidad de las geometrías, lo que puede mejorar el rendimiento en
 aplicaciones web y análisis.
 
 #### IMx2020 (RMapshaper)
-
-**Enlace:**
-<https://dvillasanao.github.io/Mapas_R/docs/01.03_Leaflet-por-año-y-grado-de-marginacion--RMapshaper-.html>
 
 <html>
 <body>
@@ -143,9 +142,6 @@ aristas entre geometrías vecinas y reduciendo redundancias.
 
 #### IMx2020 (TopoJSON)
 
-**Enlace:**
-<https://dvillasanao.github.io/Mapas_R/docs/01.04_Leaflet-por-año-y-grado-de-marginacion--TopoJSON-.html>
-
 <html>
 <body>
 <a href="https://dvillasanao.github.io/Mapas_R/docs/01.04_Leaflet-por-año-y-grado-de-marginacion--TopoJSON-.html" target="_blank">
@@ -168,9 +164,6 @@ visualización de modelos espaciales y análisis de datos geoespaciales.
 
 #### IMx2020 (Raster)
 
-**Enlace:**
-<https://dvillasanao.github.io/Mapas_R/docs/01.05_Leaflet-por-año-y-grado-de-marginacion--Raster-.html>
-
 <html>
 <body>
 <a href="https://dvillasanao.github.io/Mapas_R/docs/01.05_Leaflet-por-año-y-grado-de-marginacion--Raster-.html" target="_blank">
@@ -191,9 +184,6 @@ explorar y comunicar datos geoespaciales de manera efectiva y eficiente.
   de datos geoespaciales.
 
 #### IMx2020 (Shiny)
-
-**Enlace:**
-<https://dvillasanao.github.io/Mapas_R/docs/01.06_Shiny_Leaflet-2010_2020.html>
 
 <html>
 <body>

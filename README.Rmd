@@ -70,12 +70,13 @@ El primer documento se utilizan diferentes paqueterías en el entorno de R, la c
 
 ### Contenido
 
-- [Mapas por desagregaciones geográficas de México](#Mapas_Mexico)
-- [Mapas en formato GeoJSON](#GeoJSON)
-- [Mapas en formato RMapshaper](#RMapshaper)
-- [Mapas en formato TopoJSON](#TopoJSON)
-- [Mapas en formato Raster](#Raster)
-- [Mapas con Shiny](#Shiny)
+- [Mapas por desagregaciones geográficas de México](#Mapas_Mexico) [[Enlace](https://dvillasanao.github.io/Mapas_R/R/01_Mapas%20por%20desagregaciones%20geograficas%20de%20Mexico.nb.html)]
+- [Mapas en formato GeoJSON](#GeoJSON) [[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.01_Leaflet-por-a%C3%B1o-2010_2020--GeoJSON-.html)]
+- [Mapas desagregado por categorías en formato GeoJSON](#GeoJSON) [[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.02_Leaflet-por-año-y-grado-de-marginacion--GeoJSON-.html)]
+- [Mapas en formato RMapshaper](#RMapshaper) [[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.03_Leaflet-por-año-y-grado-de-marginacion--RMapshaper-.html)]
+- [Mapas en formato TopoJSON](#TopoJSON) [[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.04_Leaflet-por-año-y-grado-de-marginacion--TopoJSON-.html)]
+- [Mapas en formato Raster](#Raster) [[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.05_Leaflet-por-año-y-grado-de-marginacion--Raster-.html)]
+- [Mapas con Shiny](#Shiny) [[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.06_Shiny_Leaflet-2010_2020.html)]
 
 
 ### Manejo de diferentes datos en formato `JSON`   
@@ -87,8 +88,6 @@ Los archivos [GeoJSON](https://enterprise.arcgis.com/es/portal/latest/use/geojso
 
 #### IMx2020 (Nivel entidad federativa, 2010 - 2020)   
 
-**Enlace:** https://dvillasanao.github.io/Mapas_R/docs/01.01_Leaflet-por-a%C3%B1o-2010_2020--GeoJSON-.html 
-
 <html>
 <body>
   <a href="https://dvillasanao.github.io/Mapas_R/docs/01.01_Leaflet-por-a%C3%B1o-2010_2020--GeoJSON-.html" target="_blank">
@@ -98,8 +97,6 @@ Los archivos [GeoJSON](https://enterprise.arcgis.com/es/portal/latest/use/geojso
 </html>
  
 #### IMx2020 (Nivel entidad federativa desagregado por grado de marginación, 2010 - 2020)   
-
-**Enlace:** https://dvillasanao.github.io/Mapas_R/docs/01.02_Leaflet-por-año-y-grado-de-marginacion--GeoJSON-.html
 
 <html>
 <body>
@@ -114,8 +111,6 @@ Los archivos [GeoJSON](https://enterprise.arcgis.com/es/portal/latest/use/geojso
 `RMapshaper` es un paquete que proporciona una interfaz para la biblioteca JavaScript **mapshaper**, que se utiliza para simplificar, transformar y analizar datos geoespaciales. Este paquete es especialmente útil para trabajar con archivos GeoJSON, Shapefiles y otros formatos de datos espaciales, reduciendo el tamaño del archivo y la complejidad de las geometrías, lo que puede mejorar el rendimiento en aplicaciones web y análisis.   
 
 #### IMx2020 (RMapshaper)    
-
-**Enlace:** https://dvillasanao.github.io/Mapas_R/docs/01.03_Leaflet-por-año-y-grado-de-marginacion--RMapshaper-.html
 
 <html>
 <body>
@@ -136,8 +131,6 @@ Los archivos `TopoJSON`; es un formato para codificar datos geográficos que mej
 
 #### IMx2020 (TopoJSON)    
 
-**Enlace:** https://dvillasanao.github.io/Mapas_R/docs/01.04_Leaflet-por-año-y-grado-de-marginacion--TopoJSON-.html
-
 <html>
 <body>
   <a href="https://dvillasanao.github.io/Mapas_R/docs/01.04_Leaflet-por-año-y-grado-de-marginacion--TopoJSON-.html" target="_blank">
@@ -154,8 +147,6 @@ Los archivos tipo `imagen-raster`; proporcionan una poderosa herramienta para vi
 
 #### IMx2020 (Raster)    
 
-**Enlace:** https://dvillasanao.github.io/Mapas_R/docs/01.05_Leaflet-por-año-y-grado-de-marginacion--Raster-.html
-
 <html>
 <body>
   <a href="https://dvillasanao.github.io/Mapas_R/docs/01.05_Leaflet-por-año-y-grado-de-marginacion--Raster-.html" target="_blank">
@@ -171,8 +162,6 @@ Usar Shiny junto con Leaflet proporciona una poderosa herramienta para crear apl
 - `Integración`: Tanto Shiny como Leaflet ofrecen numerosas opciones de personalización. Puedes controlar el diseño, los estilos, las capas base, las capas superpuestas, las leyendas y otros aspectos visuales del mapa para adaptarlo específicamente a necesidades de visualización de datos geoespaciales.    
 
 #### IMx2020 (Shiny)    
-
-**Enlace:** https://dvillasanao.github.io/Mapas_R/docs/01.06_Shiny_Leaflet-2010_2020.html
 
 <html>
 <body>
