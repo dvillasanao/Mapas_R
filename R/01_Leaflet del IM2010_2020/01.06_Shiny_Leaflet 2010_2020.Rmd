@@ -362,7 +362,7 @@ server <- function(input, output, session) {
                      selected_year <- input$selected_year
                      selected_grades <- input$selected_grades
                      
-                     #Actualiza dinámicamente el mapa Leaflet 
+                     #Actualiza'' dinámicamente el mapa Leaflet 
                      leafletProxy("map") %>%
                       hideGroup(paste(rep(years, each = length(grados)), grados)) %>%
                        showGroup(paste(selected_year, selected_grades))  

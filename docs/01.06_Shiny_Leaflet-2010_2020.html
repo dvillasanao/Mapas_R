@@ -2132,7 +2132,7 @@ entorno Shiny.</p>
 <span id="cb9-37"><a href="#cb9-37" tabindex="-1"></a>                     selected_year <span class="ot">&lt;-</span> input<span class="sc">$</span>selected_year</span>
 <span id="cb9-38"><a href="#cb9-38" tabindex="-1"></a>                     selected_grades <span class="ot">&lt;-</span> input<span class="sc">$</span>selected_grades</span>
 <span id="cb9-39"><a href="#cb9-39" tabindex="-1"></a>                     </span>
-<span id="cb9-40"><a href="#cb9-40" tabindex="-1"></a>                     <span class="co">#Actualiza dinámicamente el mapa Leaflet </span></span>
+<span id="cb9-40"><a href="#cb9-40" tabindex="-1"></a>                     <span class="co">#Actualiza&#39;&#39; dinámicamente el mapa Leaflet </span></span>
 <span id="cb9-41"><a href="#cb9-41" tabindex="-1"></a>                     <span class="fu">leafletProxy</span>(<span class="st">&quot;map&quot;</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb9-42"><a href="#cb9-42" tabindex="-1"></a>                      <span class="fu">hideGroup</span>(<span class="fu">paste</span>(<span class="fu">rep</span>(years, <span class="at">each =</span> <span class="fu">length</span>(grados)), grados)) <span class="sc">%&gt;%</span></span>
 <span id="cb9-43"><a href="#cb9-43" tabindex="-1"></a>                       <span class="fu">showGroup</span>(<span class="fu">paste</span>(selected_year, selected_grades))  </span>
