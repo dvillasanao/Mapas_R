@@ -275,7 +275,7 @@ La conversión de shapefiles a raster puede ser necesaria para varios tipos de a
 **Consideraciones**    
 - `Propósito del Análisis`: La precisión y el detalle que se necesitan pueden afectar la elección del tamaño de los píxeles y el método de rasterización.    
 - `Tamaño del Dataset`: Si se esta trabajando con datasets muy grandes, la eficiencia computacional puede ser un factor importante.    
-- `Tipo de Datos`: El tipo de datos en el shapefile (`puntos`, `líneas`, `polígonos`) puede influir en el método de rasterización. Más adelante se trabará con la conversión de cada uno de estos datos. 
+- `Tipo de Datos`: El tipo de datos en el shapefile (`puntos`, `líneas`, `polígonos`) puede influir en el método de rasterización. Más adelante se trabajará con la conversión de cada uno de estos datos. 
 
 #### Extensión espacial de los shapefiles     
 
@@ -449,7 +449,7 @@ raster_estados_2015 <- readRDS(file = paste0(here::here(), "/Output/raster_estad
 raster_estados_2010 <- readRDS(file = paste0(here::here(), "/Output/raster_estados_2010.RDS"))
 ```
 
-#### Conversión a `SpatialLinesDataFrame`    
+##### Conversión a `SpatialLinesDataFrame`    
 
 Se realiza la conversión de los datos vectoriales de polígonos a líneas, se crean las cuadrículas espaciales `gridsize` y luego se rasterizan esas líneas en celdas con una resolución definida. Esto permite una fácil visualización y análisis de los datos espaciales.
 
@@ -471,7 +471,7 @@ sldf_estados_2010 <- map2(layers_estados_2010, seq_along(grados), function(layer
 })
 ```
 
-#### Resolución de `SpatialLinesDataFrame`   
+##### Resolución de `SpatialLinesDataFrame`   
 
 La mejor resolución para un raster, definida por el parámetro `gridsize`, depende de varios factores, incluyendo el propósito del análisis, la extensión del área de estudio, la resolución de los datos originales, y la capacidad computacional disponible. Véase, [Resolución del raster](#Resolucion).        
 
@@ -487,7 +487,7 @@ spatial_grid_2015 <- map(sldf_estados_2015, ~raster(.x, res = gridsize))
 spatial_grid_2010 <- map(sldf_estados_2010, ~raster(.x, res = gridsize))
 ```
 
-####  Rasterización de `SpatialLinesDataFrame`  
+#####  Rasterización de `SpatialLinesDataFrame`  
 
 La función `rasterize()` del paquete `terra`, se utiliza para convertir datos vectoriales (como shapefiles) en datos raster (una cuadrícula de celdas o píxeles). Este proceso es útil para muchas aplicaciones de análisis espacial porque los datos raster pueden ser más fáciles de manejar y analizar en ciertas situaciones. Veáse, [Rasterización de los shapefiles](#Rasterizacion). 
 
@@ -501,7 +501,7 @@ raster_lines_estados_2015 <- map2(sldf_estados_2015, spatial_grid_2015, ~rasteri
 raster_lines_estados_2010 <- map2(sldf_estados_2010, spatial_grid_2010, ~rasterize(.x, .y))
 ```
 
-#### Archivos `.TIFF `  
+##### Archivos `.TIFF `  
 
 Se guardan los rasters generados en archivos TIFF con información de georreferenciación. Utilizando un bucle  para iterar sobre los diferentes grados y años, generando nombres de archivos dinámicamente y asegurando que los archivos resultantes estén bien organizados. Véase, [Archivos `.TIFF ](#TIFF).    
 
@@ -530,7 +530,7 @@ raster_lines_estados_2015 <- readRDS(file = paste0(here::here(), "/Output/raster
 raster_lines_estados_2010 <- readRDS(file = paste0(here::here(), "/Output/raster_lines_estados_2010.RDS"))
 ```
 
-#### Conversión a `SpatialPointsDataFrame`    
+##### Conversión a `SpatialPointsDataFrame`    
 
 Se realiza la conversión de los datos vectoriales de líneas a puntos, se crean las cuadrículas espaciales `gridsize` y luego se rasterizan esas líneas en celdas con una resolución definida. Esto permite una fácil visualización y análisis de los datos espaciales.
 
@@ -553,7 +553,7 @@ spdf_estados_2010 <- map2(sldf_estados_2010, seq_along(grados), function(layer_f
 })
 ```
 
-#### Resolución de `SpatialPointsDataFrame`   
+##### Resolución de `SpatialPointsDataFrame`   
 
 La mejor resolución para un raster, definida por el parámetro `gridsize`, depende de varios factores, incluyendo el propósito del análisis, la extensión del área de estudio, la resolución de los datos originales, y la capacidad computacional disponible. Véase, [Resolución del raster](#Resolucion).        
 
@@ -569,7 +569,7 @@ spatial_grid_2015 <- map(spdf_estados_2015, ~raster(.x, res = gridsize))
 spatial_grid_2010 <- map(spdf_estados_2010, ~raster(.x, res = gridsize))
 ```
 
-####  Rasterización de `SpatialPointsDataFrame`  
+#####  Rasterización de `SpatialPointsDataFrame`  
 
 La función `rasterize()` del paquete `terra`, se utiliza para convertir datos vectoriales (como shapefiles) en datos raster (una cuadrícula de celdas o píxeles). Este proceso es útil para muchas aplicaciones de análisis espacial porque los datos raster pueden ser más fáciles de manejar y analizar en ciertas situaciones. Veáse, [Rasterización de los shapefiles](#Rasterizacion).    
 
@@ -583,7 +583,7 @@ raster_points_estados_2015 <- map2(spdf_estados_2015, spatial_grid_2015, ~raster
 raster_points_estados_2010 <- map2(spdf_estados_2010, spatial_grid_2010, ~rasterize(.x, .y, field = 1, update = TRUE, updateValue = "NA"))
 ```
 
-#### Archivos `.TIFF `  
+##### Archivos `.TIFF `  
 
 Se guardan los rasters generados en archivos TIFF con información de georreferenciación. Utilizando un bucle  para iterar sobre los diferentes grados y años, generando nombres de archivos dinámicamente y asegurando que los archivos resultantes estén bien organizados. Véase, [Archivos `.TIFF ](#TIFF).    
 

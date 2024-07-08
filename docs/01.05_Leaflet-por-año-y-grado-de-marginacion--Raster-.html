@@ -2040,7 +2040,7 @@ muy grandes, la eficiencia computacional puede ser un factor
 importante.<br />
 - <code>Tipo de Datos</code>: El tipo de datos en el shapefile
 (<code>puntos</code>, <code>líneas</code>, <code>polígonos</code>) puede
-influir en el método de rasterización. Más adelante se trabará con la
+influir en el método de rasterización. Más adelante se trabajará con la
 conversión de cada uno de estos datos.</p>
 <div id="extensión-espacial-de-los-shapefiles" class="section level4">
 <h4>Extensión espacial de los shapefiles</h4>
@@ -2238,9 +2238,8 @@ forman parte de <code>GTiff</code> como <code>.shx</code> o
 <span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>  <span class="fu">writeRaster</span>(<span class="fu">get</span>(<span class="fu">paste0</span>(<span class="st">&quot;raster_estados_2010&quot;</span>))[[i]], <span class="at">filename =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/raster_estados_2010_&quot;</span>, i, <span class="st">&quot;.tif&quot;</span>), </span>
 <span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>               <span class="at">options =</span> <span class="fu">c</span>(<span class="st">&#39;TFW=YES&#39;</span>))</span>
 <span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>}</span></code></pre></div>
-</div>
-<div id="conversión-a-spatiallinesdataframe" class="section level4">
-<h4>Conversión a <code>SpatialLinesDataFrame</code></h4>
+<div id="conversión-a-spatiallinesdataframe" class="section level5">
+<h5>Conversión a <code>SpatialLinesDataFrame</code></h5>
 <p>Se realiza la conversión de los datos vectoriales de polígonos a
 líneas, se crean las cuadrículas espaciales <code>gridsize</code> y
 luego se rasterizan esas líneas en celdas con una resolución definida.
@@ -2265,8 +2264,8 @@ shapefile de polígonos a una estructura de datos de líneas espaciales
 <span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a>                              <span class="fu">as</span>(layer_file, <span class="st">&#39;SpatialLinesDataFrame&#39;</span>)</span>
 <span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a>})</span></code></pre></div>
 </div>
-<div id="resolución-de-spatiallinesdataframe" class="section level4">
-<h4>Resolución de <code>SpatialLinesDataFrame</code></h4>
+<div id="resolución-de-spatiallinesdataframe" class="section level5">
+<h5>Resolución de <code>SpatialLinesDataFrame</code></h5>
 <p>La mejor resolución para un raster, definida por el parámetro
 <code>gridsize</code>, depende de varios factores, incluyendo el
 propósito del análisis, la extensión del área de estudio, la resolución
@@ -2284,8 +2283,8 @@ de los datos originales, y la capacidad computacional disponible. Véase,
 <span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>spatial_grid_2015 <span class="ot">&lt;-</span> <span class="fu">map</span>(sldf_estados_2015, <span class="sc">~</span><span class="fu">raster</span>(.x, <span class="at">res =</span> gridsize))</span>
 <span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a>spatial_grid_2010 <span class="ot">&lt;-</span> <span class="fu">map</span>(sldf_estados_2010, <span class="sc">~</span><span class="fu">raster</span>(.x, <span class="at">res =</span> gridsize))</span></code></pre></div>
 </div>
-<div id="rasterización-de-spatiallinesdataframe" class="section level4">
-<h4>Rasterización de <code>SpatialLinesDataFrame</code></h4>
+<div id="rasterización-de-spatiallinesdataframe" class="section level5">
+<h5>Rasterización de <code>SpatialLinesDataFrame</code></h5>
 <p>La función <code>rasterize()</code> del paquete <code>terra</code>,
 se utiliza para convertir datos vectoriales (como shapefiles) en datos
 raster (una cuadrícula de celdas o píxeles). Este proceso es útil para
@@ -2306,8 +2305,8 @@ cuadrícula espacial (spatial_grid) previamente creada.</li>
 <span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>raster_lines_estados_2015 <span class="ot">&lt;-</span> <span class="fu">map2</span>(sldf_estados_2015, spatial_grid_2015, <span class="sc">~</span><span class="fu">rasterize</span>(.x, .y))</span>
 <span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>raster_lines_estados_2010 <span class="ot">&lt;-</span> <span class="fu">map2</span>(sldf_estados_2010, spatial_grid_2010, <span class="sc">~</span><span class="fu">rasterize</span>(.x, .y))</span></code></pre></div>
 </div>
-<div id="archivos-.tiff" class="section level4">
-<h4>Archivos <code>.TIFF</code></h4>
+<div id="archivos-.tiff" class="section level5">
+<h5>Archivos <code>.TIFF</code></h5>
 <p>Se guardan los rasters generados en archivos TIFF con información de
 georreferenciación. Utilizando un bucle para iterar sobre los diferentes
 grados y años, generando nombres de archivos dinámicamente y asegurando
@@ -2321,8 +2320,8 @@ que los archivos resultantes estén bien organizados. Véase, <a href="#TIFF">Ar
 <span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>               <span class="at">options =</span> <span class="fu">c</span>(<span class="st">&#39;TFW=YES&#39;</span>))</span>
 <span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>}</span></code></pre></div>
 </div>
-<div id="conversión-a-spatialpointsdataframe" class="section level4">
-<h4>Conversión a <code>SpatialPointsDataFrame</code></h4>
+<div id="conversión-a-spatialpointsdataframe" class="section level5">
+<h5>Conversión a <code>SpatialPointsDataFrame</code></h5>
 <p>Se realiza la conversión de los datos vectoriales de líneas a puntos,
 se crean las cuadrículas espaciales <code>gridsize</code> y luego se
 rasterizan esas líneas en celdas con una resolución definida. Esto
@@ -2346,8 +2345,8 @@ shapefile de líneas a una estructura de datos de puntos espaciales
 <span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a>                              <span class="fu">as</span>(layer_file, <span class="st">&#39;SpatialPointsDataFrame&#39;</span>)</span>
 <span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a>})</span></code></pre></div>
 </div>
-<div id="resolución-de-spatialpointsdataframe" class="section level4">
-<h4>Resolución de <code>SpatialPointsDataFrame</code></h4>
+<div id="resolución-de-spatialpointsdataframe" class="section level5">
+<h5>Resolución de <code>SpatialPointsDataFrame</code></h5>
 <p>La mejor resolución para un raster, definida por el parámetro
 <code>gridsize</code>, depende de varios factores, incluyendo el
 propósito del análisis, la extensión del área de estudio, la resolución
@@ -2365,8 +2364,8 @@ de los datos originales, y la capacidad computacional disponible. Véase,
 <span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a>spatial_grid_2015 <span class="ot">&lt;-</span> <span class="fu">map</span>(spdf_estados_2015, <span class="sc">~</span><span class="fu">raster</span>(.x, <span class="at">res =</span> gridsize))</span>
 <span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a>spatial_grid_2010 <span class="ot">&lt;-</span> <span class="fu">map</span>(spdf_estados_2010, <span class="sc">~</span><span class="fu">raster</span>(.x, <span class="at">res =</span> gridsize))</span></code></pre></div>
 </div>
-<div id="rasterización-de-spatialpointsdataframe" class="section level4">
-<h4>Rasterización de <code>SpatialPointsDataFrame</code></h4>
+<div id="rasterización-de-spatialpointsdataframe" class="section level5">
+<h5>Rasterización de <code>SpatialPointsDataFrame</code></h5>
 <p>La función <code>rasterize()</code> del paquete <code>terra</code>,
 se utiliza para convertir datos vectoriales (como shapefiles) en datos
 raster (una cuadrícula de celdas o píxeles). Este proceso es útil para
@@ -2387,8 +2386,8 @@ usando la cuadrícula espacial (spatial_grid) previamente creada.</li>
 <span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>raster_points_estados_2015 <span class="ot">&lt;-</span> <span class="fu">map2</span>(spdf_estados_2015, spatial_grid_2015, <span class="sc">~</span><span class="fu">rasterize</span>(.x, .y, <span class="at">field =</span> <span class="dv">1</span>, <span class="at">update =</span> <span class="cn">TRUE</span>, <span class="at">updateValue =</span> <span class="st">&quot;NA&quot;</span>))</span>
 <span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>raster_points_estados_2010 <span class="ot">&lt;-</span> <span class="fu">map2</span>(spdf_estados_2010, spatial_grid_2010, <span class="sc">~</span><span class="fu">rasterize</span>(.x, .y, <span class="at">field =</span> <span class="dv">1</span>, <span class="at">update =</span> <span class="cn">TRUE</span>, <span class="at">updateValue =</span> <span class="st">&quot;NA&quot;</span>))</span></code></pre></div>
 </div>
-<div id="archivos-.tiff-1" class="section level4">
-<h4>Archivos <code>.TIFF</code></h4>
+<div id="archivos-.tiff-1" class="section level5">
+<h5>Archivos <code>.TIFF</code></h5>
 <p>Se guardan los rasters generados en archivos TIFF con información de
 georreferenciación. Utilizando un bucle para iterar sobre los diferentes
 grados y años, generando nombres de archivos dinámicamente y asegurando
@@ -2401,6 +2400,7 @@ que los archivos resultantes estén bien organizados. Véase, <a href="#TIFF">Ar
 <span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a>  <span class="fu">writeRaster</span>(<span class="fu">get</span>(<span class="fu">paste0</span>(<span class="st">&quot;raster_points_estados_2010&quot;</span>))[[i]], <span class="at">filename =</span> <span class="fu">paste0</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;/Output/raster_points_estados_2010_&quot;</span>, i, <span class="st">&quot;.tif&quot;</span>), </span>
 <span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a>               <span class="at">options =</span> <span class="fu">c</span>(<span class="st">&#39;TFW=YES&#39;</span>))</span>
 <span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a>}</span></code></pre></div>
+</div>
 </div>
 </div>
 </div>
