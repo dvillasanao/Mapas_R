@@ -31,7 +31,7 @@ install.packages("rmarkdown")
 
 # Repositorio de Mapas en `R`
 
-### Mapas por desagregaciones geográficas de México
+### Mapas por desagregaciones geográficas de México <a id = "Mapas_Mexico"></a>
 
 El primer documento se utilizan diferentes paqueterías en el entorno de
 R, la cual se toman los diferentes niveles de desagregación en México.
@@ -54,9 +54,17 @@ Tomando como base a el índice de marginación 2020.
 </body>
 </html>
 
+### Contenido
+
+- [Mapas por desagregaciones geográficas de México](#Mapas_Mexico)
+- [Mapas en formato GeoJSON](#GeoJSON)
+- [Mapas en formato RMapshaper](#RMapshaper)
+- [Mapas en formato TopoJSON](#TopoJSON)
+- [Mapas en formato Raster](#Raster)
+
 ### Manejo de diferentes datos en formato `JSON`
 
-#### `GeoJSON`
+#### `GeoJSON`<a id = "GeoJSON"></a>
 
 Los archivos
 [GeoJSON](https://enterprise.arcgis.com/es/portal/latest/use/geojson.htm)
@@ -93,7 +101,7 @@ decimales como unidades.
 </body>
 </html>
 
-#### `RMapshaper`
+#### `RMapshaper` <a id = "RMapshaper"></a>
 
 `RMapshaper` es un paquete que proporciona una interfaz para la
 biblioteca JavaScript **mapshaper**, que se utiliza para simplificar,
@@ -115,7 +123,7 @@ aplicaciones web y análisis.
 </body>
 </html>
 
-#### `TopoJSON`
+#### `TopoJSON` <a id = "TopoJSON"></a>
 
 Los archivos `TopoJSON`; es un formato para codificar datos geográficos
 que mejora la eficiencia sobre GeoJSON. Comprime los datos compartiendo
@@ -141,5 +149,30 @@ aristas entre geometrías vecinas y reduciendo redundancias.
 <body>
 <a href="https://dvillasanao.github.io/Mapas_R/docs/01.04_Leaflet-por-año-y-grado-de-marginacion--TopoJSON-.html" target="_blank">
 <img src="img/05_img.png" width="50%" height="50%"> </a>
+</body>
+</html>
+
+#### `Raster` <a id = "Raster"></a>
+
+Los archivos tipo `imagen-raster`; proporcionan una poderosa herramienta
+para visualizar datos geoespaciales complejos de una manera interactiva
+y fácil de entender. Esto es especialmente útil en aplicaciones que van
+desde la cartografía ambiental y la gestión de recursos hasta la
+visualización de modelos espaciales y análisis de datos geoespaciales.
+
+- `Archivos Raster`: Los archivos raster representan datos que están
+  organizados en cuadrículas de celdas (píxeles). Estas celdas contienen
+  valores que representan alguna medida o fenómeno en una ubicación
+  específica del espacio geográfico.
+
+#### IMx2020 (Raster)
+
+**Enlace:**
+<https://dvillasanao.github.io/Mapas_R/docs/01.05_Leaflet-por-año-y-grado-de-marginacion--Raster-.html>
+
+<html>
+<body>
+<a href="https://dvillasanao.github.io/Mapas_R/docs/01.05_Leaflet-por-año-y-grado-de-marginacion--Raster-.html" target="_blank">
+<img src="img/06_img.png" width="50%" height="50%"> </a>
 </body>
 </html>
