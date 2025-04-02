@@ -71,7 +71,7 @@ El primer documento se utilizan diferentes paqueterías en el entorno de R, la c
 ### Contenido
 
 - [Mapas por desagregaciones geográficas de México](#Mapas_Mexico) [[Enlace](https://dvillasanao.github.io/Mapas_R/R/01_Mapas%20por%20desagregaciones%20geograficas%20de%20Mexico.nb.html)]
-- [Mapas en formato GeoJSON](#GeoJSON) [[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.01_Leaflet-por-a%C3%B1o-2010_2020--GeoJSON-.html)]
+- [Mapas en formato GeoJSON](#GeoJSON) [[Enlace en RPubs](https://rpubs.com/dvillasanao/Leaflet_2010-2020_GeoJSON)]
 - [Mapas desagregado por categorías en formato GeoJSON](#GeoJSON) [[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.02_Leaflet-por-año-y-grado-de-marginacion--GeoJSON-.html)]
 - [Mapas en formato RMapshaper](#RMapshaper) [[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.03_Leaflet-por-año-y-grado-de-marginacion--RMapshaper-.html)]
 - [Mapas en formato TopoJSON](#TopoJSON) [[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.04_Leaflet-por-año-y-grado-de-marginacion--TopoJSON-.html)]
@@ -90,7 +90,7 @@ Los archivos [GeoJSON](https://enterprise.arcgis.com/es/portal/latest/use/geojso
 
 <html>
 <body>
-  <a href="https://dvillasanao.github.io/Mapas_R/docs/01.01_Leaflet-por-a%C3%B1o-2010_2020--GeoJSON-.html" target="_blank">
+  <a href="https://rpubs.com/dvillasanao/Leaflet_2010-2020_GeoJSON" target="_blank">
     <img src="img/02_img.png" width="50%" height="50%">
   </a>
 </body>

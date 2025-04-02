@@ -58,8 +58,8 @@ Tomando como base a el índice de marginación 2020.
 
 - [Mapas por desagregaciones geográficas de México](#Mapas_Mexico)
   \[[Enlace](https://dvillasanao.github.io/Mapas_R/R/01_Mapas%20por%20desagregaciones%20geograficas%20de%20Mexico.nb.html)\]
-- [Mapas en formato GeoJSON](#GeoJSON)
-  \[[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.01_Leaflet-por-a%C3%B1o-2010_2020--GeoJSON-.html)\]
+- [Mapas en formato GeoJSON](#GeoJSON) \[[Enlace en
+  RPubs](https://rpubs.com/dvillasanao/Leaflet_2010-2020_GeoJSON)\]
 - [Mapas desagregado por categorías en formato GeoJSON](#GeoJSON)
   \[[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.02_Leaflet-por-año-y-grado-de-marginacion--GeoJSON-.html)\]
 - [Mapas en formato RMapshaper](#RMapshaper)
@@ -90,7 +90,7 @@ decimales como unidades.
 
 <html>
 <body>
-<a href="https://dvillasanao.github.io/Mapas_R/docs/01.01_Leaflet-por-a%C3%B1o-2010_2020--GeoJSON-.html" target="_blank">
+<a href="https://rpubs.com/dvillasanao/Leaflet_2010-2020_GeoJSON" target="_blank">
 <img src="img/02_img.png" width="50%" height="50%"> </a>
 </body>
 </html>
