@@ -3,7 +3,7 @@ title: "Mapas por desagregaciones geográficas de México"
 author: "Diana Villasana Ocampo"
 date: "`r format(Sys.time(), '%d-%m-%Y')`"
 output:
-  html_notebook:
+  html_document:
     code_folding: show
     highlight: tango
     theme: flatly
