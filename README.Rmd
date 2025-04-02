@@ -172,3 +172,6 @@ Usar Shiny junto con Leaflet proporciona una poderosa herramienta para crear apl
 </html>
 
 
+## Código de Conducta
+
+Por favor, revisa nuestro [Código de Conducta](CODE_OF_CONDUCT.md) antes de contribuir.

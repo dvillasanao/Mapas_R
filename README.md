@@ -21,7 +21,7 @@ Es necesario contar con el paquete **rmarkdown** dentro de [RStudio
 IDE](https://www.rstudio.com/products/rstudio/download), pero no
 necesita instalarlo explícitamente o bien cargarlo, ya que RStudio hace
 ambas cosas automáticamente cuando es necesario. También se requiere una
-versión reciente de Pandoc (\>= 3.1.11); RStudio también incluye esto
+versión reciente de Pandoc (\>= 3.2); RStudio también incluye esto
 automáticamente, por lo que no se necesita descargar Pandoc si planea
 usar rmarkdown desde el IDE de RStudio.
 
@@ -191,3 +191,8 @@ explorar y comunicar datos geoespaciales de manera efectiva y eficiente.
 <img src="img/07_img.png" width="50%" height="50%"> </a>
 </body>
 </html>
+
+## Código de Conducta
+
+Por favor, revisa nuestro [Código de Conducta](CODE_OF_CONDUCT.md) antes
+de contribuir.
