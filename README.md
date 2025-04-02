@@ -61,7 +61,8 @@ Tomando como base a el índice de marginación 2020.
 - [Mapas en formato GeoJSON](#GeoJSON) \[[Enlace en
   RPubs](https://rpubs.com/dvillasanao/Leaflet_2010-2020_GeoJSON)\]
 - [Mapas desagregado por categorías en formato GeoJSON](#GeoJSON)
-  \[[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.02_Leaflet-por-año-y-grado-de-marginacion--GeoJSON-.html)\]
+  \[[Enlace en
+  RPubs](https://rpubs.com/dvillasanao/Leaflet_por_grado_GeoJSON)\]
 - [Mapas en formato RMapshaper](#RMapshaper)
   \[[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.03_Leaflet-por-año-y-grado-de-marginacion--RMapshaper-.html)\]
 - [Mapas en formato TopoJSON](#TopoJSON)
@@ -99,7 +100,7 @@ decimales como unidades.
 
 <html>
 <body>
-<a href="https://dvillasanao.github.io/Mapas_R/docs/01.02_Leaflet-por-año-y-grado-de-marginacion--GeoJSON-.html" target="_blank">
+<a href="https://rpubs.com/dvillasanao/Leaflet_por_grado_GeoJSON" target="_blank">
 <img src="img/03_img.png" width="50%" height="50%"> </a>
 </body>
 </html>
