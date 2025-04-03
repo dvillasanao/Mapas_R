@@ -65,8 +65,8 @@ Tomando como base a el índice de marginación 2020.
   RPubs](https://rpubs.com/dvillasanao/Leaflet_por_grado_GeoJSON)\]
 - [Mapas en formato RMapshaper](#RMapshaper) \[[Enlace en
   RPubs](https://rpubs.com/dvillasanao/Leaflet_por_grado_RMapshaper)\]
-- [Mapas en formato TopoJSON](#TopoJSON)
-  \[[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.04_Leaflet-por-año-y-grado-de-marginacion--TopoJSON-.html)\]
+- [Mapas en formato TopoJSON](#TopoJSON) \[[Enlace en
+  RPubs](https://rpubs.com/dvillasanao/Leaflet_por_grado_TopoJSON)\]
 - [Mapas en formato Raster](#Raster)
   \[[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.05_Leaflet-por-año-y-grado-de-marginacion--Raster-.html)\]
 - [Mapas con Shiny](#Shiny)
@@ -145,7 +145,7 @@ aristas entre geometrías vecinas y reduciendo redundancias.
 
 <html>
 <body>
-<a href="https://dvillasanao.github.io/Mapas_R/docs/01.04_Leaflet-por-año-y-grado-de-marginacion--TopoJSON-.html" target="_blank">
+<a href="https://rpubs.com/dvillasanao/Leaflet_por_grado_TopoJSON" target="_blank">
 <img src="img/05_img.png" width="50%" height="50%"> </a>
 </body>
 </html>
