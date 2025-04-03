@@ -70,13 +70,13 @@ El primer documento se utilizan diferentes paqueterías en el entorno de R, la c
 
 ### Contenido
 
-- [Mapas por desagregaciones geográficas de México](#Mapas_Mexico) [[Enlace](https://dvillasanao.github.io/Mapas_R/R/01_Mapas%20por%20desagregaciones%20geograficas%20de%20Mexico.nb.html)]
-- [Mapas en formato GeoJSON](#GeoJSON) [[Enlace en RPubs](https://rpubs.com/dvillasanao/Leaflet_2010-2020_GeoJSON)]
-- [Mapas desagregado por categorías en formato GeoJSON](#GeoJSON) [[Enlace en RPubs](https://rpubs.com/dvillasanao/Leaflet_por_grado_GeoJSON)]
-- [Mapas en formato RMapshaper](#RMapshaper) [[Enlace en RPubs](https://rpubs.com/dvillasanao/Leaflet_por_grado_RMapshaper)]
-- [Mapas en formato TopoJSON](#TopoJSON) [[Enlace en RPubs](https://rpubs.com/dvillasanao/Leaflet_por_grado_TopoJSON)]
-- [Mapas en formato Raster](#Raster) [[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.05_Leaflet-por-año-y-grado-de-marginacion--Raster-.html)]
-- [Mapas con Shiny](#Shiny) [[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.06_Shiny_Leaflet-2010_2020.html)]
+- 🟣 [Mapas por desagregaciones geográficas de México](#Mapas_Mexico) [[Enlace](https://dvillasanao.github.io/Mapas_R/R/01_Mapas%20por%20desagregaciones%20geograficas%20de%20Mexico.nb.html)]
+- 🔵 [Mapas en formato GeoJSON](#GeoJSON) [[Enlace en RPubs](https://rpubs.com/dvillasanao/Leaflet_2010-2020_GeoJSON)]
+- 🟢 [Mapas desagregado por categorías en formato GeoJSON](#GeoJSON) [[Enlace en RPubs](https://rpubs.com/dvillasanao/Leaflet_por_grado_GeoJSON)]
+- 🟡 [Mapas en formato RMapshaper](#RMapshaper) [[Enlace en RPubs](https://rpubs.com/dvillasanao/Leaflet_por_grado_RMapshaper)]
+- 🟠 [Mapas en formato TopoJSON](#TopoJSON) [[Enlace en RPubs](https://rpubs.com/dvillasanao/Leaflet_por_grado_TopoJSON)]
+- 🔴 [Mapas en formato Raster](#Raster) [[Enlace en Rpubs](https://rpubs.com/dvillasanao/Leaflet_por_grado_Raster)]
+- ⚪ [Mapas con Shiny](#Shiny) [[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.06_Shiny_Leaflet-2010_2020.html)]
 
 
 ### Manejo de diferentes datos en formato `JSON`   
@@ -149,7 +149,7 @@ Los archivos tipo `imagen-raster`; proporcionan una poderosa herramienta para vi
 
 <html>
 <body>
-  <a href="https://dvillasanao.github.io/Mapas_R/docs/01.05_Leaflet-por-año-y-grado-de-marginacion--Raster-.html" target="_blank">
+  <a href="https://rpubs.com/dvillasanao/Leaflet_por_grado_Raster" target="_blank">
     <img src="img/06_img.png" width="50%" height="50%">
   </a>
 </body>
@@ -159,7 +159,7 @@ Los archivos tipo `imagen-raster`; proporcionan una poderosa herramienta para vi
 
 Usar Shiny junto con Leaflet proporciona una poderosa herramienta para crear aplicaciones web interactivas y visualmente atractivas para explorar y comunicar datos geoespaciales de manera efectiva y eficiente.  
 
-- `Integración`: Tanto Shiny como Leaflet ofrecen numerosas opciones de personalización. Puedes controlar el diseño, los estilos, las capas base, las capas superpuestas, las leyendas y otros aspectos visuales del mapa para adaptarlo específicamente a necesidades de visualización de datos geoespaciales.    
+- `Integración`: Tanto Shiny como Leaflet ofrecen numerosas opciones de personalización. Se puede controlar el diseño, los estilos, las capas base, las capas superpuestas, las leyendas y otros aspectos visuales del mapa para adaptarlo específicamente a necesidades de visualización de datos geoespaciales.    
 
 #### IMx2020 (Shiny)    
 
