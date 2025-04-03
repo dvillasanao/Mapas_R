@@ -1,7 +1,7 @@
 ---
 title: "Mapas por desagregaciones geográficas de México"
 author: "Diana Villasana Ocampo"
-date: "`r format(Sys.time(), '%d-%m-%Y')`"
+date: "Actualizado el `r format(Sys.time(), '%d-%m-%Y')`"
 output:
   html_document:
     code_folding: show
@@ -113,7 +113,7 @@ pre.sourceCode {
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE, cache.lazy = FALSE, collapse = TRUE, 
                       #class.source = "fold-hide",
-                      eval = TRUE
+                      eval = FALSE
                       )
 ```
 
@@ -121,14 +121,15 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = TRU
 rm(list = ls())
 ```
 
-```{r, echo = FALSE}
-#Font Stlye
+```{r, echo = FALSE, results=FALSE}
+# Se descargan las fuentes de la google fonts
 require(showtext)
 library(extrafont)
+# activar showtext
 windowsFonts()
 ```
 
-```{r, echo = FALSE, results=FALSE}
+```{r, echo = FALSE, results=FALSE, eval = TRUE}
 require(dplyr)          #A Grammar of Data Manipulation 
 require(forcats)        #Tools for Working with Categorical Variables (Factors)
 require(ggplot2)        # Generar gráficos ggplot y la geometría de un mapa
@@ -158,7 +159,7 @@ invisible(utils::memory.limit(size = 60000000))
 #tinytex::install_tinytex()  # Esto instala un motor LaTeX completo
 ```
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, eval = TRUE}
 # Se cargan las bases de datos generadas en el documento
 archivo <- c("shape", "capas", "layer", "tbl")
 nivel <- c("estados", "municipios", "localidad", "ageb")
@@ -173,7 +174,6 @@ load(file = paste0(here::here(), "/Output/IMM_2020.RData"))
 load(file = paste0(here::here(), "/Output/IML_2020.RData"))
 load(file = paste0(here::here(), "/Output/IMU_2020.RData"))
 load(file = paste0(here::here(), "/Output/ZM_2020.RData"))
-
 ```
 
 
@@ -187,7 +187,7 @@ El Instituto Nacional de Estadística, Geografía e Informática (INEGI) tiene p
 
 Este producto integra información vectorial, tablas de atributos y catálogos. Muestra la división geoestadística del territorio nacional en sucesivos niveles del territorio. Esta división está dada por los llamados **límites estadísticos**, que pueden coincidir con los límites político-administrativos oficiales, los cuales tienen sustento legal.
 
-```{r,echo = FALSE}
+```{r,echo = FALSE, eval = TRUE}
 require(kableExtra)
 require(knitr)
 
@@ -222,7 +222,7 @@ La [`Norma Técnica para el Sistema Geodésico Nacional`](https://www.inegi.org.
 
 A continuación se enlista los datos del sistema de coordenadas para la estandarización de la información:
 
-```{r, echo= FALSE}
+```{r, echo = FALSE, eval = TRUE}
 tabla <- data.frame(Parametros = c("Cónica Conforme de Lambert (`CCL`)", "Dátum:", "Elipsoide", "Meridiano origen", 
                                    "Latitud origen","Primer paralelo estándar", "Segundo paralelo estándar", "Falso Este","Falso Norte"), 
                     Datos = c("", "ITRF2008", "GRS80","102° 00' 00' W.", "12° 00' 00' N.", "17° 30' N", "29° 30'N", "2 500 000", "0"))
@@ -249,7 +249,7 @@ También el paquete `gdalUtils` permite reproyectar, transformar, reclasificar, 
 
 La función `ogrDrivers` permite visualizar los tipos de formatos que el paquete `rgdal` permite trabajar:
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, eval = TRUE}
 kable(ogrDrivers(), 
         align = "c") %>%
   kable_styling(position = "center",
@@ -260,7 +260,7 @@ kable(ogrDrivers(),
      scroll_box(width = "100%", height = "300px")
 ```
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, eval = TRUE}
 require(tidyverse)
 require(knitr)
 require(lubridate)
@@ -305,7 +305,7 @@ Para leer un archivo `shapefile`, se establecen los siguientes argumentos, como 
 
 A continuación se lee el archivo `.shp` que contiene de manera integrada la división de el área geoestadística estatal `agee`.
 
-```{r, class.source = "fold-show"}
+```{r, class.source = "fold-show", eval = FALSE}
 require(rgdal)
 shape_estados <- readOGR(dsn = paste0(here::here(), "/MGN 2020/conjunto_de_datos"), 
                           layer = "00ent",
@@ -315,14 +315,14 @@ shape_estados <- readOGR(dsn = paste0(here::here(), "/MGN 2020/conjunto_de_datos
 
 La función `rename()` del paquete `dplyr` permite cambiar el nombre de la columna de la clave geoestadística a nivel estatal dentro de la base de datos del shape.
 
-```{r, class.source = "fold-show"}
+```{r, class.source = "fold-show", eval = FALSE}
 shape_estados@data <- shape_estados@data %>%
                        rename("CVE_GEO" = "CVEGEO")
 ```
 
 Un objeto `SpatialPolygons` se puede combinar con una data.frame para crear lo que se llama `SpatialPolygonsDataFrame`. La diferencia está en los atributos asociados con los polígonos. Un objeto `SpatialPolygonsDataFrame` tiene información adicional asociada a los polígonos (ejemplo, nombre de la entidad, población, etc.) mientras que `SpatialPolygons` contiene solo la información espacial (vértices) sobre el polígono.
 
-```{r, class.source = "fold-show"}
+```{r, class.source = "fold-show", eval = TRUE}
 class(shape_estados)
 ```
 
@@ -330,7 +330,7 @@ Si el archivo no tuviera Sitema de Referencia de Coordenadas `CRS` asignado se d
 
 La función `proj4string()`representa el sistema de referencia de coordenadas utilizado en los datos.
 
-```{r, class.source = "fold-show"}
+```{r, class.source = "fold-show", eval = FALSE}
 proj4string(shape_estados)
 ```
 
@@ -340,7 +340,7 @@ La base de datos del índice de marginación por estados se encuentra disponible
 
 Para poder trabajar con la base de datos del índice de marginación a nivel estatal, se elimina la fila que contiene los datos a nivel nacional con la función `::filter()` del paquete `dplyr` y por otro lado se cambia el nombre de la columna `CVE_ENT` que hace referencia a la clave geográfica del estado por `CVE_GEO` para fines prácticos.
 
-```{r, class.source = "fold-show"}
+```{r, class.source = "fold-show", eval = FALSE}
 IME_2020 <- read_xlsx(paste0(here::here(), "/Data/IME_2020.xlsx"), sheet = "IME_2020") %>% 
              filter(NOM_ENT != "Nacional") %>% 
               mutate(CVE_GEO = CVE_ENT) %>% 
@@ -349,7 +349,7 @@ IME_2020 <- read_xlsx(paste0(here::here(), "/Data/IME_2020.xlsx"), sheet = "IME_
 
 Ahora bien, para la realización de los *mapas cloropléticos* que muestran áreas geográficas divididas o regiones que están coloreadas en relación con una variable de interés. Para este documento se decide hacer uso del **grado de marginación** que permite englobar a las unidades geográficas que presentan las mismas condiciones de exclusión social en cinco categorías.
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, eval = TRUE}
 require(kableExtra)
 require(knitr)
 
@@ -390,7 +390,7 @@ Cuando es necesario cambiar los ID's de las características en los objetos `Spa
 
 La función `fortify()` convierte un objeto S3 para convertir objetos diversos a un data.frame para `ggplot2`. El data.frame resultante de la conversión de un objeto *spdf* es sumamente largo, tiene una fila por cada cambio en un polígono y un columna de grupo para separar cada polígono.
 
-```{r capas_estados, class.source = "fold-show", results=FALSE}
+```{r capas_estados, class.source = "fold-show", results=FALSE, eval = FALSE}
 capas_estados <- shape_estados %>%
                   sp::spChFIDs(., str_pad(shape_estados@data$CVE_GEO, 2, "left", pad = "0")) %>%
                    fortify(., id = "CVE_GEO") %>%
@@ -402,7 +402,7 @@ capas_estados <- shape_estados %>%
 
 ##### SpatialPolygons ⇒ SpatialPolygons + Datos      
 
-```{r, class.source = "fold-show"}
+```{r, class.source = "fold-show", eval = FALSE}
 layer_estados <- merge(shape_estados,
                         IME_2020 %>%
                          dplyr::select(c(-CVE_ENT, -NOM_ENT)) %>%
@@ -430,7 +430,7 @@ Conversión de datos: `st_as_sf`, convierte un objeto externo en un spatial obje
 
 La función `as_tibble` de la paquetería `tibble`, genera una base de datos genérica de S3 con métodos más eficientes para matrices y data.frame. Su envoltorio delgado permite trabajar de manera más rápida que un `data.frame`.
 
-```{r, class.source = "fold-show"}
+```{r, class.source = "fold-show", eval = FALSE}
 # Paquetes 
 require(tibble)
 require(sf)
@@ -449,7 +449,7 @@ Para leer un archivo `shapefile`, se establecen los siguientes argumentos, como 
 
 A continuación se lee el archivo .shp que contiene de manera integrada la división de el área geoestadística municipal `agem`.
 
-```{r,results=FALSE,class.source = "fold-show"}
+```{r,results=FALSE,class.source = "fold-show", eval = FALSE}
 shape_municipios <- readOGR(dsn = paste0(here::here(), "/MGN 2020/conjunto_de_datos"), 
                              layer = "00mun",
                               encoding = "UTF-8",
@@ -458,7 +458,7 @@ shape_municipios <- readOGR(dsn = paste0(here::here(), "/MGN 2020/conjunto_de_da
 
 La función `rename()` del paquete `dplyr` permite cambiar el nombre de la columna de la clave geoestadística a nivel estatal dentro de la base de datos del shape.
 
-```{r, class.source = "fold-show"}
+```{r, class.source = "fold-show", eval = FALSE}
 shape_municipios@data <- shape_municipios@data %>%
                           rename("CVE_GEO" = "CVEGEO")
 ```
@@ -469,7 +469,7 @@ La base de datos del índice de marginación por municipios se encuentra disponi
 
 Para poder trabajar con la base de datos del índice de marginación a nivel municipal, se elimina la fila que contiene los datos a nivel nacional con la función `::filter()` del paquete `dplyr` y por otro lado se cambia el nombre de la columna `CVE_MUN` que hace referencia a la clave geográfica del municipio por `CVE_GEO` para fines prácticos.
 
-```{r, class.source = "fold-show"}
+```{r, class.source = "fold-show", eval = FALSE}
 IMM_2020 <- read_xlsx(paste0(here::here(), "/Data/IMM_2020.xlsx"), sheet = "IMM_2020") %>%
              filter(NOM_ENT != "Nacional") %>%
                mutate(CVE_GEO = CVE_MUN) %>%
@@ -478,7 +478,7 @@ IMM_2020 <- read_xlsx(paste0(here::here(), "/Data/IMM_2020.xlsx"), sheet = "IMM_
 
 Ahora bien, para la realización de los *mapas cloropléticos* que muestran áreas geográficas divididas o regiones que están coloreadas en relación con una variable de interés. Para este documento se decide hacer uso del **grado de marginación** que permite englobar a las unidades geográficas que presentan las mismas condiciones de exclusión social en cinco categorías.
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, eval = TRUE}
 tabla <- IMM_2020 %>%
           mutate(GM_2020 = fct_relevel(GM_2020, c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))) %>% 
            dplyr::select(GM_2020) %>%
@@ -516,7 +516,7 @@ Cuando es necesario cambiar los ID's de las características en los objetos `Spa
 
 La función `fortify()` convierte un objeto S3 para convertir objetos diversos a un data.frame para `ggplot2`. El data.frame resultante de la conversión de un objeto *spdf* es sumamente largo, tiene una fila por cada cambio en un polígono y un columna de grupo para separar cada polígono.
 
-```{r capas_municipio, class.source = "fold-show"}
+```{r capas_municipio, class.source = "fold-show", eval = FALSE}
 capas_municipio <-  shape_municipios %>%
                      sp::spChFIDs(., str_pad(shape_municipios@data$CVE_GEO, 5, "left", pad = "0")) %>%
                       fortify(., id = "CVE_GEO") %>%
@@ -527,7 +527,7 @@ capas_municipio <-  shape_municipios %>%
 
 ##### SpatialPolygons ⇒  SpatialPolygons + Datos     
 
-```{r, class.source = "fold-show"}
+```{r, class.source = "fold-show", eval = FALSE}
 layer_municipios <- merge(shape_municipios,
                            IMM_2020 %>% dplyr::select(c(-CVE_ENT, -CVE_MUN)) %>%
                                          mutate(GM_2020 = fct_relevel(.$GM_2020,"Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
@@ -542,7 +542,7 @@ Conversión de datos: `st_as_sf`, convierte un objeto externo en un spatial obje
 
 La función `as_tibble` de la paquetería `tibble`, genera una base de datos genérica de S3 con métodos más eficientes para matrices y data.frame. Su envoltorio delgado permite trabajar de manera más rápida que un `data.frame`.
 
-```{r, class.source = "fold-show"}
+```{r, class.source = "fold-show", eval = FALSE}
 # Paquetes 
 require(tibble)
 require(sf)
@@ -553,11 +553,11 @@ tbl_municipios <- as_tibble(st_as_sf(shape_municipios)) %>%
 
 ### Zonas Metropolitanas
 
-```{r, class.source = "fold-show"}
+```{r, class.source = "fold-show", eval = FALSE}
 ZM_2020 <- read_xlsx(paste0(here::here(), "/Data/ZM_2020.xlsx"), sheet = "ZM_2020", range = "A7:I428") 
 ```
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, eval = TRUE}
 kable(head(ZM_2020, 10),
        align = "c", 
         caption = c("Base: Zonas Metropolitanas 2020.")) %>%
@@ -580,7 +580,7 @@ Para leer un archivo `shapefile`, se establecen los siguientes argumentos, como 
 
 A continuación se lee el archivo .shp que contiene de manera integrada la división de el área geoestadística por localidad.
 
-```{r,results=FALSE,class.source = "fold-show"}
+```{r,results=FALSE,class.source = "fold-show", eval = FALSE}
 shape_localidad <- readOGR(dsn =paste0(here::here(), "/MGN 2020/conjunto_de_datos"), 
                             layer = "00l",
                              encoding = "UTF-8",
@@ -589,7 +589,7 @@ shape_localidad <- readOGR(dsn =paste0(here::here(), "/MGN 2020/conjunto_de_dato
 
 La función `rename()` del paquete `dplyr` permite cambiar el nombre de la columna de la clave geoestadística a nivel estatal dentro de la base de datos del shape.
 
-```{r, class.source = "fold-show"}
+```{r, class.source = "fold-show", eval = FALSE}
 shape_localidad@data <- shape_localidad@data %>%
                          rename("CVE_GEO" = "CVEGEO")
 ```
@@ -600,7 +600,7 @@ La base de datos del índice de marginación por localidades se encuentra dispon
 
 Para poder trabajar con la base de datos del índice de marginación a nivel localidad, se cambia el nombre de la columna `CVE_LOC` que hace referencia a la clave geográfica de la localidad por `CVE_GEO` para fines prácticos.
 
-```{r, class.source = "fold-show"}
+```{r, class.source = "fold-show", eval = FALSE}
 IML_2020 <- read_xlsx(paste0(here::here(), "/Data/IML_2020.xlsx"), sheet = "IML_2020") %>%
               mutate(CVE_GEO = CVE_LOC) %>% 
                as.data.frame()
@@ -608,7 +608,7 @@ IML_2020 <- read_xlsx(paste0(here::here(), "/Data/IML_2020.xlsx"), sheet = "IML_
 
 Ahora bien, para la realización de los *mapas cloropléticos* que muestran áreas geográficas divididas o regiones que están coloreadas en relación con una variable de interés. Para este documento se decide hacer uso del **grado de marginación** que permite englobar a las unidades geográficas que presentan las mismas condiciones de exclusión social en cinco categorías.
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, eval = TRUE}
 require(kableExtra)
 require(knitr)
 
@@ -649,7 +649,7 @@ Cuando es necesario cambiar los ID's de las características en los objetos `Spa
 
 La función `fortify()` convierte un objeto S3 para convertir objetos diversos a un data.frame para `ggplot2`. El data.frame resultante de la conversión de un objeto *spdf* es sumamente largo, tiene una fila por cada cambio en un polígono y un columna de grupo para separar cada polígono.
 
-```{r capas_localidad, class.source = "fold-show"}
+```{r capas_localidad, class.source = "fold-show", eval = FALSE}
 capas_localidad <- shape_localidad %>%
                     sp::spChFIDs(., str_pad(shape_localidad@data$CVE_GEO, 9, "left", pad = "0")) %>%
                      fortify(., id = c("CVE_GEO")) 
@@ -664,7 +664,7 @@ length(unique(capas_localidad$id))
 
 ##### SpatialPolygons ⇒  SpatialPolygons + Datos
 
-```{r, class.source = "fold-show"}
+```{r, class.source = "fold-show", eval = FALSE}
 layer_localidad <- merge(shape_localidad,
                           IML_2020 %>%
                               dplyr::select(c(-CVE_LOC)) %>%
@@ -680,7 +680,7 @@ Conversión de datos: `st_as_sf`, convierte un objeto externo en un spatial obje
 
 La función `as_tibble` de la paquetería `tibble`, genera una base de datos genérica de S3 con métodos más eficientes para matrices y data.frame. Su envoltorio delgado permite trabajar de manera más rápida que un `data.frame`.
 
-```{r, class.source = "fold-show"}
+```{r, class.source = "fold-show", eval = FALSE}
 # Paquetes 
 require(tibble)
 require(sf)
@@ -698,7 +698,7 @@ Para leer un archivo `shapefile`, se establecen los siguientes argumentos, como 
 
 A continuación se lee el archivo .shp que contiene de manera integrada la división de el área geoestadística a nivel ageb `ageb`.
 
-```{r,results=FALSE,class.source = "fold-show"}
+```{r,results=FALSE,class.source = "fold-show", eval = FALSE}
 shape_ageb <- readOGR(dsn = paste0(here::here(), "/MGN 2020/conjunto_de_datos"), 
                        layer = "00a",
                         encoding = "UTF-8",
@@ -707,7 +707,7 @@ shape_ageb <- readOGR(dsn = paste0(here::here(), "/MGN 2020/conjunto_de_datos"),
 
 La función `rename()` del paquete `dplyr` permite cambiar el nombre de la columna de la clave geoestadística a nivel estatal dentro de la base de datos del shape.
 
-```{r, class.source = "fold-show"}
+```{r, class.source = "fold-show", eval = FALSE}
 shape_ageb@data <- shape_ageb@data %>%
                     rename("CVE_GEO" = "CVEGEO")
 ```
@@ -718,7 +718,7 @@ La base de datos del índice de marginación por ageb se encuentra disponible en
 
 Para poder trabajar con la base de datos del índice de marginación a nivel ageb, se cambia el nombre de la columna \``CVE_AGEB` que hace referencia a la clave geográfica de la ageb por `CVE_GEO` para fines prácticos.
 
-```{r, class.source = "fold-show"}
+```{r, class.source = "fold-show", eval = FALSE}
 IMU_2020 <- read_xlsx(paste0(here::here(), "/Data/IMU_2020.xlsx"), sheet = "IMU_2020") %>%
              mutate(CVE_GEO = CVE_AGEB) %>% 
               as.data.frame()
@@ -726,7 +726,7 @@ IMU_2020 <- read_xlsx(paste0(here::here(), "/Data/IMU_2020.xlsx"), sheet = "IMU_
 
 Ahora bien, para la realización de los *mapas cloropléticos* que muestran áreas geográficas divididas o regiones que están coloreadas en relación con una variable de interés. Para este documento se decide hacer uso del **grado de marginación** que permite englobar a las unidades geográficas que presentan las mismas condiciones de exclusión social en cinco categorías.
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, eval = TRUE}
 require(kableExtra)
 require(knitr)
 
@@ -767,15 +767,19 @@ Cuando es necesario cambiar los ID's de las características en los objetos `Spa
 
 La función `fortify()` convierte un objeto S3 para convertir objetos diversos a un data.frame para `ggplot2`. El data.frame resultante de la conversión de un objeto *spdf* es sumamente largo, tiene una fila por cada cambio en un polígono y un columna de grupo para separar cada polígono.
 
-```{r capas_ageb, class.source = "fold-show"}
-## SE tarda mucho en correr
+```{r capas_ageb, class.source = "fold-show", eval = FALSE}
 capas_ageb <- shape_ageb %>%
                sp::spChFIDs(., str_pad(shape_ageb@data$CVE_GEO, 13, "left", pad = "0")) %>%
-                select(CVE_GEO) %>%
-                 filter(CVE_GEO %in% IMU_2020$CVE_GEO) %>%
-                  fortify(., id = "CVE_GEO") %>% 
-                spdplyr:::left_join.Spatial(., IMU_2020 %>% dplyr::select(CVE_GEO, GM_2020), 
-                                                   by = c("CVE_GEO")) 
+                dplyr::select(CVE_GEO) %>%
+                 dplyr::filter(CVE_GEO %in% IMU_2020$CVE_GEO) 
+
+capas_ageb <- capas_ageb %>% 
+               fortify(., id = "CVE_GEO") 
+
+capas_ageb <- capas_ageb %>%
+               rename("CVE_GEO" = "id") %>%
+               left_join(., IMU_2020 %>% dplyr::select(CVE_GEO, GM_2020), 
+                         by = c("CVE_GEO")) 
 ```
 
 
@@ -785,7 +789,7 @@ capas_ageb <- shape_ageb %>%
 
 ##### SpatialPolygons ⇒  SpatialPolygons + Datos     
 
-```{r, class.source = "fold-show"}
+```{r, class.source = "fold-show", eval = FALSE}
 layer_ageb <- merge(shape_ageb,
                      IMU_2020 %>%
                         dplyr::select(c(-CVE_AGEB)) %>%
@@ -801,18 +805,18 @@ Conversión de datos: `st_as_sf`, convierte un objeto externo en un spatial obje
 
 La función `as_tibble` de la paquetería `tibble`, genera una base de datos genérica de S3 con métodos más eficientes para matrices y data.frame. Su envoltorio delgado permite trabajar de manera más rápida que un `data.frame`.
 
-```{r, class.source = "fold-show"}
+```{r, class.source = "fold-show", eval = FALSE}
 # Paquetes 
 require(tibble)
 require(sf)
 
 tbl_ageb <- as_tibble(st_as_sf(shape_ageb)) %>%
-                       merge(., IMU_2020 %>% dplyr::select(CVE_GEO, GM_2020))
+                         IMU_2020 %>% dplyr::select(CVE_GEO, GM_2020)
 ```
 
 ### Zona Metropolitanas
 
-```{r capas_zm, class.source = "fold-show"}
+```{r capas_zm, class.source = "fold-show", eval = FALSE}
 capas_zm <- shape_ageb %>%
              sp::spChFIDs(., str_pad(shape_ageb@data$CVE_GEO, 13, "left", pad = "0")) %>%
               spdplyr:::inner_join.Spatial(., IMU_2020 %>% dplyr::select(CVE_GEO, ENT, NOM_ENT, MUN, NOM_MUN, LOC, NOM_LOC, GM_2020), 
@@ -839,7 +843,7 @@ rm(capas_zm_data, capas_zm_fortify)
 
 La forma más básica de mapear datos en `R` es crear un objeto `ggplot()` regular y mapear los argumentos `x = longuitude` y la `y = latitude`. Se puede usar esta técnica para crear mapas de áreas geográficas, como estados o países, y para gráficar ubicaciones como puntos, líneas y otras formas. El paquete `ggplot2` incluye algunos conjuntos de funciones `geom` que permiten graficar con información geográfica. Teniendo en cuenta que el data.frame incluye las columnas con ubicación (`long` y `lat`). También incluye una columna que describe el orden en que se deben conectar estos puntos para formar un polígono (`order`), el nombre del estado (`NOM_ENT`) y una columna de `group` que separa los puntos en polígonos únicos que se deben trazar.
 
-```{r, class.source = "fold-hide"}
+```{r, class.source = "fold-hide", eval = FALSE}
 p <- ggplot() + 
       geom_polygon(data = capas_estados,
                     mapping = aes(x = long, 
@@ -2321,14 +2325,6 @@ save(ZM_2020, file = paste0(here::here(), "/Output/ZM_2020.RData"))
 ```
 
 
-# Librerías
-
-**Librerías que se usaron en el trabajo**
-
-```{r, echo = FALSE}
-names(sessionInfo()$otherPkgs)
-```
-
 # Referencias
 
 Datos Abiertos de México - Índice de marginación (carencias poblacionales) por localidad, municipio y entidad. (2021). Retrieved February 13, 2022, from <https://datos.gob.mx/busca/dataset/indice-de-marginacion-carencias-poblacionales-por-localidad-municipio-y-entidad>
@@ -2339,4 +2335,16 @@ Garnett, R. (2018). cheatsheets/sf.pdf at main · rstudio/cheatsheets · GitHub.
 
 Lovelace, R., Nowosad, J., & Muenchow, J. (2019). Geocomputation with R. CRC Press. <https://geocompr.robinlovelace.net/>
 
-<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img src="https://i.creativecommons.org/l/by/4.0/88x31.png" alt="Creative Commons Licence" style="border-width:0"/></a><br />This work by [**Diana Villasana Ocampo**]{xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName"} is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+# Librerías
+
+**Librerías que se usaron en el trabajo**
+
+```{r, echo = FALSE, eval = TRUE}
+sesion_info <- devtools::session_info()
+knitr::kable(dplyr::select(tibble::as_tibble(sesion_info$packages %>% dplyr::filter(attached == TRUE)),
+                    c(package, loadedversion, source))) %>%
+ kableExtra::kable_classic(full_width = TRUE, html_font = 'Montserrat Medium', font_size = 10) 
+```
+
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img src="https://i.creativecommons.org/l/by/4.0/88x31.png" alt="Creative Commons Licence" style="border-width:0"/></a><br />This work by [**Diana Villasana Ocampo**]{xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName"} is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.  
