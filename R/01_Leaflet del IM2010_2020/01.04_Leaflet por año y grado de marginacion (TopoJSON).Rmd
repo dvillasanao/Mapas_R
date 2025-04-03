@@ -69,7 +69,7 @@ h5 {
 
 ```{r, include=FALSE}
 # automatically create a bib database for R packages
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = FALSE,
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE,
                        eval = FALSE)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 setwd(here::here())
@@ -654,7 +654,7 @@ Los eventos `baselayerchange`, `overlayadd`, `overlayremove`: Añaden eventos pa
 - `baselayerchange`: Este evento se activa cuando el usuario cambia la capa base del mapa.
 - `overlayadd`: Este evento se activa cuando se añade una capa superpuesta al mapa.
 
-```{r}
+```{r, cache.lazy=TRUE}
 map <- map %>%
         htmlwidgets::onRender("
           function(el, x) {
@@ -698,9 +698,9 @@ map <- map %>%
               });
             });
           }")
+
 map
 ```
-
 
 Se genera un Widget Interactivo con la función `saveWidget()`.     
   
@@ -712,7 +712,7 @@ Se genera un Widget Interactivo con la función `saveWidget()`.
 
 Es importante que el uso combinado de saveWidget y mapshot en el mismo contexto podría no ser necesario. Normalmente, se elige uno u otro según la necesidad específica: guardar el mapa interactivo para ser utilizado en un sitio web (saveWidget) o capturar una imagen estática para propósitos de visualización o impresión (mapshot).    
  
-```{r}
+```{r, eval = FALSE}
 #saveRDS(map,  paste0(here::here(), "/Output/map_2020.RDS"))
 saveWidget(map,  paste0(here::here(), "/img/map_2010_2020.html"), selfcontained = TRUE)
 map <- map %>% 
@@ -724,7 +724,7 @@ map <- map %>%
 
 `TopoJSON en Leaflet`:  Se leen archivos `TopoJSON` y almacenarlos en listas anidadas según los años y grados especificados. La función `readLines` se utiliza para leer el contenido de los archivos `TopoJSON` y almacenar cada línea del archivo como un elemento en un vector de caracteres dentro de las listas correspondientes a cada año y grado. Esto facilita la organización y el acceso a los datos leídos en un formato estructurado.    
 
-```{r}
+```{r, EVAL = FALSE}
 # Define los grados y años
 years <- c("2020", "2015", "2010")
 grados <- c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
@@ -750,7 +750,7 @@ for(i in 1:5){
 
 Se asigna a la lista `shape_estados` los datos de shapefile correspondientes a cada año, el cual a su vez cada lista contiene a los niveles de marginación.     
 
-```{r}
+```{r, EVAL = FALSE}
 # Define los datos y años
 years <- c("2020", "2015", "2010")
 grados <-  c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
@@ -766,7 +766,7 @@ shape_estados <- list(shape_estados_2020, shape_estados_2015, shape_estados_2010
 - Se generan IDs únicos y se añaden propiedades `ID`, `ANIO` y `id_year` a cada geometría.      
 - La variable start_id se utiliza para mantener un conteo acumulativo de los IDs generados.     
 
-```{r}
+```{r, EVAL = FALSE}
 # lista de TopoJSONs:
 shape_estados <- map(seq_along(years), function(year) {
                    map(grados, function(grado) {
@@ -807,7 +807,7 @@ shape_estados <- map2(shape_estados, years, function(shape_files, year) {
 - Se define una paleta de colores correspondiente a los diferentes grados de marginación.    
 - Los estilos se aplican a cada shapefile, incluyendo la propiedad `layerId` que utiliza el valor de id_year.     
 
-```{r}
+```{r, EVAL = FALSE}
 paleta <- c("#13322B", #Muy alto
             "#086953", #Alto 
             "#4C9562", #Medio
@@ -842,7 +842,7 @@ Se define una función llamada `addPolygonLayer`, la cual añade una capa de pol
 - `year`: Año asociado con los datos de los polígonos, usado para agrupar.    
 - `grado`: Grado asociado con los datos de los polígonos, también usado para agrupar.   
 
-```{r}
+```{r, EVAL = FALSE}
 # Define una función para añadir capas de polígonos
 addPolygonLayer <- function(map, data, year, grado) {
                              map <- map %>%
@@ -857,7 +857,7 @@ addPolygonLayer <- function(map, data, year, grado) {
 
 Se crea un mapa centrado en unas coordenadas específicas (`lat = 23.6260333` y `lng = -102.5375005`), con un nivel de zoom fijo, y establece los límites máximos para evitar que el usuario se desplace fuera de una región definida. El mapa utiliza capa de OpenStreetMap tanto en la capa base como en una capa adicional de tiles del mismo proveedor.    
 
-```{r}
+```{r, EVAL = FALSE}
 # Crear el mapa inicial
 map <- leaflet(options = leafletOptions(minZoom = 5, maxZoom = 5, zoomControl = FALSE)) %>%
         addTiles() %>%
@@ -875,7 +875,7 @@ map <- leaflet(options = leafletOptions(minZoom = 5, maxZoom = 5, zoomControl = 
 Se añaden las capas de polígonos al mapa de Leaflet para cada combinación de año y grado. Se recorren todas las combinaciones posibles de años (`years`) y grados (`grados`), y para cada combinación, añade una capa de polígonos al mapa utilizando la función `addPolygonLayer`. La lista shape_estados contiene los datos geográficos organizados por año y grado, y la lista paleta proporciona la paleta de colores correspondiente para cada grado.    
 
 
-```{r}
+```{r, EVAL = FALSE}
 # Añadir capas de polígonos para cada año
 for (i in seq_along(years)) {
   for(j in seq_along(grados)){
@@ -897,7 +897,7 @@ Se añaden los controles adicionales y una leyenda al mapa de Leaflet. Permitien
 - `baseGroups = c("2020", "2015", "2010")`: Define los grupos de capas base que se mostrarán en el control de capas. Estos podrían ser los años para los cuales se están visualizando datos.    
 - `options = layersControlOptions(collapsed = FALSE)`:  Especifica las opciones del control de capas. collapsed = FALSE significa que el control de capas estará expandido por defecto, mostrando todas las opciones disponibles sin necesidad de expandirlo manualmente.         
 
-```{r}
+```{r, eval =FALSE}
 map <- map %>%
         addControl(title, position = "bottomright") %>%
          addLegend("bottomright", 
@@ -921,7 +921,7 @@ Los eventos `baselayerchange`, `overlayadd`, `overlayremove`: Añaden eventos pa
 - `baselayerchange`: Este evento se activa cuando el usuario cambia la capa base del mapa.
 - `overlayadd`: Este evento se activa cuando se añade una capa superpuesta al mapa.
 
-```{r}
+```{r mapTopoJSON, cache.lazy=TRUE, eval = FALSE}
 map <- map %>%
         htmlwidgets::onRender("
           function(el, x) {
@@ -965,6 +965,8 @@ map <- map %>%
               });
             });
           }")
+
+map
 ```
 
 
@@ -979,17 +981,9 @@ Se genera un Widget Interactivo con la función `saveWidget()`,
 
 Es importante que el uso combinado de saveWidget y mapshot en el mismo contexto podría no ser necesario. Normalmente, se elige uno u otro según la necesidad específica: guardar el mapa interactivo para ser utilizado en un sitio web (saveWidget) o capturar una imagen estática para propósitos de visualización o impresión (mapshot).    
 
-```{r}
-#saveRDS(map,  paste0(here::here(), "/Output/map_2020.RDS"))
-saveWidget(map,  paste0(here::here(), "/index.html"), selfcontained = TRUE)
 
-map <- map %>% 
-        mapshot(url = paste0(here::here(), "/index.html")) 
-```
-
- 
-```{r}
-#saveRDS(map,  paste0(here::here(), "/Output/map_2020.RDS"))
+```{r, eval = FALSE}
+saveRDS(map,  paste0(here::here(), "/Output/map_2020.RDS"))
 saveWidget(map,  paste0(here::here(), "/img/map_2010_2020.html"), selfcontained = TRUE)
 map <- map %>% 
         mapshot(url = paste0(here::here(), "/map_2010_2020.html"))
