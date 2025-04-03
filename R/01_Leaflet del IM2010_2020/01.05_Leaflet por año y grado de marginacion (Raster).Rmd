@@ -69,8 +69,8 @@ h5 {
 
 ```{r, include=FALSE}
 # automatically create a bib database for R packages
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = FALSE,  
-                      eval = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE,  
+                      eval = FALSE)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 setwd(here::here())
 options(digits = 2)
@@ -199,15 +199,15 @@ Se cambian de `IDs` de los Features del Shapefile; de esta manera si se hace alg
 
 ```{r, eval = FALSE}
 shape_estados_2020 <- shape_estados_2020 %>%
-                       select(CVE_ENT) %>%
+                       dplyr::select(CVE_ENT) %>%
                          sp::spChFIDs(., str_pad(shape_estados_2020@data$CVE_ENT, 2, "left", pad = "0"))
 
 shape_estados_2015 <- shape_estados_2015 %>%
-                       select(CVE_ENT) %>%
+                       dplyr::select(CVE_ENT) %>%
                          sp::spChFIDs(., str_pad(shape_estados_2015@data$CVE_ENT, 2, "left", pad = "0"))
 
 shape_estados_2010 <- shape_estados_2010 %>%
-                       select(CVE_ENT) %>%
+                       dplyr::select(CVE_ENT) %>%
                          sp::spChFIDs(., str_pad(shape_estados_2010@data$CVE_ENT, 2, "left", pad = "0"))
 ```
 
@@ -229,19 +229,19 @@ El resultado es un nuevo objeto Spatial (capa_estados_2020) que combina la geome
 ```{r, eval = FALSE}
 capa_estados_2020 <- shape_estados_2020 %>%
                       spdplyr:::left_join.Spatial(., DP2_2020 %>% 
-                                                      select(CVE_ENT, ANIO, GM_2020) %>%  
+                                                      dplyr::select(CVE_ENT, ANIO, GM_2020) %>%  
                                                        mutate(GM_2020 = fct_relevel(stringr::str_trim(.$GM_2020, "both"), c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))),
                                                         by = c("CVE_ENT")) 
 
 capa_estados_2015 <- shape_estados_2015 %>%
                       spdplyr:::left_join.Spatial(., DP2_2015 %>% 
-                                                      select(CVE_ENT, ANIO, GM_2015) %>%  
+                                                      dplyr::select(CVE_ENT, ANIO, GM_2015) %>%  
                                                        mutate(GM_2015 = fct_relevel(stringr::str_trim(.$GM_2015, "both"), c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))),
                                                         by = c("CVE_ENT")) 
 
 capa_estados_2010 <- shape_estados_2010 %>%
                       spdplyr:::left_join.Spatial(., DP2_2010 %>% 
-                                                      select(CVE_ENT, ANIO, GM_2010) %>%  
+                                                      dplyr::select(CVE_ENT, ANIO, GM_2010) %>%  
                                                        mutate(GM_2010 = fct_relevel(stringr::str_trim(.$GM_2010, "both"), c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))),
                                                         by = c("CVE_ENT")) 
 ```
@@ -873,7 +873,7 @@ Se genera un Widget Interactivo con la función `saveWidget()`.
 
 Es importante que el uso combinado de saveWidget y mapshot en el mismo contexto podría no ser necesario. Normalmente, se elige uno u otro según la necesidad específica: guardar el mapa interactivo para ser utilizado en un sitio web (saveWidget) o capturar una imagen estática para propósitos de visualización o impresión (mapshot).    
  
-```{r}
+```{r, eval = FALSE}
 #saveRDS(map,  paste0(here::here(), "/Output/map_2020.RDS"))
 saveWidget(map,  paste0(here::here(), "/img/map_2010_2020.html"), selfcontained = TRUE)
 map <- map %>% 
@@ -982,7 +982,6 @@ for (i in seq_along(years)) {
             start_id <- start_id + 1
   }
 }
-map
 ```
 
 ##### Se añade la leyenda y control de capas    
@@ -1075,7 +1074,7 @@ Se genera un Widget Interactivo con la función `saveWidget()`.
 Es importante que el uso combinado de saveWidget y mapshot en el mismo contexto podría no ser necesario. Normalmente, se elige uno u otro según la necesidad específica: guardar el mapa interactivo para ser utilizado en un sitio web (saveWidget) o capturar una imagen estática para propósitos de visualización o impresión (mapshot).    
  
 ```{r, eval = FALSE}
-#saveRDS(map,  paste0(here::here(), "/Output/map_2020.RDS"))
+#saveRDS(map,  paste0(here::here(), "/Output/map_2020_puntos.RDS"))
 saveWidget(map,  paste0(here::here(), "/img/map_2010_2020.html"), selfcontained = TRUE)
 map <- map %>% 
         mapshot(url = paste0(here::here(), "/map_2010_2020.html"))
