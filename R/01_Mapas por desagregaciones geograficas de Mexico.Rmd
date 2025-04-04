@@ -74,21 +74,13 @@ h5 {
     color: #ffffff;
     background: #0A6A87
 }
-</style>
-```
 
-```{=html}
-<style>
 .tile2-text {
     position: relative;
     display: block;
     padding: 10px 15px;
     color: #0A6CC8;
     list-style: none;
-}
-.top2-tiles a:nth-of-type(1):hover, .top2-tiles a:nth-of-type(1):focus{
-    color: #ffffff;
-    background: #0A6CC8
 }
 </style>
 ```
@@ -159,7 +151,7 @@ invisible(utils::memory.limit(size = 60000000))
 #tinytex::install_tinytex()  # Esto instala un motor LaTeX completo
 ```
 
-```{r, echo = FALSE, eval = TRUE}
+```{r, echo = FALSE, eval = TRUE, cache=TRUE}
 # Se cargan las bases de datos generadas en el documento
 archivo <- c("shape", "capas", "layer", "tbl")
 nivel <- c("estados", "municipios", "localidad", "ageb")
@@ -294,7 +286,7 @@ Para este ejercicio se hace uso de las bases de datos que contienen las estimaci
 
 La base de datos del índice de marginación en los diferentes niveles de desagregación se encuentra disponible en la página de [datos abiertos](https://www.gob.mx/conapo/documentos/indices-de-marginacion-2020-284372).
 
-# Estructura de un mapa {.tile-text .top-tiles .tabset .tabset-fade .tabset-pills}
+# Estructura de un mapa {.tile-text .top-tiles .tabset .tabset-fade .tabset-pills}  
 
 ## Entidad Federativa {.tabset .tabset-fade .tabset-pills}
 
@@ -322,8 +314,11 @@ shape_estados@data <- shape_estados@data %>%
 
 Un objeto `SpatialPolygons` se puede combinar con una data.frame para crear lo que se llama `SpatialPolygonsDataFrame`. La diferencia está en los atributos asociados con los polígonos. Un objeto `SpatialPolygonsDataFrame` tiene información adicional asociada a los polígonos (ejemplo, nombre de la entidad, población, etc.) mientras que `SpatialPolygons` contiene solo la información espacial (vértices) sobre el polígono.
 
-```{r, class.source = "fold-show", eval = TRUE}
+```{r, class.source = "fold-show", eval = FALSE}
 class(shape_estados)
+## "SpatialPolygonsDataFrame"
+## attr(,"package")
+## "sp"
 ```
 
 Si el archivo no tuviera Sitema de Referencia de Coordenadas `CRS` asignado se debería utilizal la función `proj4string()` para asignar el `CRS` adecuado. En cambio, si se quisiera cambiar el sistema de referencia (transormar) debe utilizarse la función `spTransform()` del paquete `sp`.
@@ -331,7 +326,8 @@ Si el archivo no tuviera Sitema de Referencia de Coordenadas `CRS` asignado se d
 La función `proj4string()`representa el sistema de referencia de coordenadas utilizado en los datos.
 
 ```{r, class.source = "fold-show", eval = FALSE}
-proj4string(shape_estados)
+proj4string(shape_estados) 
+## "+proj=lcc +lat_0=12 +lon_0=-102 +lat_1=17.5 +lat_2=29.5 +x_0=2500000 +y_0=0 +ellps=GRS80 +units=m +no_defs"
 ```
 
 ### IME_2020
@@ -384,7 +380,7 @@ Existen dos maneras de trabajar los datos de los mapas:
 
 #### data.frame   
 
-##### SpatialPolygons ⇒ data.frame     
+##### SpatialPolygons ➡️ data.frame     
 
 Cuando es necesario cambiar los ID's de las características en los objetos `SpatialLines` o `SpatialPolygons`, se puede usar la función `spChFIDs()` de la paquetería `sp`. Donde los nuevos ID's deben ser un vector de caracteres únicos de la longitud correcta.
 
@@ -400,7 +396,7 @@ capas_estados <- shape_estados %>%
 
 #### SpatialPolygons   
 
-##### SpatialPolygons ⇒ SpatialPolygons + Datos      
+##### SpatialPolygons ➡️ SpatialPolygons + Datos      
 
 ```{r, class.source = "fold-show", eval = FALSE}
 layer_estados <- merge(shape_estados,
@@ -410,7 +406,7 @@ layer_estados <- merge(shape_estados,
                            by = "CVE_GEO")
 ```
 
-##### Data.frame ⇒ SpatialPolygonsDataFrame       
+##### Data.frame ➡️ SpatialPolygonsDataFrame       
 
 Para poder emparejar polígonos y puntos, los objetos espaciales deben tener el mismo `CRS`. Para después poder calcular el área de cada polígono o bien se puede reproyectar los datos espaciales usando la función `spTransform`:
 
@@ -424,7 +420,7 @@ tabla <- SpatialPointsDataFrame(data = capas_estados,
 
 #### Tibble
 
-##### SpatialPolygons ⇒  tbl_df/ tbl / data.frame       
+##### SpatialPolygons ➡️  tbl_df/ tbl / data.frame       
 
 Conversión de datos: `st_as_sf`, convierte un objeto externo en un spatial object. A continuación, se muestra un ejemplo de cómo visualizar objetos `sf`. Este tipo de función es un poco más amigable de usar.
 
@@ -510,7 +506,7 @@ Existen dos maneras de trabajar los datos de los mapas:
 
 #### data.frame
 
-##### SpatialPolygons ⇒ data.frame     
+##### SpatialPolygons ➡️ data.frame     
 
 Cuando es necesario cambiar los ID's de las características en los objetos `SpatialLines` o `SpatialPolygons`, se puede usar la función `spChFIDs()` de la paquetería `sp`. Donde los nuevos ID's deben ser un vector de caracteres únicos de la longitud correcta.
 
@@ -525,7 +521,7 @@ capas_municipio <-  shape_municipios %>%
 
 #### SpatialPolygons
 
-##### SpatialPolygons ⇒  SpatialPolygons + Datos     
+##### SpatialPolygons ➡️  SpatialPolygons + Datos     
 
 ```{r, class.source = "fold-show", eval = FALSE}
 layer_municipios <- merge(shape_municipios,
@@ -536,7 +532,7 @@ layer_municipios <- merge(shape_municipios,
 
 #### Tibble
 
-##### SpatialPolygons ⇒  tbl_df/ tbl / data.frame    
+##### SpatialPolygons ➡️  tbl_df/ tbl / data.frame    
 
 Conversión de datos: `st_as_sf`, convierte un objeto externo en un spatial object. A continuación, se muestra un ejemplo de cómo visualizar objetos `sf`. Este tipo de función es un poco más amigable de usar.
 
@@ -551,7 +547,17 @@ tbl_municipios <- as_tibble(st_as_sf(shape_municipios)) %>%
                     merge(., IMM_2020 %>% dplyr::select(CVE_GEO, GM_2020))
 ```
 
-### Zonas Metropolitanas
+### Zonas Metropolitanas    
+
+El Consejo Nacional de Población (`CONAPO`), en colaboración con instituciones clave como el `INEGI` y la `SEDATU`, ha establecido un marco comprehensivo para la delimitación y caracterización de las áreas urbanas más significativas de México. Este esfuerzo interinstitucional refleja la importancia de coordinar diferentes perspectivas y capacidades técnicas para comprender la compleja realidad metropolitana del país.
+
+La conceptualización de una zona metropolitana es particularmente relevante en el contexto mexicano. Se define específicamente como una agrupación de dos o más municipios que albergan una ciudad con población superior a los 100,000 habitantes. Lo distintivo de estas zonas es que sus funciones y actividades trascienden los límites municipales originales, estableciendo una integración socioeconómica significativa con las áreas circundantes. 
+
+Página oficial del `CONAPO`: Aquí encontrarás publicaciones y datos relacionados con las zonas metropolitanas.   
+
+**Publicación**: [Metrópolis de México 2020](https://www.gob.mx/sedatu/documentos/metropolis-de-mexico-2020?state=published) 
+**Base de Datos**: [Datos Abiertos](https://datos.gob.mx/) y se presenta en formato `.xlsx`  
+
 
 ```{r, class.source = "fold-show", eval = FALSE}
 ZM_2020 <- read_xlsx(paste0(here::here(), "/Data/ZM_2020.xlsx"), sheet = "ZM_2020", range = "A7:I428") 
@@ -643,7 +649,7 @@ Existen dos maneras de trabajar los datos de los mapas:
 
 #### data.frame
 
-##### SpatialPolygons ⇒  data.frame    
+##### SpatialPolygons ➡️  data.frame    
 
 Cuando es necesario cambiar los ID's de las características en los objetos `SpatialLines` o `SpatialPolygons`, se puede usar la función `spChFIDs()` de la paquetería `sp`. Donde los nuevos ID's deben ser un vector de caracteres únicos de la longitud correcta.
 
@@ -662,7 +668,7 @@ length(unique(capas_localidad$id))
 
 #### SpatialPolygon
 
-##### SpatialPolygons ⇒  SpatialPolygons + Datos
+##### SpatialPolygons ➡️  SpatialPolygons + Datos
 
 ```{r, class.source = "fold-show", eval = FALSE}
 layer_localidad <- merge(shape_localidad,
@@ -674,7 +680,7 @@ layer_localidad <- merge(shape_localidad,
 
 #### Tibble
 
-##### SpatialPolygons ⇒  tbl_df/ tbl / data.frame    
+##### SpatialPolygons ➡️  tbl_df/ tbl / data.frame    
 
 Conversión de datos: `st_as_sf`, convierte un objeto externo en un spatial object. A continuación, se muestra un ejemplo de cómo visualizar objetos `sf`. Este tipo de función es un poco más amigable de usar.
 
@@ -761,7 +767,7 @@ Existen dos maneras de trabajar los datos de los mapas:
 
 #### data.frame
 
-##### SpatialPolygons ⇒  data.frame      
+##### SpatialPolygons ➡️  data.frame      
 
 Cuando es necesario cambiar los ID's de las características en los objetos `SpatialLines` o `SpatialPolygons`, se puede usar la función `spChFIDs()` de la paquetería `sp`. Donde los nuevos ID's deben ser un vector de caracteres únicos de la longitud correcta.
 
@@ -787,7 +793,7 @@ capas_ageb <- capas_ageb %>%
 
 #### SpatialPolygons
 
-##### SpatialPolygons ⇒  SpatialPolygons + Datos     
+##### SpatialPolygons ➡️  SpatialPolygons + Datos     
 
 ```{r, class.source = "fold-show", eval = FALSE}
 layer_ageb <- merge(shape_ageb,
@@ -799,7 +805,7 @@ layer_ageb <- merge(shape_ageb,
 
 #### Tibble
 
-##### SpatialPolygons ⇒  tbl_df/ tbl / data.frame      
+##### SpatialPolygons ➡️  tbl_df/ tbl / data.frame      
 
 Conversión de datos: `st_as_sf`, convierte un objeto externo en un spatial object. A continuación, se muestra un ejemplo de cómo visualizar objetos `sf`. Este tipo de función es un poco más amigable de usar.
 
@@ -814,7 +820,16 @@ tbl_ageb <- as_tibble(st_as_sf(shape_ageb)) %>%
                          IMU_2020 %>% dplyr::select(CVE_GEO, GM_2020)
 ```
 
-### Zona Metropolitanas
+### Zona Metropolitanas  
+
+El Consejo Nacional de Población (`CONAPO`), en colaboración con instituciones clave como el `INEGI` y la `SEDATU`, ha establecido un marco comprehensivo para la delimitación y caracterización de las áreas urbanas más significativas de México. Este esfuerzo interinstitucional refleja la importancia de coordinar diferentes perspectivas y capacidades técnicas para comprender la compleja realidad metropolitana del país.
+
+La conceptualización de una zona metropolitana es particularmente relevante en el contexto mexicano. Se define específicamente como una agrupación de dos o más municipios que albergan una ciudad con población superior a los 100,000 habitantes. Lo distintivo de estas zonas es que sus funciones y actividades trascienden los límites municipales originales, estableciendo una integración socioeconómica significativa con las áreas circundantes. 
+
+Página oficial del `CONAPO`: Aquí encontrarás publicaciones y datos relacionados con las zonas metropolitanas.   
+
+**Publicación**: [Metrópolis de México 2020](https://www.gob.mx/sedatu/documentos/metropolis-de-mexico-2020?state=published) 
+**Base de Datos**: [Datos Abiertos](https://datos.gob.mx/) y se presenta en formato `.xlsx`   
 
 ```{r capas_zm, class.source = "fold-show", eval = FALSE}
 capas_zm <- shape_ageb %>%
