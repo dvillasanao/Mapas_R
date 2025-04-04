@@ -94,12 +94,6 @@ h5 {
 </style>
 ```
 
-<style>
-pre.sourceCode {
-  max-height: 300px;
-  overflow: auto;
-}
-</style>
 
 
 ```{r setup, include=FALSE}
@@ -171,11 +165,11 @@ load(file = paste0(here::here(), "/Output/ZM_2020.RData"))
 
 # Objetivo
 
-Se presentan algunos ejercicios básicos de la cartografía digital con `R` y haciendo uso de algunas paqueterías para integrar herramientas geográficas y estadísticas. Así bien, para visualizar y modelar datos geográficos con el software de código abierto y tratar de entender principalmente el manejo de Sistemas de Información Geográfica (`SIG`) y visualizar datos e información que requiera de una localización específica.
+Se presenta una metodología para el análisis cartográfico digital utilizando R, implementando diversas bibliotecas que integran funcionalidades geográficas y estadísticas. El objetivo es facilitar la visualización y el modelado de datos geoespaciales mediante software de código abierto, con énfasis en la aplicación de Sistemas de Información Geográfica (SIG) para el análisis de datos georreferenciados.
 
 # Sistema de Información Geográfica
 
-El Instituto Nacional de Estadística, Geografía e Informática (INEGI) tiene puestos a disposición del público los shapefiles con los distintos niveles de información geográfica. Estos archivos digitales se encuentran disponibles en el [`Marco Geoestadístico Nacional (MGN)`](https://www.inegi.org.mx/temas/mg/#Descargas), el cual es un sistema único y se presenta la división del territorio nacional en diferentes niveles de desagregación para referir geográficamente la información estadística de los censos y encuestas. Se integra al Sistema Nacional de Información Estadística y Geográfica (SNIEG).
+El **Instituto Nacional de Estadística, Geografía e Informática (`INEGI`)** tiene puestos a disposición del público los shapefiles con los distintos niveles de información geográfica. Estos archivos digitales se encuentran disponibles en el [`Marco Geoestadístico Nacional (MGN)`](https://www.inegi.org.mx/temas/mg/#Descargas), el cual es un sistema único y se presenta la división del territorio nacional en diferentes niveles de desagregación para referir geográficamente la información estadística de los censos y encuestas. Se integra al **Sistema Nacional de Información Estadística y Geográfica (`SNIEG`)**.
 
 Este producto integra información vectorial, tablas de atributos y catálogos. Muestra la división geoestadística del territorio nacional en sucesivos niveles del territorio. Esta división está dada por los llamados **límites estadísticos**, que pueden coincidir con los límites político-administrativos oficiales, los cuales tienen sustento legal.
 
@@ -210,7 +204,7 @@ kable(tabla,
 
 Ocurre a menudo que las capas de información vectorial se han obtenido de fuentes con sistemas de coordenadas distintas; por lo que se debe transformar la información para homogenizarla y representarla en el proyecto.
 
-La [`Norma Técnica para el Sistema Geodésico Nacional`](https://www.inegi.org.mx/contenidos/temas/MapaDigital/Doc/asignar_sistema_coordenadas.pdf) define las disposiciones con el fin de que el marco sea homogéneo, compatible y comparable; y establece que el Marco de Referencia oficial para los Estados Unidos Mexicanos es el International Terrestrial Reference Frame 2008, con datos de época 2010.0 (ITRF08 ) asociado al elipsoide de referencia definido en el GRS80.
+La [`Norma Técnica para el Sistema Geodésico Nacional`](https://www.inegi.org.mx/contenidos/temas/MapaDigital/Doc/asignar_sistema_coordenadas.pdf) define las disposiciones con el fin de que el marco sea homogéneo, compatible y comparable; y establece que el Marco de Referencia oficial para los Estados Unidos Mexicanos es el **International Terrestrial Reference Frame 2008**, con datos de época 2010.0 (`ITRF08`) asociado al **elipsoide de referencia** definido en el **GRS80**.
 
 A continuación se enlista los datos del sistema de coordenadas para la estandarización de la información:
 
@@ -278,11 +272,11 @@ tribble(~Tema,                   ~Métodos                             , ~`Libre
 
 ### Índice de marginación
 
-Para conocer las desigualdades territoriales, desde 1993 la Secretaría General del Consejo Nacional de Población (`CONAPO`) realiza un ejercicio que permite construir el Índice de marginación con base en los resultados censales, una medida que permite identificar las zonas y regiones con más carencias dentro del país. Este índice resume y permite diferenciar los estados, municipios, localidades y áreas geoestadísticas básicas del país según el impacto global de las carencias que padece la población como resultado de la falta de acceso a la educación, la residencia en viviendas inadecuadas, la percepción de ingresos monetarios insuficientes y las relacionadas con la residencia en localidades pequeñas.
+Desde 1993, la **Secretaría General del Consejo Nacional de Población (`CONAPO`)** implementa una metodología sistemática para evaluar las disparidades territoriales mediante la construcción del Índice de marginación, basado en datos censales. Este instrumento permite una identificación precisa de las zonas y regiones que presentan mayores necesidades socioeconómicas en el país. El índice proporciona un análisis detallado que distingue entre estados, municipios, localidades y áreas geoestadísticas básicas, considerando factores críticos como el acceso a la educación, la calidad de la vivienda, el nivel de ingresos y la ubicación geográfica de los asentamientos.
 
-Hoy este índice se ha convertido en una de las principales herramientas analíticas y operativas para la definición y focalización de políticas públicas enfocadas al abatimiento de las carencias socioeconómicas de la población mexicana.
+En la actualidad, este índice constituye un instrumento fundamental para el diseño e implementación de políticas públicas orientadas a la reducción de las carencias socioeconómicas que afectan a la población mexicana.
 
-Para este ejercicio se hace uso de las bases de datos que contienen las estimaciones del índice de marginación en los diferentes niveles de desagregación geográfica censal. Permitiendo de esta manera hacer de manera visual los territorios de desigualdad que enfrenta el país.
+La metodología implementada utiliza bases de datos que incorporan estimaciones del índice de marginación en diversos niveles de desagregación geográfica censal, facilitando una representación cartográfica comprehensiva de las disparidades socioeconómicas presentes en el territorio nacional.
 
 La base de datos del índice de marginación en los diferentes niveles de desagregación se encuentra disponible en la página de [datos abiertos](https://www.gob.mx/conapo/documentos/indices-de-marginacion-2020-284372).
 
@@ -923,13 +917,6 @@ p <- IME_2020 %>%
 p
 ```
 
-
-
-```{r, eval = FALSE}
-path = paste0(here::here(),"/img/IME_2020_gmap.pdf")
-ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
-```
-
 ![](../img/IME_2020_gmap.png){width="70%" fig-align="center"}  
 
 #### Google API 
@@ -952,7 +939,8 @@ A menudo se necesita recopilar conjuntos de datos espaciales de diferentes fuent
 
 ```{r,class.source = "fold-show"}
 ## El sistema de referencia de coordenadas (INEGI)
-proj4string(shape_estados)
+proj4string(shape_estados) 
+## "+proj=lcc +lat_0=12 +lon_0=-102 +lat_1=17.5 +lat_2=29.5 +x_0=2500000 +y_0=0 +ellps=GRS80 +units=m +no_defs"
 ```
 
 Haciendo uso de la función `spTransform()` del paquete `sp`, proporcionan la transformación entre datum(s) y conversión entre proyecciones (también conocidas como *proyección y/o reproyección*), de un sistema de referencia de coordenadas (`CRS`).      
@@ -970,7 +958,7 @@ shape_estados_T <- spTransform(shape_estados, CRSobj = CRS('+proj=longlat +ellps
 
 **Ejemplo.- Mapa a nivel estatal**  
 
-Antes de poder visualizar el mapa es importante elegir el sistema de coordenadas del sitio de representación. Dichas coordenadas pueden obtenerse del sistema información geográfico de los shapefiles (previamente transformado al Sistema Geodésico Mundial), ya que este proporciona las longitudes y latitudes o bien se puede geolocalizar el punto de interés con su ubicación geográfica y/o posicionarse directamente mediante Google Earth.    
+Antes de poder visualizar el mapa es importante elegir el sistema de coordenadas del sitio de representación. Dichas coordenadas pueden obtenerse del sistema información geográfico de los shapefiles (previamente transformado al **Sistema Geodésico Mundial**), ya que este proporciona las longitudes y latitudes o bien se puede geolocalizar el punto de interés con su ubicación geográfica y/o posicionarse directamente mediante **Google Earth**.    
 
 ```{r, class.source = "fold-hide"}
 # Se buscan los límites del shape de estados  
@@ -1007,8 +995,9 @@ p <- get_map(location = location, source = "google", maptype="roadmap", scale = 
 
 #path = paste0(here::here(),"/img/img_2020_ggmap_API.pdf")
 #ggexport (p, width = 8, height = 5, res = 400, filename = path)
-print(p)
 ```
+
+![](../img/img_2020_ggmap_API.png){width="70%" fig-align="center"}  
 
 **Caso particular**  
 
@@ -1035,6 +1024,8 @@ get_googlemap(center = c(lon = -100.445009, lat = 20.705260), maptype = "satelli
                y = "")
 ```
 
+![](../img/Caso particular.png){width="70%" fig-align="center"}  
+
 ### `geom_polygon`
 
 La función `geom_polygon()` de la paquetería `ggplot2`, devuelve un objeto `ggplot` en el cual dibuja líneas entre puntos y los cierra ( es decir, dibuja una línea desde el último punto hasta el primer punto). En el cual es importante tener en cuenta que el data.frame incluye columnas con la ubicación de las áreas geográficas y se agregan como argumentos en la función `aes(x = long,  y = lat)`. También se incluye una columna que describe el orden en que se deben conectar estos puntos para formar un polígono (`order`), el nombre del estado (`id`) y una columna de grupo que separa los puntos en polígonos únicos que se deben trazar `aes (group = group)`.
@@ -1055,15 +1046,20 @@ p <- ggplot() +
                       y = capas_estados$lat) + 
          theme_transparent() + 
           theme(plot.title = element_text(size = 21, hjust = 0.15, family = "Montserrat", face = "bold"),
-                 plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
-                  legend.key.size = unit(0.5, "cm"),
-                   legend.text = element_text(size = 10, family = "Montserrat"), 
-                    legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
-                     legend.position = c(0.8, 0.7)) + 
+                plot.subtitle = element_text(size = 18, hjust = 0, family = "Montserrat Medium"),
+                plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
+                axis.text = element_blank(),
+                axis.title = element_blank(),
+                axis.ticks = element_blank(),
+                legend.key.size = unit(0.5, "cm"),
+                legend.text = element_text(size = 10, family = "Montserrat"), 
+                legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
+                legend.position = c(0.8, 0.7)) + 
            scale_fill_manual(values = rev(usecol(pal = pal_petrol, n = 5))) + 
             scale_color_manual(values = c("#BDBDBD")) +  
              guides(color = guide_legend(override.aes = list(fill = usecol(pal = pal_petrol, n = 5)))) +
        labs(title = "Índice de marginación a nivel estatal, 2020",
+            subtitle = "Utilizando geom_polygon()",
              fill = stringr::str_wrap("Grado de marginación", 10),
               caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
 
@@ -1073,6 +1069,8 @@ p <- ggplot() +
 p
 ```
 
+![](../img/IME_2020_geom_polygon.png){width="70%" fig-align="center"}  
+
 ### `tmap`
 
 Con el paquete `tmap` se pueden generar mapas temáticos con gran flexibilidad. La sintaxis para crear gráficos es similar a la de *ggplot2*, pero adaptada a los mapas. Además, ofrece un sistema de trazado coherente para mapas temáticos que se basan en la estructura de las capas en los gráficos. Los mapas temáticos se crean apilando capas, donde cada capa y cada dato se pueden asignar a una o más `aes ()`. También es posible escalarlos y agregando posibles atributos del mapa, como una barra de escala o una brújula.
@@ -1081,36 +1079,38 @@ Una de las ventajas a diferencia de ggplot(), es más rápido de generar los gr�
 
 La función `tm_shape`, crea un elemento que especifica un objeto de `SpatialPolygonsDataFrame`, sin la necesidad de convertir los datos a un data.frame. [GitHub: r-tmap/tmap](https://github.com/r-tmap/tmap)
 
-```{r, fig.width=10,fig.height=10, class.source = "fold-hide"}
+```{r, fig.width=8,fig.height=5, class.source = "fold-hide"}
 # Paquetes 
 require(tmap)
 require(tmaptools)
 
 p <- tm_shape(layer_estados) + 
       tm_polygons("GM_2020", 
-                   title = stringr::str_wrap("Grado de marginación", 10),
-                    #palette = hcl.colors(18, palette = "Inferno")[3:9], 
-                     palette = "BuPu") + 
-       tm_borders(col = "grey20", lwd = 0.5) + 
-        tm_layout(title.snap.to.legend = TRUE,
-                   title = "Índice de marginación a nivel estatal, 2020",
-                    title.fontfamily = "Montserrat",
-                     title.fontface = "bold",
-                      title.size = 2,
-                       main.title.fontface = "bold",
-                        main.title.position = c("center", "top"),
-                         main.title.size = 7, 
-                          main.title.fontfamily = "Montserrat",
-                           legend.outside.position = "right",
-                            legend.title.fontfamily = "Montserrat",
-                             legend.title.fontface = "bold", 
-                              legend.text.fontfamily = "Montserrat",
-                               legend.title.size = 1.2, 
-                                legend.text.size = 1, 
-                                 inner.margins = c(t = 0.05, r = 0.02, b = 0.11, l = 0.15),
-                                  fontfamily = "Montserrat",
-                                   frame = FALSE) + 
-         tm_legend(legend.position = c("right", "center")) +
+                  title = "Grado de \n marginación",
+                  palette = "BuPu", 
+                  na.show = FALSE,
+                  ) + 
+       tm_borders(col = "grey", lwd = 0.5) + 
+        tm_layout(title = "Índice de marginación a nivel estatal, 2020",
+                  title.fontfamily = "Montserrat",
+                  title.fontface = "bold",
+                  title.size = 2,
+                  title.position = c("center", "top"), 
+                   main.title.fontface = "bold",
+                   main.title.position = c("center", "top"),
+                   main.title.size = 7, 
+                   main.title.fontfamily = "Montserrat",
+                    legend.outside = TRUE,
+                    legend.outside.position = c("center", "right"),
+                    legend.title.fontfamily = "Montserrat",
+                    legend.na.show = FALSE,
+                    legend.title.fontface = "bold", 
+                    legend.text.fontfamily = "Montserrat",
+                    legend.title.size = 1, 
+                    legend.text.size = 0.8, 
+                    legend.frame = FALSE,
+                      fontfamily = "Montserrat",
+                      frame = FALSE) + 
           tm_credits(expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")),
                       position=c("left", "bottom"), 
                        size = 1.1)
@@ -1120,6 +1120,13 @@ p <- tm_shape(layer_estados) +
 
 p
 ```
+
+```{r, eval = FALSE}
+path = paste0(here::here(),"/img/IME_2020_tmap.pdf")
+ggexport(p, filename = path, width = 10, height = 6, res = 400, device = "cairo")
+```
+
+![](../img/IME_2020_tmap.png){width="70%" fig-align="center"}  
 
 ### `ggspatial`
 
