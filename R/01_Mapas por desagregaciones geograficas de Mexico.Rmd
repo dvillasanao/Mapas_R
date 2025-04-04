@@ -306,6 +306,7 @@ shape_estados@data <- shape_estados@data %>%
                        rename("CVE_GEO" = "CVEGEO")
 ```
 
+
 Un objeto `SpatialPolygons` se puede combinar con una data.frame para crear lo que se llama `SpatialPolygonsDataFrame`. La diferencia está en los atributos asociados con los polígonos. Un objeto `SpatialPolygonsDataFrame` tiene información adicional asociada a los polígonos (ejemplo, nombre de la entidad, población, etc.) mientras que `SpatialPolygons` contiene solo la información espacial (vértices) sobre el polígono.
 
 ```{r, class.source = "fold-show", eval = FALSE}
@@ -314,6 +315,14 @@ class(shape_estados)
 ## attr(,"package")
 ## "sp"
 ```
+
+Cuando es necesario cambiar los ID's de las características en los objetos `SpatialLines` o `SpatialPolygons`, se puede usar la función `spChFIDs()` de la paquetería `sp`. Donde los nuevos ID's deben ser un vector de caracteres únicos de la longitud correcta.
+
+```{r}
+shape_estados <- shape_estados %>%
+                  sp::spChFIDs(., str_pad(shape_estados@data$CVE_GEO, 2, "left", pad = "0")) 
+```
+
 
 Si el archivo no tuviera Sitema de Referencia de Coordenadas `CRS` asignado se debería utilizal la función `proj4string()` para asignar el `CRS` adecuado. En cambio, si se quisiera cambiar el sistema de referencia (transormar) debe utilizarse la función `spTransform()` del paquete `sp`.
 
@@ -453,6 +462,15 @@ shape_municipios@data <- shape_municipios@data %>%
                           rename("CVE_GEO" = "CVEGEO")
 ```
 
+
+Cuando es necesario cambiar los ID's de las características en los objetos `SpatialLines` o `SpatialPolygons`, se puede usar la función `spChFIDs()` de la paquetería `sp`. Donde los nuevos ID's deben ser un vector de caracteres únicos de la longitud correcta.
+
+```{r}
+shape_municipios <- shape_municipios %>%
+                     sp::spChFIDs(., str_pad(shape_municipios@data$CVE_GEO, 5, "left", pad = "0"))
+```
+
+
 ### IMM_2020
 
 La base de datos del índice de marginación por municipios se encuentra disponible en la página oficial de [CONAPO](https://www.gob.mx/conapo/documentos/indices-de-marginacion-2020-284372) o bien se puede consultar en la página de [Datos Abiertos](https://datos.gob.mx/) y se presenta en formato `.xlsx` [Consulta](https://datos.gob.mx/busca/dataset/indice-de-marginacion-carencias-poblacionales-por-localidad-municipio-y-entidad).
@@ -519,9 +537,9 @@ capas_municipio <-  shape_municipios %>%
 
 ```{r, class.source = "fold-show", eval = FALSE}
 layer_municipios <- merge(shape_municipios,
-                           IMM_2020 %>% dplyr::select(c(-CVE_ENT, -CVE_MUN)) %>%
-                                         mutate(GM_2020 = fct_relevel(.$GM_2020,"Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
-                            by = "CVE_GEO")
+                          IMM_2020 %>% dplyr::select(c(-CVE_ENT, -CVE_MUN)) %>%
+                                        mutate(GM_2020 = fct_relevel(.$GM_2020,"Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
+                          by = "CVE_GEO")
 ```
 
 #### Tibble
@@ -1092,14 +1110,14 @@ p <- tm_shape(layer_estados) +
                   ) + 
        tm_borders(col = "grey", lwd = 0.5) + 
         tm_layout(title = "Índice de marginación a nivel estatal, 2020",
-                  title.fontfamily = "Montserrat",
-                  title.fontface = "bold",
-                  title.size = 2,
-                  title.position = c("center", "top"), 
-                   main.title.fontface = "bold",
-                   main.title.position = c("center", "top"),
-                   main.title.size = 7, 
-                   main.title.fontfamily = "Montserrat",
+                    title.fontfamily = "Montserrat",
+                    title.fontface = "bold",
+                    title.size = 2,
+                    title.position = c("center", "top"), 
+                    main.title.fontface = "bold",
+                    main.title.position = c("center", "top"),
+                    main.title.size = 7, 
+                    main.title.fontfamily = "Montserrat",
                     legend.outside = TRUE,
                     legend.outside.position = c("center", "right"),
                     legend.title.fontfamily = "Montserrat",
@@ -1109,8 +1127,8 @@ p <- tm_shape(layer_estados) +
                     legend.title.size = 1, 
                     legend.text.size = 0.8, 
                     legend.frame = FALSE,
-                      fontfamily = "Montserrat",
-                      frame = FALSE) + 
+                    fontfamily = "Montserrat",
+                    frame = FALSE) + 
           tm_credits(expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")),
                       position=c("left", "bottom"), 
                        size = 1.1)
@@ -1275,12 +1293,6 @@ p <- IMM_2020 %>%
 p
 ```
 
-
-```{r, eval = FALSE}
-path = paste0(here::here(),"/img/IMM_2020_gmap.pdf")
-ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
-```
-
 ![](../img/IMM_2020_gmap.png){width="90%" fig-align="center"}  
 
 ### `geom_polygon`
@@ -1288,8 +1300,8 @@ ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
 La función `geom_polygon()` de la paquetería `ggplot2`, devuelve un objeto `ggplot` en el cual dibuja líneas entre puntos y los cierra ( es decir, dibuja una línea desde el último punto hasta el primer punto). En el cual es importante tener en cuenta que el data.frame incluye columnas con la ubicación de las áreas geográficas y se agregan como argumentos en la función `aes(x = long,  y = lat)`. También se incluye una columna que describe el orden en que se deben conectar estos puntos para formar un polígono (`order`), el nombre del municipio (`id`) y una columna de grupo que separa los puntos en polígonos únicos que se deben trazar `aes (group = group)`.
 
 ```{r, class.source = "fold-hide"}
-# Paleta de colores 
-require(RColorBrewer)
+# Paleta de colores
+require(unikn) 
 
 p <- ggplot() + 
       geom_polygon(capas_municipios,
@@ -1309,23 +1321,31 @@ p <- ggplot() +
                        size = 0.6) +
        coord_equal() +
         theme_transparent() + 
-         theme(plot.title = element_text(size = 21, hjust = 0.15, family = "Montserrat", face = "bold"),     
-                plot.caption = element_text(size = 10, hjust = 0.2, vjust = 1, family = "Montserrat"),
-                 legend.key.size = unit(0.5, "cm"), 
-                  legend.text = element_text(size = 10, family = "Montserrat"), 
+             theme(plot.title = element_text(size = 21, hjust = 0.15, family = "Montserrat", face = "bold"),
+                   plot.subtitle = element_text(size = 18, hjust = 0, family = "Montserrat Medium"),
+                   plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
+                   axis.text = element_blank(),
+                   axis.title = element_blank(),
+                   axis.ticks = element_blank(),
+                   legend.key.size = unit(0.5, "cm"),
+                   legend.text = element_text(size = 10, family = "Montserrat"), 
                    legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
-                    legend.position = c(0.8, 0.7)) + 
-          scale_fill_brewer(palette = "YlGnBu") +
-           guides(color = 'none') +
-     labs(title = expression(paste("Índice de marginación a nivel municipal, 2020")),
-           fill = stringr::str_wrap("Grado de marginación", 10),
-            caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
+                   legend.position = c(0.8, 0.7)) + 
+              scale_fill_manual(values = rev(usecol(pal = pal_petrol, n = 5))) + 
+               scale_color_manual(values = c("#BDBDBD")) +  
+                guides(color = 'none') +
+          labs(title = "Índice de marginación a nivel municipal, 2020",
+                subtitle = "Utilizando geom_polygon()",
+                 fill = stringr::str_wrap("Grado de marginación", 10),
+                  caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
 
 #path = "Images/IMM_2020_geom_polygon.pdf"
 #ggexport(p, width = 8, height = 5, res = 400, filename = path)
 
 p
 ```
+
+![](../img/IMM_2020_geom_polygon.png){width="90%" fig-align="center"}  
 
 ### `tmap`
 
@@ -1339,42 +1359,56 @@ La función `tm_shape`, crea un elemento que especifica un objeto de `SpatialPol
 # Paquetes
 require(tmap)
 require(tmaptools)
+require(sf)
+
+paleta <- rev(colorRampPalette(pals::brewer.bupu(10))(6))
+paleta <- c("#4D004B", "#832C8E", "#8B73B4", "#9CB1D4", "#CBDCEB")
 
 p <- tm_shape(layer_municipios, id = "CVE_GEO") +
-      tm_polygons("GM_2020", 
+      tm_polygons("GM_2020",
                    title = stringr::str_wrap("Grado de marginación", 10),
-                    palette = "BuPu", 
-                     border.col = 'transparent') + 
-     tm_shape(layer_estados) + 
-       tm_borders("grey20", lwd = 0.5) + 
-        tm_layout(title.snap.to.legend = TRUE,
-                   title = "Índice de marginación a nivel municipal, 2020",
+                    palette = paleta,
+                     border.col = NA
+                  ) + 
+       tm_shape(st_as_sf(layer_estados), is.master = TRUE) +
+        tm_borders(col = "grey", lwd = 1) +
+          tm_layout(title = "Índice de marginación a nivel municipal, 2020",
                     title.fontfamily = "Montserrat",
-                     title.fontface = "bold",
-                      title.size = 2,
-                       main.title.fontface = "bold",
-                        main.title.position = c("center", "top"),
-                         main.title.size = 7, 
-                          main.title.fontfamily = "Montserrat",
-                           legend.outside.position = "right",
-                            legend.title.fontfamily = "Montserrat",
-                             legend.title.fontface = "bold", 
-                              legend.text.fontfamily = "Montserrat",
-                               legend.title.size = 1.5, 
-                                legend.text.size = 1.2, 
-                                 inner.margins = c(t = 0.06, r = 0.04, b = 0.13, l = 0.15),
-                                  fontfamily = "Montserrat",
-                                   frame = FALSE) + 
-         tm_legend(legend.position = c("right", "center")) +
-          tm_credits(expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")),
-                      position=c("left", "bottom"), 
-                       size = 1.4)
+                    title.fontface = "bold",
+                    title.size = 2,
+                    title.position = c("center", "top"), 
+                    main.title.fontface = "bold",
+                    main.title.position = c("center", "top"),
+                    main.title.size = 7, 
+                    main.title.fontfamily = "Montserrat",
+                    legend.outside = TRUE,
+                    legend.outside.position = c("center", "right"),
+                    legend.title.fontfamily = "Montserrat",
+                    legend.na.show = FALSE,
+                    legend.title.fontface = "bold", 
+                    legend.text.fontfamily = "Montserrat",
+                    legend.title.size = 1, 
+                    legend.text.size = 0.8, 
+                    legend.frame = FALSE,
+                    fontfamily = "Montserrat",
+                    frame = FALSE) + 
+            tm_credits(expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")),
+                        position = c("left", "bottom"), 
+                         size = 1.1) 
      
 #path = "Images/IMM_2020_tmap.pdf"
 #ggexport(p, width = 8, height = 5, res = 400, filename = path)
 
 p
 ```
+
+
+```{r, eval = FALSE}
+path = paste0(here::here(),"/img/IMM_2020_tmap.pdf")
+ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
+```
+
+![](../img/IMM_2020_tmap.png){width="90%" fig-align="center"}  
 
 ### `geom_sf`
 
