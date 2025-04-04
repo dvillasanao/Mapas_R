@@ -287,7 +287,14 @@ La base de datos del índice de marginación en los diferentes niveles de desagr
 ### .shp
 
 La función `readOGR` del paquete `rgdal`, extrae automáticamente la información utilizada por otros paquetes `SIG` de código abierto como QGIS y permite a `R` manejar una gama más amplia de formatos de datos espaciales. Esta función lee datos `OGR` y datos vectoriales, pero solamente permite manejar capas con características geométricas (no mezcla puntos, líneas o polígonos en una sola capa) y a su vez establecerá un sistema de referencia espacial si la capa tiene dichos metadatos.\
-Para leer un archivo `shapefile`, se establecen los siguientes argumentos, como `dsn`, en donde se indica el directorio que contiene los shapes y `layer` que es el nombre explícito de la capa a trabajar y dichas capas deben de ir sin la extensión `.shp`.
+
+Para leer un archivo `shapefile`, se establecen los siguientes argumentos:     
+- `readOGR`: Esta función se usa para leer shapefiles.    
+- `dsn`: Especifica la ruta al directorio que contiene el shapefile.  
+- `layer`: Especifica el nombre de la capa dentro del shapefile.  
+- `encoding`: Especifica la codificación de los caracteres, en este caso, UTF-8.  
+- `use_iconv`: Se usa para convertir la codificación si es necesario.  
+
 
 A continuación se lee el archivo `.shp` que contiene de manera integrada la división de el área geoestadística estatal `agee`.
 
@@ -316,7 +323,10 @@ class(shape_estados)
 ## "sp"
 ```
 
-Cuando es necesario cambiar los ID's de las características en los objetos `SpatialLines` o `SpatialPolygons`, se puede usar la función `spChFIDs()` de la paquetería `sp`. Donde los nuevos ID's deben ser un vector de caracteres únicos de la longitud correcta.
+Se cambian de `IDs` de los Features del Shapefile; de esta manera si se hace alguna manipulación al shapefile directamente los polígonos tendrán el ID de la clave de la entidad y conservarán el orden. Además de que es útil cuando se necesita asegurar que los IDs de las entidades geográficas sean consistentes en longitud y formato para su posterior análisis o visualización.     
+
+- `sp::spChFIDs` cambia los IDs de las features del objeto Spatial.
+- `str_pad(shape_estados_2020@data$CVE_ENT, 2, "left", pad = "0")`: Utiliza la función `str_pad()` para rellenar con ceros a la izquierda (si es necesario) para asegurarse de que cada ID tenga al menos 2 dígitos.
 
 ```{r}
 shape_estados <- shape_estados %>%
@@ -444,7 +454,14 @@ tbl_estados <- as_tibble(st_as_sf(shape_estados)) %>%
 ### .shp
 
 La función `readOGR` del paquete `rgdal`, extrae automáticamente la información utilizada por otros paquetes `SIG` de código abierto como QGIS y permite a R manejar una gama más amplia de formatos de datos espaciales. Esta función lee datos `OGR` y datos vectoriales, pero solamente permite manejar capas con características geométricas (no mezcla puntos, líneas o polígonos en una sola capa) y a su vez establecerá un sistema de referencia espacial si la capa tiene dichos metadatos.\
-Para leer un archivo `shapefile`, se establecen los siguientes argumentos, como `dsn`, en donde se indica el directorio que contiene los shapes y `layer` que es el nombre explícito de la capa a trabajar y dichas capas deben de ir sin la extensión `.shp`.
+
+Para leer un archivo `shapefile`, se establecen los siguientes argumentos:     
+- `readOGR`: Esta función se usa para leer shapefiles.    
+- `dsn`: Especifica la ruta al directorio que contiene el shapefile.  
+- `layer`: Especifica el nombre de la capa dentro del shapefile.  
+- `encoding`: Especifica la codificación de los caracteres, en este caso, UTF-8.  
+- `use_iconv`: Se usa para convertir la codificación si es necesario.  
+
 
 A continuación se lee el archivo .shp que contiene de manera integrada la división de el área geoestadística municipal `agem`.
 
@@ -463,7 +480,10 @@ shape_municipios@data <- shape_municipios@data %>%
 ```
 
 
-Cuando es necesario cambiar los ID's de las características en los objetos `SpatialLines` o `SpatialPolygons`, se puede usar la función `spChFIDs()` de la paquetería `sp`. Donde los nuevos ID's deben ser un vector de caracteres únicos de la longitud correcta.
+Se cambian de `IDs` de los Features del Shapefile; de esta manera si se hace alguna manipulación al shapefile directamente los polígonos tendrán el ID de la clave de la entidad y conservarán el orden. Además de que es útil cuando se necesita asegurar que los IDs de las entidades geográficas sean consistentes en longitud y formato para su posterior análisis o visualización.     
+
+- `sp::spChFIDs` cambia los IDs de las features del objeto Spatial.
+- `str_pad(shape_municipios@data$CVE_GEO, 5, "left", pad = "0")`: Utiliza la función `str_pad()` para rellenar con ceros a la izquierda (si es necesario) para asegurarse de que cada ID tenga al menos 5 dígitos.
 
 ```{r}
 shape_municipios <- shape_municipios %>%
@@ -593,8 +613,15 @@ kable(head(ZM_2020, 10),
 
 ### .shp
 
-La función `readOGR` del paquete `rgdal`, extrae automáticamente la información utilizada por otros paquetes `SIG` de código abierto como QGIS y permite a R manejar una gama más amplia de formatos de datos espaciales. Esta función lee datos `OGR` y datos vectoriales, pero solamente permite manejar capas con características geométricas (no mezcla puntos, líneas o polígonos en una sola capa) y a su vez establecerá un sistema de referencia espacial si la capa tiene dichos metadatos.\
-Para leer un archivo `shapefile`, se establecen los siguientes argumentos, como `dsn`, en donde se indica el directorio que contiene los shapes y `layer` que es el nombre explícito de la capa a trabajar y dichas capas deben de ir sin la extensión `.shp`.
+La función `readOGR` del paquete `rgdal`, extrae automáticamente la información utilizada por otros paquetes `SIG` de código abierto como QGIS y permite a R manejar una gama más amplia de formatos de datos espaciales. Esta función lee datos `OGR` y datos vectoriales, pero solamente permite manejar capas con características geométricas (no mezcla puntos, líneas o polígonos en una sola capa) y a su vez establecerá un sistema de referencia espacial si la capa tiene dichos metadatos.\  
+
+Para leer un archivo `shapefile`, se establecen los siguientes argumentos:     
+- `readOGR`: Esta función se usa para leer shapefiles.    
+- `dsn`: Especifica la ruta al directorio que contiene el shapefile.  
+- `layer`: Especifica el nombre de la capa dentro del shapefile.  
+- `encoding`: Especifica la codificación de los caracteres, en este caso, UTF-8.  
+- `use_iconv`: Se usa para convertir la codificación si es necesario.  
+
 
 A continuación se lee el archivo .shp que contiene de manera integrada la división de el área geoestadística por localidad.
 
@@ -611,6 +638,18 @@ La función `rename()` del paquete `dplyr` permite cambiar el nombre de la colum
 shape_localidad@data <- shape_localidad@data %>%
                          rename("CVE_GEO" = "CVEGEO")
 ```
+
+
+Se cambian de `IDs` de los Features del Shapefile; de esta manera si se hace alguna manipulación al shapefile directamente los polígonos tendrán el ID de la clave de la entidad y conservarán el orden. Además de que es útil cuando se necesita asegurar que los IDs de las entidades geográficas sean consistentes en longitud y formato para su posterior análisis o visualización.     
+
+- `sp::spChFIDs` cambia los IDs de las features del objeto Spatial.
+- `str_pad(shape_localidad@data$CVE_GEO, 9, "left", pad = "0")`: Utiliza la función `str_pad()` para rellenar con ceros a la izquierda (si es necesario) para asegurarse de que cada ID tenga al menos 9 dígitos.
+
+```{r}
+shape_localidad <- shape_localidad %>%
+                    sp::spChFIDs(., str_pad(shape_localidad@data$CVE_GEO, 9, "left", pad = "0"))
+```
+
 
 ### IML_2020
 
@@ -711,8 +750,15 @@ tbl_localidad <- as_tibble(st_as_sf(shape_localidad)) %>%
 
 ### .shp
 
-La función `readOGR` del paquete `rgdal`, extrae automáticamente la información utilizada por otros paquetes `SIG` de código abierto como QGIS y permite a R manejar una gama más amplia de formatos de datos espaciales. Esta función lee datos `OGR` y datos vectoriales, pero solamente permite manejar capas con características geométricas (no mezcla puntos, líneas o polígonos en una sola capa) y a su vez establecerá un sistema de referencia espacial si la capa tiene dichos metadatos.\
-Para leer un archivo `shapefile`, se establecen los siguientes argumentos, como `dsn`, en donde se indica el directorio que contiene los shapes y `layer` que es el nombre explícito de la capa a trabajar y dichas capas deben de ir sin la extensión `.shp`.
+La función `readOGR` del paquete `rgdal`, extrae automáticamente la información utilizada por otros paquetes `SIG` de código abierto como QGIS y permite a R manejar una gama más amplia de formatos de datos espaciales. Esta función lee datos `OGR` y datos vectoriales, pero solamente permite manejar capas con características geométricas (no mezcla puntos, líneas o polígonos en una sola capa) y a su vez establecerá un sistema de referencia espacial si la capa tiene dichos metadatos.\  
+
+Para leer un archivo `shapefile`, se establecen los siguientes argumentos:     
+- `readOGR`: Esta función se usa para leer shapefiles.    
+- `dsn`: Especifica la ruta al directorio que contiene el shapefile.  
+- `layer`: Especifica el nombre de la capa dentro del shapefile.  
+- `encoding`: Especifica la codificación de los caracteres, en este caso, UTF-8.  
+- `use_iconv`: Se usa para convertir la codificación si es necesario.  
+
 
 A continuación se lee el archivo .shp que contiene de manera integrada la división de el área geoestadística a nivel ageb `ageb`.
 
@@ -728,6 +774,16 @@ La función `rename()` del paquete `dplyr` permite cambiar el nombre de la colum
 ```{r, class.source = "fold-show", eval = FALSE}
 shape_ageb@data <- shape_ageb@data %>%
                     rename("CVE_GEO" = "CVEGEO")
+```
+
+Se cambian de `IDs` de los Features del Shapefile; de esta manera si se hace alguna manipulación al shapefile directamente los polígonos tendrán el ID de la clave de la entidad y conservarán el orden. Además de que es útil cuando se necesita asegurar que los IDs de las entidades geográficas sean consistentes en longitud y formato para su posterior análisis o visualización.     
+
+- `sp::spChFIDs` cambia los IDs de las features del objeto Spatial.
+- `str_pad(shape_ageb@data$CVE_GEO, 13, "left", pad = "0")`: Utiliza la función `str_pad()` para rellenar con ceros a la izquierda (si es necesario) para asegurarse de que cada ID tenga al menos 13 dígitos.
+
+```{r}
+shape_ageb <- shape_ageb %>%
+               sp::spChFIDs(., str_pad(shape_ageb@data$CVE_GEO, 13, "left", pad = "0"))
 ```
 
 ### IMU_2020
@@ -939,7 +995,7 @@ p
 
 #### Google API 
 
-Una de las bondades de utilizar ggmap es usar una colección de funciones para visualizar datos espaciales y modelos sobre mapas estáticos de varias fuentes en línea como *Google Maps*.  Incluye herramientas comunes a esas tareas, incluidas funciones de geolocalización y enrutamiento, además de que estéticamente se vean más profesionales.  
+Al utilizar la paquetería `ggmap` permitira usar una colección de funciones para visualizar datos espaciales y modelos sobre mapas estáticos de varias fuentes en línea como *Google Maps*.  Incluye herramientas comunes a esas tareas, incluidas funciones de geolocalización y enrutamiento, además de que estéticamente se vean más profesionales.  
 Para obtener más funciones, consulte la documentación de [`ggmap`]( https://journal.r-project.org/archive/2013-1/kahle-wickham.pdf) o ([guias básicas de introducción a ggmap](https://www.nceas.ucsb.edu/sites/default/files/2020-04/ggmapCheatsheet.pdf), [Mapas estáticos con ggmap](http://www.riaat.ujat.mx/hablandoalaire/tutoriales/Tutorial_MapasEstaticos_ggmap.pdf)).     
 
 La idea central que impulsa `ggmap` es tomar una imagen de mapa descargada de la plataforma de Google Maps y, trazarla como una capa contextual usando el paquete `ggplot2` y posteriormente incluir capas de contenido adicionales de datos, estadísticas o modelos en la parte superior del mapa.   
@@ -1402,12 +1458,6 @@ p <- tm_shape(layer_municipios, id = "CVE_GEO") +
 p
 ```
 
-
-```{r, eval = FALSE}
-path = paste0(here::here(),"/img/IMM_2020_tmap.pdf")
-ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
-```
-
 ![](../img/IMM_2020_tmap.png){width="90%" fig-align="center"}  
 
 ### `geom_sf`
@@ -1420,38 +1470,52 @@ La función `as_tibble` de la paquetería `tibble`, genera una base de datos gen
 # Paquetes
 require(ggplot2)
 require(tibble)
-require(sf)
+require(sf) 
+
+# Paleta  
+paleta <- rev(colorRampPalette(pals::brewer.seqseq1(20))(5))
 
 p <- ggplot() +
       geom_sf(data = tbl_municipios,
                mapping = aes(geometry = geometry, 
-                             fill = fct_relevel(GM_2020, "Muy alto","Alto","Medio","Bajo","Muy bajo"),
-                             color = fct_relevel(GM_2020, "Muy alto","Alto","Medio","Bajo","Muy bajo")),
+                             fill = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"),
+                             color = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo","Muy bajo")),
                   size = 0.1) + 
-      geom_sf(data = tbl_estados,
-               mapping = aes(geometry = geometry), 
-                fill = 'transparent',
-                 color = "black") +
+       geom_sf(data = tbl_estados,
+                mapping = aes(geometry = geometry), 
+                 fill = 'transparent',
+                  color = "black") +
         coord_sf() +
-        theme_transparent() + 
-         theme(plot.title = element_text(size = 22, hjust = 0.15, family = "Montserrat", face = "bold"),
-                plot.caption = element_text(size = 10, hjust = 0.2, vjust = 1, family = "Montserrat"),  
-                 legend.key.size = unit(0.5, "cm"),
-                  legend.text = element_text(size = 10, family = "Montserrat"),   
-                   legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
-                    legend.position = c(0.8, 0.7)) + 
-          scale_fill_manual(values = usecol(pal_bordeaux, n = 5)) + 
-           scale_color_manual(values = usecol(pal_bordeaux, n = 5)) + 
-      labs(title = "Índice de marginación a nivel municipal, 2020",
-            fill = stringr::str_wrap("Grado de marginación", 10),
-             color = stringr::str_wrap("Grado de marginación", 10),
-             caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
-
+         theme_transparent() + 
+          theme(plot.title = element_text(size = 21, hjust = 0.15, family = "Montserrat", face = "bold"),
+                plot.subtitle = element_text(size = 18, hjust = 0, family = "Montserrat Medium"),
+                plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
+                axis.text = element_blank(),
+                axis.title = element_blank(),
+                axis.ticks = element_blank(),
+                legend.key.size = unit(0.5, "cm"),
+                legend.text = element_text(size = 10, family = "Montserrat"), 
+                legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
+                legend.position = c(0.8, 0.7)) + 
+          scale_fill_manual(values = paleta) + 
+           scale_color_manual(values = paleta) +  
+            guides(color = 'none') +
+          labs(title = "Índice de marginación a nivel municipal, 2020",
+                subtitle = "Utilizando geom_sf()",
+                 fill = stringr::str_wrap("Grado de marginación", 10),
+                  caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
 #path = "Images/IMM_2020_geom_sf.pdf"
 #ggexport(p, width = 8, height = 5, res = 400, filename = path)
 
 p
 ```
+
+```{r, eval = FALSE}
+path = paste0(here::here(),"/img/IMM_2020_geom_sf.pdf")
+ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
+```
+
+![](../img/IMM_2020_geom_sf.png){width="90%" fig-align="center"}  
 
 ## Localidad {.tabset .tabset-fade .tabset-pills}
 
