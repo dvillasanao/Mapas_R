@@ -148,7 +148,7 @@ invisible(utils::memory.limit(size = 60000000))
 ```{r, echo = FALSE, eval = TRUE, cache=TRUE}
 # Se cargan las bases de datos generadas en el documento
 archivo <- c("shape", "capas", "layer", "tbl")
-nivel <- c("estados", "municipios", "localidad", "ageb")
+nivel <- c("estados", "municipios", "localidad", "localidad_p", "ageb")
 for(i in 1:4){
   for(j in 1:4){
     assign(paste0(archivo[i], "_", nivel[j]), readRDS(file = paste0(here::here(), "/Output/", archivo[i], "_", nivel[j], ".RDS")))
@@ -691,12 +691,20 @@ class(shape_localidad_p)
 ```
 
 
-La función `rename()` del paquete `dplyr` permite cambiar el nombre de la columna de la clave geoestadística a nivel estatal dentro de la base de datos del shape.
+La función `rename()` del paquete `dplyr` permite cambiar el nombre de la columna de la clave geoestadística a nivel estatal dentro de la base de datos del shape. 
 
 ```{r, class.source = "fold-show", eval = FALSE}
 shape_localidad@data <- shape_localidad@data %>%
-                         rename("CVE_GEO" = "CVEGEO")
+                         rename("CVE_GEO" = "CVEGEO") 
 ```
+
+Por otro lado, se trabajará con los polígonos urbanos `AMBITO %in% Urbana`, ya que las localidades rurales se encuentran en el shapefile de puntos. 
+
+```{r}
+shape_localidad <- shape_localidad %>% 
+                    filter(AMBITO %in% "Urbana") 
+```
+
 
 
 Se cambian de `IDs` de los Features del Shapefile; de esta manera si se hace alguna manipulación al shapefile directamente los polígonos tendrán el ID de la clave de la entidad y conservarán el orden. Además de que es útil cuando se necesita asegurar que los IDs de las entidades geográficas sean consistentes en longitud y formato para su posterior análisis o visualización.     
@@ -774,15 +782,21 @@ capas_localidad <- shape_localidad %>%
 capas_localidad <- capas_localidad %>% 
                     inner_join(., IML_2020 %>% dplyr::select(CVE_GEO, ENT, MUN, LOC, GM_2020), 
                                    by = c("id" = "CVE_GEO")) 
-length(unique(capas_localidad$id)) 
 
-50308 + 103233
+length(unique(capas_localidad$id)) 
 ```
 
 ```{r}
 capas_localidad_p <- shape_localidad_p %>% 
-                      inner_join(., IML_2020 %>% dplyr::select(CVE_GEO, ENT, MUN, LOC, GM_2020), 
-                                    by = c("CVE_GEO")) 
+                      fortify(., id = c("CVE_GEO")) %>%
+                       inner_join(., IML_2020 %>% dplyr::select(CVE_GEO, ENT, MUN, LOC, GM_2020), 
+                                     by = c("CVE_GEO")) 
+capas_localidad_p <- shape_localidad_p %>%
+                      as.data.frame() %>%
+                       mutate(lon = coordinates(shape_localidad_p)[, 1],
+                              lat = coordinates(shape_localidad_p)[, 2]) %>%
+                       inner_join(IML_2020 %>% select(CVE_GEO, ENT, MUN, LOC, GM_2020),
+                        by = "CVE_GEO")
 ```
 
 
@@ -791,12 +805,21 @@ capas_localidad_p <- shape_localidad_p %>%
 ##### SpatialPolygons ➡️  SpatialPolygons + Datos
 
 ```{r, class.source = "fold-show", eval = FALSE}
-layer_localidad <- merge(shape_localidad,
-                          IML_2020 %>%
-                              dplyr::select(c(-CVE_LOC)) %>%
-                                mutate(GM_2020 = fct_relevel(.$GM_2020,"Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
-                           by = "CVE_GEO")
+layer_localidad <- inner_join(shape_localidad,
+                               IML_2020 %>%
+                                  dplyr::select(c(-CVE_LOC)) %>%
+                                   mutate(GM_2020 = fct_relevel(.$GM_2020,"Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
+                               by = "CVE_GEO")
 ```
+
+```{r, class.source = "fold-show", eval = FALSE}
+layer_localidad_p <- inner_join(shape_localidad_p,
+                                 IML_2020 %>%
+                                    dplyr::select(c(-CVE_LOC)) %>%
+                                     mutate(GM_2020 = fct_relevel(.$GM_2020,"Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
+                                 by = "CVE_GEO")
+```
+
 
 #### Tibble
 
@@ -812,6 +835,9 @@ require(tibble)
 require(sf)
 
 tbl_localidad <- as_tibble(st_as_sf(shape_localidad)) %>%
+                    merge(., IML_2020 %>% dplyr::select(CVE_GEO, GM_2020)) 
+
+tbl_localidad_p <- as_tibble(st_as_sf(shape_localidad_p)) %>%
                     merge(., IML_2020 %>% dplyr::select(CVE_GEO, GM_2020))
 ```
 
@@ -1604,6 +1630,11 @@ p <- IML_2020 %>%
         geom_map(map = capas_localidad, 
                   aes(map_id = CVE_GEO, fill = GM_2020), 
                    color = 'transparent')  +
+         geom_point(capas_localidad_p, 
+                      mapping = aes(x = lon, 
+                                    y = lat, 
+                                    color = GM_2020),
+                     size = 0.001)  +
          geom_polygon(capas_estados,
                        mapping = aes(x = long, 
                                      y = lat, 
@@ -1624,7 +1655,7 @@ p <- IML_2020 %>%
                    legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
                    legend.position = c(0.8, 0.7)) + 
               scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
-               scale_color_manual(values = c("#BDBDBD")) +  
+               scale_color_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
                 guides(color = 'none') +
           labs(title = "Índice de marginación a nivel localidad, 2020",
                 subtitle = "Utilizando ggmap()",
@@ -1636,6 +1667,12 @@ p <- IML_2020 %>%
 
 p
 ```
+
+```{r, eval = FALSE}
+path = paste0(here::here(),"/img/IML_2020_gmap.pdf")
+ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
+```
+
 
 ![](../img/IML_2020_gmap.png){width="90%" fig-align="center"}  
 
@@ -2610,8 +2647,10 @@ saveRDS(shape_localidad, file = paste0(here::here(), "/Output/shape_localidad.RD
 saveRDS(capas_localidad, file = paste0(here::here(), "/Output/capas_localidad.RDS"))
 saveRDS(layer_localidad, file = paste0(here::here(), "/Output/layer_localidad.RDS"))
 saveRDS(tbl_localidad, file = paste0(here::here(), "/Output/tbl_localidad.RDS"))
-saveRDS(shape_localidad_p, file = paste0(here::here(), "/Output/shape_localidad.RDS"))
-saveRDS(capas_localidad_p, file = paste0(here::here(), "/Output/capas_localidad.RDS"))
+saveRDS(shape_localidad_p, file = paste0(here::here(), "/Output/shape_localidad_p.RDS"))
+saveRDS(capas_localidad_p, file = paste0(here::here(), "/Output/capas_localidad_p.RDS"))
+saveRDS(layer_localidad_p, file = paste0(here::here(), "/Output/layer_localidad_p.RDS"))
+saveRDS(tbl_localidad_p, file = paste0(here::here(), "/Output/tbl_localidad_p.RDS"))
 saveRDS(shape_ageb, file = paste0(here::here(), "/Output/shape_ageb.RDS"))
 saveRDS(capas_ageb, file = paste0(here::here(), "/Output/capas_ageb.RDS"))
 saveRDS(layer_ageb, file = paste0(here::here(), "/Output/layer_ageb.RDS"))
