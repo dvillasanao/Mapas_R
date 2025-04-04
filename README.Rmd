@@ -58,11 +58,11 @@ El primer documento se utilizan diferentes paqueterías en el entorno de R, la c
 | AGEB                       |
 
 
-**Enlace:** https://dvillasanao.github.io/Mapas_R/R/01_Mapas%20por%20desagregaciones%20geograficas%20de%20Mexico.nb.html 
+**Enlace:** https://dvillasanao.github.io/Mapas_R/R/01_Mapas-por-desagregaciones-geograficas-de-Mexico.html
 
 <html>
 <body>
-  <a href = "https://dvillasanao.github.io/Mapas_R/R/01_Mapas%20por%20desagregaciones%20geograficas%20de%20Mexico.nb.html" target="_blank">
+  <a href = "https://dvillasanao.github.io/Mapas_R/R/01_Mapas-por-desagregaciones-geograficas-de-Mexico.html" target="_blank">
 <img src="img/01_img.png" width="50%">
   </a>
 </body>
@@ -70,7 +70,7 @@ El primer documento se utilizan diferentes paqueterías en el entorno de R, la c
 
 ### Contenido
 
-- 🟣 [Mapas por desagregaciones geográficas de México](#Mapas_Mexico) [[Enlace](https://dvillasanao.github.io/Mapas_R/R/01_Mapas%20por%20desagregaciones%20geograficas%20de%20Mexico.nb.html)]
+- 🟣 [Mapas por desagregaciones geográficas de México](#Mapas_Mexico) [[Enlace](https://dvillasanao.github.io/Mapas_R/R/01_Mapas-por-desagregaciones-geograficas-de-Mexico.html)]
 - 🔵 [Mapas en formato GeoJSON](#GeoJSON) [[Enlace en RPubs](https://rpubs.com/dvillasanao/Leaflet_2010-2020_GeoJSON)]
 - 🟢 [Mapas desagregado por categorías en formato GeoJSON](#GeoJSON) [[Enlace en RPubs](https://rpubs.com/dvillasanao/Leaflet_por_grado_GeoJSON)]
 - 🟡 [Mapas en formato RMapshaper](#RMapshaper) [[Enlace en RPubs](https://rpubs.com/dvillasanao/Leaflet_por_grado_RMapshaper)]

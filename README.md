@@ -45,11 +45,11 @@ Tomando como base a el índice de marginación 2020.
 |           AGEB           |
 
 **Enlace:**
-<https://dvillasanao.github.io/Mapas_R/R/01_Mapas%20por%20desagregaciones%20geograficas%20de%20Mexico.nb.html>
+<https://dvillasanao.github.io/Mapas_R/R/01_Mapas-por-desagregaciones-geograficas-de-Mexico.html>
 
 <html>
 <body>
-<a href = "https://dvillasanao.github.io/Mapas_R/R/01_Mapas%20por%20desagregaciones%20geograficas%20de%20Mexico.nb.html" target="_blank">
+<a href = "https://dvillasanao.github.io/Mapas_R/R/01_Mapas-por-desagregaciones-geograficas-de-Mexico.html" target="_blank">
 <img src="img/01_img.png" width="50%"> </a>
 </body>
 </html>
@@ -57,7 +57,7 @@ Tomando como base a el índice de marginación 2020.
 ### Contenido
 
 - 🟣 [Mapas por desagregaciones geográficas de México](#Mapas_Mexico)
-  \[[Enlace](https://dvillasanao.github.io/Mapas_R/R/01_Mapas%20por%20desagregaciones%20geograficas%20de%20Mexico.nb.html)\]
+  \[[Enlace](https://dvillasanao.github.io/Mapas_R/R/01_Mapas-por-desagregaciones-geograficas-de-Mexico.html)\]
 - 🔵 [Mapas en formato GeoJSON](#GeoJSON) \[[Enlace en
   RPubs](https://rpubs.com/dvillasanao/Leaflet_2010-2020_GeoJSON)\]
 - 🟢 [Mapas desagregado por categorías en formato GeoJSON](#GeoJSON)

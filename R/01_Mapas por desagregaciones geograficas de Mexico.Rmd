@@ -1224,13 +1224,6 @@ p <- ggplot(data = tbl_estados) +
 p
 ```
 
-
-
-```{r, eval = FALSE}
-path = paste0(here::here(),"/img/IME_2020_geom_sf.pdf")
-ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
-```
-
 ![](../img/IME_2020_geom_sf.png){width="90%" fig-align="center"}  
 
 ## Municipio {.tabset .tabset-fade .tabset-pills}
@@ -1268,6 +1261,14 @@ p <- IMM_2020 %>%
 
 p
 ```
+
+
+```{r, eval = FALSE}
+path = paste0(here::here(),"/img/IME_2020_geom_sf.pdf")
+ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
+```
+
+![](../img/IME_2020_geom_sf.png){width="90%" fig-align="center"}  
 
 ### `geom_polygon`
 
