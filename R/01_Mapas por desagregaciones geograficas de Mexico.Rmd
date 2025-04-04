@@ -585,10 +585,11 @@ El Consejo Nacional de Población (`CONAPO`), en colaboración con instituciones
 
 La conceptualización de una zona metropolitana es particularmente relevante en el contexto mexicano. Se define específicamente como una agrupación de dos o más municipios que albergan una ciudad con población superior a los 100,000 habitantes. Lo distintivo de estas zonas es que sus funciones y actividades trascienden los límites municipales originales, estableciendo una integración socioeconómica significativa con las áreas circundantes. 
 
-Página oficial del `CONAPO`: Aquí encontrarás publicaciones y datos relacionados con las zonas metropolitanas.   
+Página oficial del `CONAPO`: Aquí encontrarás publicaciones y datos relacionados con las zonas metropolitanas.      
 
-**Publicación**: [Metrópolis de México 2020](https://www.gob.mx/sedatu/documentos/metropolis-de-mexico-2020?state=published) 
-**Base de Datos**: [Datos Abiertos](https://datos.gob.mx/) y se presenta en formato `.xlsx`  
+**Publicación**: [Metrópolis de México 2020](https://www.gob.mx/sedatu/documentos/metropolis-de-mexico-2020?state=published)     
+
+**Base de Datos**: [Datos Abiertos](https://datos.gob.mx/) y se presenta en formato `.xlsx`   
 
 
 ```{r, class.source = "fold-show", eval = FALSE}
@@ -623,7 +624,34 @@ Para leer un archivo `shapefile`, se establecen los siguientes argumentos:
 - `use_iconv`: Se usa para convertir la codificación si es necesario.  
 
 
-A continuación se lee el archivo .shp que contiene de manera integrada la división de el área geoestadística por localidad.
+A continuación se lee el archivo .shp que contiene de manera integrada la división de el área geoestadística por localidad.  
+
+```{r, echo = FALSE, eval = TRUE} 
+tabla <- data.frame(`Tipo de shapefile` = c("Punto", "Polígono"),
+                    `Representación` = c(" Ubicación puntual (centroide)", " Área delimitada"),
+                    `Usos comunes` = c("Localidades rurales o pequeñas", " Localidades urbanas grandes"),
+                    `Nivel de detalle` = c("Bajo", "Alto"))
+kable(tabla,
+      col.names = c("Tipo de shapefile", "Representación", "Usos comunes", "Nivel de detalle"),
+       align = "c", 
+       caption = c("Shapefiles por localidades")) %>%
+ kable_styling(position = "center",
+                font_size = 11,
+                 bootstrap_options = c("condensed", "responsive", "bordered")) %>%
+  kable_classic(full_width = T, html_font = "Montserrat") %>%
+   row_spec(0, color = "black", bold = TRUE) %>%
+    footnote(footnote_as_chunk = T,
+              general_title = "Fuentes:",
+               general = "INEGI") 
+```
+
+
+**Shapefiles de polígonos**
+  - Representan localidades que tienen una **delimitación física clara**, normalmente **zonas urbanas**.
+- Cada polígono muestra la **extensión territorial real** de la localidad.
+- Son utilizados cuando se cuenta con información **más detallada y precisa** sobre los límites de la localidad.
+- Comunes en **ciudades, cabeceras municipales o zonas con planificación urbana**. 
+
 
 ```{r,results=FALSE,class.source = "fold-show", eval = FALSE}
 shape_localidad <- readOGR(dsn =paste0(here::here(), "/MGN 2020/conjunto_de_datos"), 
@@ -631,6 +659,37 @@ shape_localidad <- readOGR(dsn =paste0(here::here(), "/MGN 2020/conjunto_de_dato
                              encoding = "UTF-8",
                               use_iconv = TRUE)
 ```
+
+**Shapefiles de puntos**
+  - Representan **localidades rurales** o **pequeñas localidades urbanas**.
+- Cada punto indica la **ubicación geográfica aproximada** del centroide o punto representativo de la localidad.
+- Útiles cuando **no se tiene delimitación precisa** del área que abarca la localidad.
+- Más comunes para localidades con **poca población o dispersas**.
+
+
+```{r,results=FALSE,class.source = "fold-show", eval = FALSE}
+shape_localidad_p <- readOGR(dsn ="D:/MGN/MGN 2020/MGN 2020/conjunto_de_datos", 
+                              layer = "00lpr",
+                               encoding = "UTF-8",
+                               use_iconv = TRUE)
+```
+
+
+Un objeto `SpatialPolygons` se puede combinar con una data.frame para crear lo que se llama `SpatialPolygonsDataFrame`. La diferencia está en los atributos asociados con los polígonos. Un objeto `SpatialPolygonsDataFrame` tiene información adicional asociada a los polígonos (ejemplo, nombre de la entidad, población, etc.) mientras que `SpatialPolygons` contiene solo la información espacial (vértices) sobre el polígono.
+
+```{r, class.source = "fold-show", eval = FALSE}
+class(shape_localidad)
+## "SpatialPolygonsDataFrame"
+## attr(,"package")
+## "sp"
+```
+```{r, class.source = "fold-show", eval = FALSE}
+class(shape_localidad_p)
+## "SpatialPointsDataFrame"
+## attr(,"package")
+## "sp"
+```
+
 
 La función `rename()` del paquete `dplyr` permite cambiar el nombre de la columna de la clave geoestadística a nivel estatal dentro de la base de datos del shape.
 
@@ -675,7 +734,8 @@ tabla <- IML_2020 %>%
             group_by(GM_2020) %>%
              summarise(N = n()) %>%
               ungroup() %>% 
-               as.data.frame()
+               as.data.frame() %>%
+                mutate(N = format(.$N, big.mark   = " "))
 
 kable(tabla,
        col.names = c("Grado de \n marginación", "Localidades"), 
@@ -712,10 +772,19 @@ capas_localidad <- shape_localidad %>%
                      fortify(., id = c("CVE_GEO")) 
 
 capas_localidad <- capas_localidad %>% 
-                    left_join(., IML_2020 %>% dplyr::select(CVE_GEO, ENT, MUN, LOC, GM_2020), 
+                    inner_join(., IML_2020 %>% dplyr::select(CVE_GEO, ENT, MUN, LOC, GM_2020), 
                                    by = c("id" = "CVE_GEO")) 
-length(unique(capas_localidad$id))
+length(unique(capas_localidad$id)) 
+
+50308 + 103233
 ```
+
+```{r}
+capas_localidad_p <- shape_localidad_p %>% 
+                      inner_join(., IML_2020 %>% dplyr::select(CVE_GEO, ENT, MUN, LOC, GM_2020), 
+                                    by = c("CVE_GEO")) 
+```
+
 
 #### SpatialPolygon
 
@@ -810,7 +879,8 @@ tabla <- IMU_2020 %>%
             group_by(GM_2020) %>%
              summarise(N = n()) %>%
               ungroup() %>% 
-               as.data.frame()
+               as.data.frame() %>%
+                mutate(N = format(.$N, big.mark   = " "))
 
 kable(tabla,
        col.names = c("Grado de \n marginación", "Ageb"), 
@@ -894,9 +964,10 @@ El Consejo Nacional de Población (`CONAPO`), en colaboración con instituciones
 
 La conceptualización de una zona metropolitana es particularmente relevante en el contexto mexicano. Se define específicamente como una agrupación de dos o más municipios que albergan una ciudad con población superior a los 100,000 habitantes. Lo distintivo de estas zonas es que sus funciones y actividades trascienden los límites municipales originales, estableciendo una integración socioeconómica significativa con las áreas circundantes. 
 
-Página oficial del `CONAPO`: Aquí encontrarás publicaciones y datos relacionados con las zonas metropolitanas.   
+Página oficial del `CONAPO`: Aquí encontrarás publicaciones y datos relacionados con las zonas metropolitanas.      
 
-**Publicación**: [Metrópolis de México 2020](https://www.gob.mx/sedatu/documentos/metropolis-de-mexico-2020?state=published) 
+**Publicación**: [Metrópolis de México 2020](https://www.gob.mx/sedatu/documentos/metropolis-de-mexico-2020?state=published)     
+
 **Base de Datos**: [Datos Abiertos](https://datos.gob.mx/) y se presenta en formato `.xlsx`   
 
 ```{r capas_zm, class.source = "fold-show", eval = FALSE}
@@ -1517,7 +1588,56 @@ ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
 
 ![](../img/IMM_2020_geom_sf.png){width="90%" fig-align="center"}  
 
-## Localidad {.tabset .tabset-fade .tabset-pills}
+## Localidad {.tabset .tabset-fade .tabset-pills}  
+
+### `geom_map`
+
+La función `ggmap()` devuelve un objeto `ggplot`. Puede usar este objeto `ggplot` resultante como lo haría con cualquier otro objeto ggplot (ejemplo, agregar geoms, cambiar tema). [GitHub: fresques/ggmap](https://github.com/fresques/ggmap)
+
+Una de las bondades del paquete `ggmap`, permite hacer mediante el uso de herramientas de *Google Maps* directamente desde `R`. Este paquete permite extraer un mapa base de *Google Maps* y algunos otros servidores de mapas, para que luego se puedan trazar y agregar puntos, polígonos, líneas y otros elementos usando funciones `ggplot2`. Este paquete usa la `API` de *Google Maps*. Otras funciones en el paquete `ggmap`, necesita una clave `API` de Google Maps para que funcione.
+
+```{r, class.source = "fold-hide"}
+
+p <- IML_2020 %>% 
+      mutate(GM_2020 = fct_relevel(.$GM_2020,"Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")) %>%
+       ggplot() + 
+        geom_map(map = capas_localidad, 
+                  aes(map_id = CVE_GEO, fill = GM_2020), 
+                   color = 'transparent')  +
+         geom_polygon(capas_estados,
+                       mapping = aes(x = long, 
+                                     y = lat, 
+                                     group = group),
+                       color = "dark grey",
+                       fill = "transparent",
+                       size = 0.6) +
+           expand_limits(x = capas_localidad$long, y = capas_localidad$lat) + 
+            theme_transparent() + 
+             theme(plot.title = element_text(size = 21, hjust = 0.15, family = "Montserrat", face = "bold"),
+                   plot.subtitle = element_text(size = 18, hjust = 0, family = "Montserrat Medium"),
+                   plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
+                   axis.text = element_blank(),
+                   axis.title = element_blank(),
+                   axis.ticks = element_blank(),
+                   legend.key.size = unit(0.5, "cm"),
+                   legend.text = element_text(size = 10, family = "Montserrat"), 
+                   legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
+                   legend.position = c(0.8, 0.7)) + 
+              scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
+               scale_color_manual(values = c("#BDBDBD")) +  
+                guides(color = 'none') +
+          labs(title = "Índice de marginación a nivel localidad, 2020",
+                subtitle = "Utilizando ggmap()",
+                 fill = stringr::str_wrap("Grado de marginación", 10),
+                  caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
+
+#path = "Images/IML_2020_gmap.pdf"
+#ggexport(p, width = 8, height = 5, res = 400, filename = path)
+
+p
+```
+
+![](../img/IML_2020_gmap.png){width="90%" fig-align="center"}  
 
 ### `geom_polygon`
 
@@ -1560,6 +1680,11 @@ p <- ggplot() +
 #ggexport (p, width = 8, height = 5, res = 400, filename = path)
 
 p
+```
+
+```{r, eval = FALSE}
+path = paste0(here::here(),"/img/IMM_2020_geom_sf.pdf")
+ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
 ```
 
 #### Por estados
@@ -2485,6 +2610,8 @@ saveRDS(shape_localidad, file = paste0(here::here(), "/Output/shape_localidad.RD
 saveRDS(capas_localidad, file = paste0(here::here(), "/Output/capas_localidad.RDS"))
 saveRDS(layer_localidad, file = paste0(here::here(), "/Output/layer_localidad.RDS"))
 saveRDS(tbl_localidad, file = paste0(here::here(), "/Output/tbl_localidad.RDS"))
+saveRDS(shape_localidad_p, file = paste0(here::here(), "/Output/shape_localidad.RDS"))
+saveRDS(capas_localidad_p, file = paste0(here::here(), "/Output/capas_localidad.RDS"))
 saveRDS(shape_ageb, file = paste0(here::here(), "/Output/shape_ageb.RDS"))
 saveRDS(capas_ageb, file = paste0(here::here(), "/Output/capas_ageb.RDS"))
 saveRDS(layer_ageb, file = paste0(here::here(), "/Output/layer_ageb.RDS"))
