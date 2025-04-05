@@ -1668,12 +1668,6 @@ p <- IML_2020 %>%
 p
 ```
 
-```{r, eval = FALSE}
-path = paste0(here::here(),"/img/IML_2020_gmap.pdf")
-ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
-```
-
-
 ![](../img/IML_2020_gmap.png){width="90%" fig-align="center"}  
 
 ### `geom_polygon`
@@ -1735,7 +1729,9 @@ ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
 
 ![](../img/IML_2020_geom_polygon.png){width="90%" fig-align="center"}  
 
-#### Por estados
+#### Por estados 
+
+Se implementa una función para visualizar la distribución geográfica de las localidades, tanto a nivel estatal como municipal, lo que permite un análisis detallado de su distribución territorial en todo el país. Para efectos demostrativos, se utiliza como ejemplo el estado de Querétaro, específicamente el municipio de San Juan del Río.
 
 ```{r Localidad_por_estado, class.source = "fold-hide"}
 # Clave única de estados 
@@ -1777,20 +1773,31 @@ p[[i]] <- ggplot() +
                              alpha = 0.9) +
            geom_polygon(capas_localidad %>% filter(ENT == estados[[i]]),
                          mapping = aes(x = long, 
-                                        y = lat, 
-                                         group = group, 
-                                          fill = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"),
-                                           color = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
-                          size = 0.5,
-                           alpha = 0.6) +
+                                       y = lat, 
+                                       group = group, 
+                                       fill = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"),
+                                       color = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
+                         size = 0.5,
+                         alpha = 0.6) +
+           geom_point(capas_localidad_p %>% filter(ENT == estados[[i]]),
+                       mapping = aes(x = lon, 
+                                     y = lat, 
+                                     fill = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"),
+                                     color = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
+                        size = 0.01,
+                        alpha = 0.8) +
              coord_equal() +
               theme_transparent() + 
-               theme(plot.title = element_text(size = 15, hjust = 0.5, family = "Montserrat", face = "bold"),
-                      plot.caption = element_text(size = 9, hjust = 0, family = "Montserrat"), 
-                       legend.key.size = unit(0.3, "cm"),
-                        legend.text = element_text(size = 10, family = "Montserrat"), 
-                         legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
-                          legend.position = "bottom") + 
+               theme(plot.title = element_text(size = 21, hjust = 0.15, family = "Montserrat", face = "bold"),
+                     plot.subtitle = element_text(size = 18, hjust = 0, family = "Montserrat Medium"),
+                     plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
+                     axis.text = element_blank(),
+                     axis.title = element_blank(),
+                     axis.ticks = element_blank(),
+                     legend.key.size = unit(0.5, "cm"),
+                     legend.text = element_text(size = 10, family = "Montserrat"), 
+                     legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
+                     legend.position = "bottom") + 
                 scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
                  scale_color_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
                   guides(color = 'none', 
@@ -1809,7 +1816,7 @@ q[[j]] <- ggplot() +
                                        group = group), 
                           fill = 'transparent',
                            color="black", 
-                            size = .15,
+                            size = .5,
                              alpha = 0.9) +
            geom_polygon(data = capas_localidad %>% 
                                  mutate(CVE_MUN = paste0(ENT, MUN)) %>% 
@@ -1819,16 +1826,29 @@ q[[j]] <- ggplot() +
                                        group = group, 
                                        fill = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"),
                                        color = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
-                          size = .15,
-                           alpha = 0.9) +
+                          size = 0.8,
+                          alpha = 1) +
+           geom_point(capas_localidad_p %>% 
+                       mutate(CVE_MUN = paste0(ENT, MUN)) %>% 
+                        filter(CVE_MUN == municipio$CVE_MUN[j]),
+                         mapping = aes(x = lon, 
+                                       y = lat, 
+                                       fill = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"),
+                                       color = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
+                         size = 0.8,
+                         alpha = 0.5) +
              coord_equal() +
-              theme_transparent() + 
-               theme(plot.title = element_text(size = 18, hjust = 0.5, family = "Montserrat", face = "bold"),
-                      plot.caption = element_text(size = 9, hjust = 0, family = "Montserrat"), 
-                       legend.key.size = unit(0.3, "cm"),
-                        legend.text = element_text(size = 10, family = "Montserrat"), 
-                         legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
-                          legend.position = "right") + 
+             theme_transparent() + 
+              theme(plot.title = element_text(size = 21, hjust = 0.15, family = "Montserrat", face = "bold"),
+                    plot.subtitle = element_text(size = 18, hjust = 0, family = "Montserrat Medium"),
+                    plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
+                    axis.text = element_blank(),
+                    axis.title = element_blank(),
+                    axis.ticks = element_blank(),
+                    legend.key.size = unit(0.5, "cm"),
+                    legend.text = element_text(size = 10, family = "Montserrat"), 
+                    legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
+                    legend.position = "right") + 
                 scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
                  scale_color_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
                   guides(color = 'none', fill = "none") + 
@@ -1872,8 +1892,14 @@ tabla <- lapply(1:nrow(municipio), function(x){
 #path = "Images/IML_2020_por estado_geom_polygon.pdf"
 #ggexport(list = tabla, width = 8, height = 5, res = 400, filename = path)
 
-tabla[[1]]
+tabla[[16]]
 ```
+```{r, eval = FALSE}
+path = paste0(here::here(),"/img/IML_2020_por estado_geom_polygon.pdf")
+ggexport(list = tabla, filename = path, width = 8, height = 6, res = 400, device = "cairo")
+```
+
+![](../img/IML_2020_por estado_geom_polygon_Page_16.png){width="90%" fig-align="center"}  
 
 ### `geom_sf`
 
