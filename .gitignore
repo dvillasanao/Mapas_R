@@ -57,6 +57,10 @@ R/01_Leaflet del IM2010_2020/Bases
 R/01_Leaflet del IM2010_2020/Output
 
 
-*.pdf
-img/IML_2020_geom_polygon.pdf
+img/*.pdf
+img/IME_2020_gmap.pdf
+img/IMM_2020_gmap.pdf
+img/IML_2020_gmap.pdf
+img/IME_2020_geom_polygon.pdf
+img/IMM_2020_geom_polygon.pdf
 img/IML_2020_geom_polygon.pdf
