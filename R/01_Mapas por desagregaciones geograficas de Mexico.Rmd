@@ -1901,6 +1901,75 @@ ggexport(list = tabla, filename = path, width = 8, height = 6, res = 400, device
 
 ![](../img/IML_2020_por estado_geom_polygon_Page_16.png){width="90%" fig-align="center"}  
 
+### `tmap`
+
+Con el paquete `tmap` se pueden generar mapas temáticos con gran flexibilidad. La sintaxis para crear gráficos es similar a la de *ggplot2*, pero adaptada a los mapas. Además, ofrece un sistema de trazado coherente para mapas temáticos que se basan en la estructura de las capas en los gráficos. Los mapas temáticos se crean apilando capas, donde cada capa y cada dato se pueden asignar a una o más `aes ()`. También es posible escalarlos y agregando posibles atributos del mapa, como una barra de escala o una brújula.
+
+Una de las ventajas a diferencia de `ggplot()`, es más rápido de generar los gráficos y permite trabajar con múltiples capas a la vez. Además, permite hacerlo de manera interactiva como un widget HTML.
+
+La función `tm_shape`, crea un elemento que especifica un objeto de `SpatialPolygonsDataFrame`, sin la necesidad de convertir los datos a un data.frame. [GitHub: r-tmap/tmap](https://github.com/r-tmap/tmap).  
+
+```{r, fig.width=8, fig.height=8, class.source = "fold-hide"}
+# Paquetes
+require(tmap)
+require(tmaptools)
+require(sf)
+
+paleta <- rev(colorRampPalette(pals::brewer.bupu(10))(6))
+paleta <- c("#4D004B", "#832C8E", "#8B73B4", "#9CB1D4", "#CBDCEB")
+
+p <- tm_shape(layer_localidad, id = "CVE_GEO") +
+      tm_polygons(fill = "GM_2020",
+                  fill.legend = tm_legend(title = str_wrap("Grado de marginación", 10)),
+                  fill.scale = tm_scale(values = paleta),
+                  col = NA  # sin borde
+                  ) + 
+       tm_shape(st_as_sf(layer_localidad_p), id = "CVE_GEO") +
+        tm_dots(fill = "GM_2020",
+                fill.legend = tm_legend(title = str_wrap("Grado de marginación", 10)),
+                fill.scale = tm_scale(values = paleta),
+                legend.show = FALSE,
+                size = 0.03
+                  ) + 
+       tm_shape(st_as_sf(layer_estados), is.master = TRUE) +
+        tm_borders(col = "grey", lwd = 1.3) +
+          tm_layout(title = "Índice de marginación a nivel localidad, 2020",
+                    title.fontfamily = "Montserrat",
+                    title.fontface = "bold",
+                    title.size = 2,
+                    title.position = c("center", "top"), 
+                    main.title.fontface = "bold",
+                    main.title.position = c("center", "top"),
+                    main.title.size = 7, 
+                    main.title.fontfamily = "Montserrat",
+                    legend.outside = TRUE,
+                    legend.outside.position = c("center", "right"),
+                    legend.title.fontfamily = "Montserrat",
+                    legend.na.show = FALSE,
+                    legend.title.fontface = "bold", 
+                    legend.text.fontfamily = "Montserrat",
+                    legend.title.size = 1, 
+                    legend.text.size = 0.8, 
+                    legend.frame = FALSE,
+                    fontfamily = "Montserrat",
+                    frame = FALSE) + 
+            tm_credits(expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")),
+                        position = c("left", "bottom"), 
+                         size = 1.1) 
+     
+#path = "Images/IML_2020_tmap.pdf"
+#ggexport(p, width = 8, height = 5, res = 400, filename = path)
+
+p
+```
+
+```{r, eval = FALSE}
+path = paste0(here::here(),"/img/IML_2020_tmap.pdf")
+ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
+```
+
+![](../img/IML_2020_tmap.png){width="90%" fig-align="center"}  
+
 ### `geom_sf`
 
 A continuación, se muestra un ejemplo de cómo visualizar objetos `sf`. Este tipo de función es un poco más amigable de usar.
