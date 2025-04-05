@@ -1682,34 +1682,43 @@ La función `geom_polygon()` de la paquetería `ggplot2`, devuelve un objeto `gg
 
 ```{r, class.source = "fold-hide"}
 p <- ggplot() + 
-      geom_polygon(capas_estados,
+      geom_polygon(capas_localidad,
                     mapping = aes(x = long, 
-                                  y = lat,  
-                                  group = group), 
-                     fill = 'transparent',
-                      color = "black", 
-                       size = .15,
-                        alpha = 0.9) +
-       geom_polygon(capas_localidad,
-                     mapping = aes(x = long, 
-                                   y = lat, 
-                                   group = group, 
-                                   fill = fct_relevel(GM_2020, "Muy alto","Alto","Medio","Bajo","Muy bajo"), 
-                                   color = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
-                      size = .15,
-                       alpha = 0.9) +
-        coord_equal() +
-         theme_transparent() + 
-          theme(plot.title = element_text(size = 24, hjust = 0.15, family = "Montserrat", face = "bold"),
-                 plot.caption = element_text(size = 12, hjust = 0.2, vjust = 1, family = "Montserrat"),  
-                  legend.key.size = unit(0.5, "cm"),
-                   legend.text = element_text(size = 12, family = "Montserrat"), 
-                    legend.title = element_text(size = 14, hjust = 0.5, family = "Montserrat", face = "bold"),
-                     legend.position = c(0.8, 0.7)) + 
-           scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
-            scale_color_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
+                                  y = lat, 
+                                  group = group, 
+                                  fill = fct_relevel(GM_2020, "Muy alto","Alto","Medio","Bajo","Muy bajo"), 
+                                  color = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
+                     size = .15) +
+       geom_point(capas_localidad_p,
+                   mapping = aes(x = lon, 
+                                 y = lat, 
+                                 color = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
+                    size = .01,
+                     alpha = 0.9) +
+        geom_polygon(capas_estados,
+                      mapping = aes(x = long, 
+                                    y = lat,  
+                                    group = group), 
+                       fill = 'transparent',
+                        color = "grey", 
+                         size = 1) +
+         coord_equal()  + 
+          theme_transparent() + 
+           theme(plot.title = element_text(size = 21, hjust = 0.15, family = "Montserrat", face = "bold"),
+                 plot.subtitle = element_text(size = 18, hjust = 0, family = "Montserrat Medium"),
+                 plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
+                 axis.text = element_blank(),
+                 axis.title = element_blank(),
+                 axis.ticks = element_blank(),
+                 legend.key.size = unit(0.5, "cm"),
+                 legend.text = element_text(size = 10, family = "Montserrat"), 
+                 legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
+                 legend.position = c(0.8, 0.7)) + 
+            scale_fill_manual(values = rev(usecol(pal = pal_petrol, n = 5))) + 
+             scale_color_manual(values = rev(usecol(pal = pal_petrol, n = 5))) + 
              guides(color = 'none') +
       labs(title = "Índice de marginación a nivel localidad, 2020",
+            subtitle = "Utilizando geom_polygon()",
             fill = stringr::str_wrap("Grado de marginación", 10),
              caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
 
@@ -1720,9 +1729,11 @@ p
 ```
 
 ```{r, eval = FALSE}
-path = paste0(here::here(),"/img/IMM_2020_geom_sf.pdf")
+path = paste0(here::here(),"/img/IML_2020_geom_polygon.pdf")
 ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
 ```
+
+![](../img/IML_2020_geom_polygon.png){width="90%" fig-align="center"}  
 
 #### Por estados
 
@@ -2634,7 +2645,7 @@ img
 
 # RDS Files 
 
-```{r}
+```{r, echo = FALSE, eval = FALSE}
 saveRDS(shape_estados, file = paste0(here::here(), "/Output/shape_estados.RDS"))
 saveRDS(capas_estados, file = paste0(here::here(), "/Output/capas_estados.RDS"))
 saveRDS(layer_estados, file = paste0(here::here(), "/Output/layer_estados.RDS"))
