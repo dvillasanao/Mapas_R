@@ -1722,11 +1722,6 @@ p <- ggplot() +
 p
 ```
 
-```{r, eval = FALSE}
-path = paste0(here::here(),"/img/IML_2020_geom_polygon.pdf")
-ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
-```
-
 ![](../img/IML_2020_geom_polygon.png){width="90%" fig-align="center"}  
 
 #### Por estados 
@@ -1979,7 +1974,10 @@ La función `as_tibble` de la paquetería `tibble`, genera una base de datos gen
 ```{r, class.source = "fold-hide"}
 require(ggplot2)
 require(tibble)
-require(sf)
+require(sf) 
+
+# Paleta  
+paleta <- rev(colorRampPalette(pals::brewer.seqseq1(20))(5))
 
 p <- list()
 #for(i in 1:32){
@@ -1996,31 +1994,40 @@ p[[i]] <-  ggplot() +
                      mapping = aes(geometry = geometry, 
                                    fill = fct_relevel(GM_2020, "Muy alto","Alto","Medio","Bajo","Muy bajo"),
                                    color = fct_relevel(GM_2020, "Muy alto","Alto","Medio","Bajo","Muy bajo"))) +
-            geom_sf(data = tbl_municipios,
-                     mapping = aes(geometry = geometry), 
-                     fill = 'transparent',
-                     color = "#D4D4D4",
-                     size = 0.3) + 
-            geom_sf(data = tbl_estados,
-                     mapping = aes(geometry = geometry), 
-                      fill = 'transparent',
-                       color = "black") +
-             coord_sf(xlim = c(limites$min.x,limites$max.x),
-                      ylim = c(limites$min.y,limites$max.y)) +
-              theme_transparent() + 
-               theme(plot.title = element_text(size = 22, hjust = 0, family = "Montserrat", face = "bold"),
-                      plot.caption = element_text(size = 9, hjust = 0.2, vjust = 1, family = "Montserrat"),  
-                       plot.margin = unit(c(t = 0.5, r = 0, b = 0, l = 0), "cm"),
+             geom_sf(data = tbl_localidad_p,
+                     mapping = aes(geometry = geometry, 
+                                   fill = fct_relevel(GM_2020, "Muy alto","Alto","Medio","Bajo","Muy bajo"),
+                                   color = fct_relevel(GM_2020, "Muy alto","Alto","Medio","Bajo","Muy bajo")),
+                     size = 0.05) +
+              geom_sf(data = tbl_municipios,
+                       mapping = aes(geometry = geometry), 
+                        fill = 'transparent',
+                         color = "#D4D4D4",
+                          size = 0.3) + 
+               geom_sf(data = tbl_estados,
+                        mapping = aes(geometry = geometry), 
+                         fill = 'transparent',
+                          color = "black") +
+                coord_sf(xlim = c(limites$min.x,limites$max.x),
+                         ylim = c(limites$min.y,limites$max.y)) +
+                 theme_transparent() + 
+                  theme(plot.title = element_text(size = 21, hjust = 0, family = "Montserrat", face = "bold"),
+                        plot.subtitle = element_text(size = 18, hjust = 0, family = "Montserrat Medium"),
+                        plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
+                        axis.text = element_blank(),
+                        axis.title = element_blank(),
+                        axis.ticks = element_blank(),
                         legend.key.size = unit(0.5, "cm"),
-                         legend.text = element_text(size = 10, family = "Montserrat"),   
-                          legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
-                           legend.position = "right") + 
-                scale_fill_manual(values = usecol(pal_bordeaux, n = 5)) + 
-                 scale_color_manual(values = usecol(pal_bordeaux, n = 5)) + 
-            labs(title = paste(nom_ent[i]),
-                  fill = stringr::str_wrap("Grado de marginación", 10),
-                   color = stringr::str_wrap("Grado de marginación", 10),
-                   caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
+                        legend.text = element_text(size = 10, family = "Montserrat"), 
+                        legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
+                        legend.position = "right") + 
+                   scale_fill_manual(values = paleta) + 
+                    scale_color_manual(values = paleta) + 
+                 labs(title = paste("Estado:", paste(nom_ent[i])),
+                      subtitle = "Utilizando geom_sf()",
+                      fill = stringr::str_wrap("Grado de marginación", 10),
+                      color = stringr::str_wrap("Grado de marginación", 10),
+                      caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
 }
 
 #path = "Images/IML_2020_geom_sf.pdf"
@@ -2028,6 +2035,13 @@ p[[i]] <-  ggplot() +
 
 p[[7]]
 ```
+
+```{r, eval = FALSE}
+path = paste0(here::here(),"/img/IML_2020_geom_sf.pdf")
+ggexport(list = p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
+```
+
+![](../img/IML_2020_geom_sf.png){width="90%" fig-align="center"} 
 
 #### Con filtro
 
