@@ -2290,6 +2290,13 @@ require(ggplot2)
 require(tibble)
 require(sf)
 
+# Paleta  
+paleta <- rev(colorRampPalette(pals::brewer.seqseq1(20))(5))
+
+# Entidades Federativas
+estados <- unique(IME_2020$CVE_ENT)
+nom_ent <- unique(IME_2020$NOM_ENT)
+
 q <- NULL
 p <- list()
 #for(i in 1:32){
@@ -2312,6 +2319,11 @@ q[[i]] <-  ggplot() +
                      fill = 'transparent',
                      color = "#C70E8E", 
                       size = 0.03) + 
+            geom_sf(data = tbl_localidad_p %>% filter(CVE_ENT == estados[i]),
+                     mapping = aes(geometry = geometry, linetype = "Line2"), 
+                      fill = 'transparent',
+                       color = "#C70E8E", 
+                        size = 0.03) + 
             geom_sf(data = tbl_municipios %>% filter(CVE_ENT == estados[i]),
                      mapping = aes(geometry = geometry), 
                      fill = 'transparent',
@@ -2324,20 +2336,28 @@ q[[i]] <-  ggplot() +
              coord_sf(xlim = c(limites$min.x,limites$max.x),
                       ylim = c(limites$min.y,limites$max.y)) +
               theme_transparent() + 
-               theme(plot.title = element_text(size = 22, hjust = 0.15, family = "Montserrat", face = "bold"),
-                      plot.caption = element_text(size = 9, hjust = 0.2, vjust = 1, family = "Montserrat"),  
-                       legend.key.size = unit(0.5, "cm"),
-                        legend.text = element_text(size = 10, family = "Montserrat"),   
-                         legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
-                          legend.position = "right") + 
-                scale_fill_manual(values = usecol(pal_bordeaux, n = 5)) + 
-                 scale_color_manual(values = usecol(pal_bordeaux, n = 5)) +  
-                  scale_linetype_manual("Nivel", labels = c("AGEB", "Localidad"), values = c("Line1" = "solid", "Line2" = "solid")) +
-                   guides(linetype = guide_legend(override.aes = list(linetype = "solid", fill = 'transparent', color = c("#771434", "#C70E8E"), size = c(0.7, 0.03)))) +
-            labs(title = paste(nom_ent[i]),
-                  fill = stringr::str_wrap("Grado de marginación", 10),
-                   color = stringr::str_wrap("Grado de marginación", 10),
-                   caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
+               theme(plot.title = element_text(size = 21, hjust = 0, family = "Montserrat", face = "bold"),
+                     plot.subtitle = element_text(size = 18, hjust = 0, family = "Montserrat Medium"),
+                     plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
+                     axis.text = element_blank(),
+                     axis.title = element_blank(),
+                     axis.ticks = element_blank(),
+                     legend.key.size = unit(0.5, "cm"),
+                     legend.text = element_text(size = 10, family = "Montserrat"), 
+                     legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
+                     legend.position = "right") + 
+                 scale_fill_manual(values = paleta) + 
+                  scale_color_manual(values = paleta) +  
+                   scale_linetype_manual("Nivel", labels = c("AGEB", "Localidad"), values = c("Line1" = "solid", "Line2" = "solid")) +
+                    guides(linetype = guide_legend(override.aes = list(linetype = "solid", 
+                                                                       fill = 'transparent', 
+                                                                       color = c("#771434", "#C70E8E"), 
+                                                                       size = c(0.7, 0.03)))) +
+             labs(title = paste("Estados:", nom_ent[i]),
+                  subtitle = "Utilizando geom_sf()",
+                   fill = stringr::str_wrap("Grado de marginación", 10),
+                    color = stringr::str_wrap("Grado de marginación", 10),
+                    caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
 if(i == 6){
   p[[i]] <- q[[i]] + 
              coord_sf(xlim = c(limites$min.x + 1060000,limites$max.x),
@@ -2354,11 +2374,11 @@ p[[6]]
 ```
 
 ```{r, eval = FALSE}
-path = paste0(here::here(),"/img/IMU_2020_ZMVM_geom_polygon.pdf")
+path = paste0(here::here(),"/img/IMU_2020_geom_sf.pdf")
 ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
 ```
 
-![](../img/IMU_2020_ZMVM_geom_polygon.png){width="90%" fig-align="center"} 
+![](../img/IMU_2020_geom_sf.png){width="90%" fig-align="center"} 
 
 # Complementos {.top2-tiles .tile2-text .tabset  .tabset-pills}
 
