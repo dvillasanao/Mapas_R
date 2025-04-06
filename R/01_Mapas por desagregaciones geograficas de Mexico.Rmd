@@ -150,7 +150,7 @@ invisible(utils::memory.limit(size = 60000000))
 archivo <- c("shape", "capas", "layer", "tbl")
 nivel <- c("estados", "municipios", "localidad", "localidad_p", "ageb")
 for(i in 1:4){
-  for(j in 1:4){
+  for(j in 1:5){
     assign(paste0(archivo[i], "_", nivel[j]), readRDS(file = paste0(here::here(), "/Output/", archivo[i], "_", nivel[j], ".RDS")))
   }
 }
@@ -947,9 +947,8 @@ capas_ageb <- capas_ageb %>%
                fortify(., id = "CVE_GEO") 
 
 capas_ageb <- capas_ageb %>%
-               rename("CVE_GEO" = "id") %>%
                left_join(., IMU_2020 %>% dplyr::select(CVE_GEO, GM_2020), 
-                         by = c("CVE_GEO")) 
+                         by = c("id" = "CVE_GEO")) 
 ```
 
 
@@ -2104,7 +2103,61 @@ ggexport(list = p, filename = path, width = 8, height = 6, res = 400, device = "
 
 ![](../img/IML_2020_geom_sf_Chiapas.png){width="90%" fig-align="center"} 
 
-## AGEB {.tabset .tabset-fade .tabset-pills}
+## AGEB {.tabset .tabset-fade .tabset-pills}  
+
+### `geom_map`
+
+La función `ggmap()` devuelve un objeto `ggplot`. Puede usar este objeto `ggplot` resultante como lo haría con cualquier otro objeto ggplot (ejemplo, agregar geoms, cambiar tema). [GitHub: fresques/ggmap](https://github.com/fresques/ggmap)
+
+Una de las bondades del paquete `ggmap`, permite hacer mediante el uso de herramientas de *Google Maps* directamente desde `R`. Este paquete permite extraer un mapa base de *Google Maps* y algunos otros servidores de mapas, para que luego se puedan trazar y agregar puntos, polígonos, líneas y otros elementos usando funciones `ggplot2`. Este paquete usa la `API` de *Google Maps*. Otras funciones en el paquete `ggmap`, necesita una clave `API` de Google Maps para que funcione.
+
+```{r, class.source = "fold-hide"}
+p <- IMU_2020 %>% 
+      mutate(GM_2020 = fct_relevel(.$GM_2020,"Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")) %>%
+       ggplot() + 
+        geom_map(map = capas_ageb, 
+                  aes(map_id = CVE_GEO,
+                      fill = GM_2020,
+                      color = GM_2020), 
+                   size = 1)  +
+         geom_polygon(capas_estados,
+                       mapping = aes(x = long, 
+                                     y = lat, 
+                                     group = group),
+                       color = "dark grey",
+                       fill = "transparent",
+                       size = 0.6) +
+           expand_limits(x = capas_localidad$long, y = capas_localidad$lat) + 
+            theme_transparent() + 
+             theme(plot.title = element_text(size = 21, hjust = 0.15, family = "Montserrat", face = "bold"),
+                   plot.subtitle = element_text(size = 18, hjust = 0, family = "Montserrat Medium"),
+                   plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
+                   axis.text = element_blank(),
+                   axis.title = element_blank(),
+                   axis.ticks = element_blank(),
+                   legend.key.size = unit(0.5, "cm"),
+                   legend.text = element_text(size = 10, family = "Montserrat"), 
+                   legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
+                   legend.position = c(0.8, 0.7)) + 
+              scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
+               scale_color_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
+                guides(color = 'none') +
+          labs(title = "Índice de marginación a nivel AGEB, 2020",
+                subtitle = "Utilizando ggmap()",
+                 fill = stringr::str_wrap("Grado de marginación", 10),
+                  caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
+
+#path = "Images/IMU_2020_gmap.pdf"
+#ggexport(p, width = 8, height = 5, res = 400, filename = path)
+
+p
+```
+```{r, eval = FALSE}
+path = paste0(here::here(),"/img/IMU_2020_gmap.pdf")
+ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
+```
+
+![](../img/IMU_2020_gmap.png){width="90%" fig-align="center"} 
 
 ### `geom_polygon`
 
@@ -2120,29 +2173,34 @@ p <- ggplot() +
                       color="black", 
                        size = .15,
                         alpha = 0.9) +
-      geom_polygon(capas_ageb,
-                    mapping = aes(x = long, 
-                                  y = lat, 
-                                  group = group, 
-                                  fill = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"), 
-                                  color = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
+       geom_polygon(capas_ageb,
+                     mapping = aes(x = long, 
+                                   y = lat, 
+                                   group = group, 
+                                   fill = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"), 
+                                   color = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
                       size = .15,
                        alpha = 0.9) +
-        coord_equal() +
+        coord_equal()  +
          theme_transparent() + 
-          theme(plot.title = element_text(size = 24, hjust = 0.15, family = "Montserrat", face = "bold"), 
-                 plot.caption = element_text(size = 12, hjust = 0.2, vjust = 1, family = "Montserrat"), 
-                  legend.key.size = unit(0.5, "cm"),
-                   legend.text = element_text(size = 12, family = "Montserrat"), 
-                    legend.title = element_text(size = 14, hjust = 0.5, family = "Montserrat", face = "bold"),
-                     legend.position = c(0.8, 0.7)) + 
-            scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
-             scale_color_viridis_d(option = "A", begin = 0.3, end = 0.8) +  
-              guides(color = 'none', 
-                      fill = guide_legend(override.aes = list(alpha = 1))) +
-       labs(title = "Índice de marginación a nivel AGEB, 2020",
-             fill = stringr::str_wrap("Grado de marginación", 10),
-              caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
+          theme(plot.title = element_text(size = 21, hjust = 0, family = "Montserrat", face = "bold"),
+                plot.subtitle = element_text(size = 18, hjust = 0, family = "Montserrat Medium"),
+                plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
+                axis.text = element_blank(),
+                axis.title = element_blank(),
+                axis.ticks = element_blank(),
+                legend.key.size = unit(0.5, "cm"),
+                legend.text = element_text(size = 10, family = "Montserrat"), 
+                legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
+               legend.position = c(0.8, 0.7)) + 
+           scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
+            scale_color_viridis_d(option = "A", begin = 0.3, end = 0.8) +  
+             guides(color = 'none', 
+                    fill = guide_legend(override.aes = list(alpha = 1))) +
+              labs(title = "Índice de marginación a nivel AGEB, 2020",
+                   subtitle = "Utilizando geom_polygon()",
+                   fill = stringr::str_wrap("Grado de marginación", 10),
+                   caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
 
 
 #path = "Images/IMU_2020_geom_polygon.pdf"
@@ -2151,30 +2209,33 @@ p <- ggplot() +
 p
 ```
 
+![](../img/IMU_2020_geom_polygon.png){width="90%" fig-align="center"} 
+
 #### Zona Metropolitana del Valle de México (ZMVM)
 
-```{r}
+```{r, class.source = "fold-hide"}
 tabla <- ZM_2020 %>%
           filter(CVE_ZM == "09.01")
 
 p <-  ggplot() + 
-       geom_polygon(capas_estados %>% filter(id == c("09", "13", "15")),
+       geom_polygon(capas_estados %>% filter(id %in% c("09", "13", "15")),
                      mapping = aes(x = long, 
                                    y = lat, 
                                    group = group), 
                       fill = 'transparent',
                        color = "black", 
-                        size = .5,
-                         alpha = 0.9) +
-       geom_polygon(capas_municipios %>% filter(id == tabla$CVE_MUN),
+                        size = 1,
+                         linewidth = 1.2,
+                          alpha = 0.9) +
+       geom_polygon(capas_municipios %>% filter(CVE_ENT %in% c("09", "13", "15")),
                      mapping = aes(x = long, 
                                    y = lat, 
                                    group = group), 
                       fill = 'transparent',
                        color = "#C7C7C7", 
-                        size = .3,
-                         alpha = 0.9) +
-       geom_polygon(capas_zm %>% filter(CVE_ZM == "09.01"),
+                        size = .1,
+                         alpha = 0.7) +
+       geom_polygon(capas_zm %>% filter(CVE_ZM %in% "09.01"),
                      mapping = aes(x = long, 
                                    y = lat, 
                                    group = group, 
@@ -2184,25 +2245,38 @@ p <-  ggplot() +
                        alpha = 0.7) +
         coord_equal() +
          theme_transparent() + 
-          theme(plot.title = element_text(size = 22, hjust = 0.15, family = "Montserrat", face = "bold"), 
-                 plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
-                  legend.key.size = unit(0.5, "cm"),
-                   legend.text = element_text(size = 12, family = "Montserrat"), 
-                    legend.title = element_text(size = 14, hjust = 0.5, family = "Montserrat", face = "bold"),
-                     legend.position = "right") + 
-            scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
-             scale_color_viridis_d(option = "A", begin = 0.3, end = 0.8) +  
+          theme(plot.title = element_text(size = 21, hjust = 0, family = "Montserrat", face = "bold"),
+                plot.subtitle = element_text(size = 18, hjust = 0, family = "Montserrat Medium"),
+                plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
+                axis.text = element_blank(),
+                axis.title = element_blank(),
+                axis.ticks = element_blank(),
+                legend.key.size = unit(0.5, "cm"),
+                legend.text = element_text(size = 10, family = "Montserrat"), 
+                legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
+               legend.position = "right") + 
+           scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
+            scale_color_viridis_d(option = "A", begin = 0.3, end = 0.8) +  
+             guides(color = 'none', 
+                    fill = guide_legend(override.aes = list(alpha = 1))) +
               guides(color = 'none', 
                       fill = guide_legend(override.aes = list(alpha = 1))) +
        labs(title = "ZMVM: Índice de marginación a nivel AGEB, 2020",
-             fill = stringr::str_wrap("Grado de marginación", 10),
-              caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
+             subtitle = "Utilizando geom_polygon()",
+              fill = stringr::str_wrap("Grado de marginación", 10),
+               caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
 
 #path = "Images/IMU_2020_ZMVM_geom_polygon.pdf"
 #ggexport (p, width = 8, height = 5, res = 400, filename = path)
 
 p
 ```
+```{r, eval = FALSE}
+path = paste0(here::here(),"/img/IMU_2020_ZMVM_geom_polygon.pdf")
+ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
+```
+
+![](../img/IMU_2020_ZMVM_geom_polygon.png){width="90%" fig-align="center"} 
 
 ### `geom_sf`
 
@@ -2210,7 +2284,7 @@ A continuación, se muestra un ejemplo de cómo visualizar objetos `sf`. Este ti
 
 La función `as_tibble` de la paquetería `tibble`, genera una base de datos genérica de S3 con métodos más eficientes para matrices y data.frame. Su envoltorio delgado permite trabajar de manera más rápida que un `data.frame`.
 
-```{r}
+```{r, class.source = "fold-hide"}
 # Paquetes
 require(ggplot2)
 require(tibble)
@@ -2278,6 +2352,13 @@ if(i == 6){
 
 p[[6]]
 ```
+
+```{r, eval = FALSE}
+path = paste0(here::here(),"/img/IMU_2020_ZMVM_geom_polygon.pdf")
+ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
+```
+
+![](../img/IMU_2020_ZMVM_geom_polygon.png){width="90%" fig-align="center"} 
 
 # Complementos {.top2-tiles .tile2-text .tabset  .tabset-pills}
 
