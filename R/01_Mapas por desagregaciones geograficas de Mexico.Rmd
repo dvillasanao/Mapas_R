@@ -1331,11 +1331,6 @@ p
 ```
 
 
-```{r, eval = FALSE}
-path = paste0(here::here(),"/img/IME_2020_ggspatial.pdf")
-ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
-```
-
 ![](../img/IME_2020_ggspatial.png){width="90%" fig-align="center"}  
 
 ### `geom_sf`
@@ -1604,11 +1599,6 @@ p <- ggplot() +
 #ggexport(p, width = 8, height = 5, res = 400, filename = path)
 
 p
-```
-
-```{r, eval = FALSE}
-path = paste0(here::here(),"/img/IMM_2020_geom_sf.pdf")
-ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
 ```
 
 ![](../img/IMM_2020_geom_sf.png){width="90%" fig-align="center"}  
@@ -2096,10 +2086,6 @@ p[[i]] <-  ggplot() +
 
 p[[7]]
 ```
-```{r, eval = FALSE}
-path = paste0(here::here(),"/img/IML_2020_geom_sf_Chiapas.pdf")
-ggexport(list = p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
-```
 
 ![](../img/IML_2020_geom_sf_Chiapas.png){width="90%" fig-align="center"} 
 
@@ -2151,10 +2137,6 @@ p <- IMU_2020 %>%
 #ggexport(p, width = 8, height = 5, res = 400, filename = path)
 
 p
-```
-```{r, eval = FALSE}
-path = paste0(here::here(),"/img/IMU_2020_gmap.pdf")
-ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
 ```
 
 ![](../img/IMU_2020_gmap.png){width="90%" fig-align="center"} 
@@ -2270,10 +2252,6 @@ p <-  ggplot() +
 #ggexport (p, width = 8, height = 5, res = 400, filename = path)
 
 p
-```
-```{r, eval = FALSE}
-path = paste0(here::here(),"/img/IMU_2020_ZMVM_geom_polygon.pdf")
-ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
 ```
 
 ![](../img/IMU_2020_ZMVM_geom_polygon.png){width="90%" fig-align="center"} 
@@ -2501,11 +2479,6 @@ p <- IME_2020 %>%
 p
 ```
 
-```{r, eval = FALSE}
-path = paste0(here::here(),"/img/IME_2020_annotation.pdf")
-ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
-```
-
 ![](../img/IME_2020_annotation.png){width="90%" fig-align="center"} 
 
 ## Municipios{.tabset .tabset-fade .tabset-pills} 
@@ -2515,7 +2488,7 @@ ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
 Se utiliza la función `coordinates()` del paquete `sp` que permite localizar los centroides de cada muncipio. Permitiendo de esta manera encontrar la localización para las etiquetas de cada área geográfica y utilizando la función `geom_label_repel()` mediante los atributos `mapping = aes(x = Longitude, y = Latitude)` y de esta manera no permitir que las etiquetas del mapa se sobrelapen entre sí y se alejen de los puntos de datos generados por la función `coordinates()`.     
 
 
-```{r}
+```{r, class.source = "fold-hide"}
 capas_zm <- left_join(capas_municipios, 
                        ZM_2020 %>% dplyr::select(-NOM_ENT, -NOM_MUN, -CVE_ENT), 
                         by = c("id" = "CVE_MUN")) %>%
@@ -2581,7 +2554,7 @@ p
 ```
 
 
-```{r}
+```{r, class.source = "fold-hide"}
 # "coordinates()" extrae los centroides de los polígonos, en el orden indicado en shape@data
 centroids.df <- as.data.frame(coordinates(shape_municipios)) %>%
                  rename("Longitude" = "V1","Latitude" = "V2") %>%
@@ -2665,6 +2638,13 @@ if(i %in% c(1:5, 7:32)){
 p[[7]]
 ```
 
+```{r, eval = FALSE}
+path = paste0(here::here(),"/img/IME_2020_annotation.pdf")
+ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
+```
+
+![](../img/IME_2020_annotation.png){width="90%" fig-align="center"} 
+
 ### 2010 - 2020      
 
 Son nueve indicadores simples, los que conforman el índice de marginación a nivel municipal. De los cuales se enfocan en cuatro dimensiones de exclusión social.  
@@ -2710,7 +2690,7 @@ Se toma como referencia el `Marco Geoestadístico, 2010 Versión 4.3`, `Marco Ge
 
 **Shape de municipios 2010**  
 
-```{r,results=FALSE,class.source = "fold-show"}
+```{r,results=FALSE, class.source = "fold-show"}
 shape_estados_2010 <- readOGR(dsn = paste0(here::here(), "/MGN 2010/32_Entidades_Federativas"),
                                layer = "ESTADOS",
                               )
@@ -2727,7 +2707,7 @@ shape_municipios_2010@data <- shape_municipios_2010@data %>%
 **Shape municipio 2015**
 
 
-```{r,results=FALSE,class.source = "fold-show"}
+```{r, results=FALSE, class.source = "fold-show"}
 shape_estados_2015 <- readOGR(dsn = paste0(here::here(), "/MGN Junio 2016/conjunto_de_datos"),
                                layer = "areas_geoestadisticas_estatales"
                               )
@@ -2742,7 +2722,7 @@ shape_municipios_2015@data <- shape_municipios_2015@data %>%
 
 Se elimina al municipio `23011` Puerto Morelos del estado de  Quintana Roo, debido a que no tiene calculado el `IM 2015`.  
 
-```{r,class.source = "fold-show"}
+```{r, class.source = "fold-show"}
 require(spdplyr)
 shape_municipios_2015 <- shape_municipios_2015 %>%
                            spdplyr:::filter.Spatial(CVE_GEO != 23011)
@@ -2750,7 +2730,7 @@ shape_municipios_2015 <- shape_municipios_2015 %>%
 
 **Se unen las bases de los indicadores simples a los shapes**  
 
-```{r,class.source = "fold-show"}
+```{r, class.source = "fold-show"}
 capas_estados_2010 <- fortify(shape_estados_2010, id = "CVE_ENT") 
 capas_municipios_2010 <- dplyr::right_join(fortify(shape_municipios_2010, id = "CVE_GEO"), 
                                             Ind %>% dplyr::select(-CVE_ENT, -NOM_ENT, -NOM_MUN) %>%
@@ -2784,7 +2764,7 @@ capas_municipios_2020 <- dplyr::right_join(fortify(shape_municipios, id = "CVE_G
 
 En este tipo de gráficos se utiliza la **capa de municipios** y la **capa de estados**. Para cada caso se usa la función `geom_polygon()` del paquete `ggplot2::` y así poder encontrar las delimitaciones de los municipios en su respectiva entidad.    
 
-```{r indicadores_simples}
+```{r indicadores_simples, class.source = "fold-hide"}
 Variables <- colnames(capas_municipios_2010)
 
 p <- NULL
@@ -2829,7 +2809,7 @@ p[[i]] <- lapply(c(11), function(x){
 
 **Mapas de los indicadores simples 2010-2020**    
 
-```{r mindsimples,fig.width=10, fig.height=10}
+```{r mindsimples,fig.width=10, fig.height=10, class.source = "fold-hide"}
 # Titulo de los gráficos
 #for(i in 1:9){
 for(i in 1){
@@ -2864,10 +2844,6 @@ img <- annotate_figure(q, bottom =  text_grob(paste(stringr::str_wrap(Indicadore
 img
 ```
 
-
-
-
-# RDS Files 
 
 ```{r, echo = FALSE, eval = FALSE}
 saveRDS(shape_estados, file = paste0(here::here(), "/Output/shape_estados.RDS"))
