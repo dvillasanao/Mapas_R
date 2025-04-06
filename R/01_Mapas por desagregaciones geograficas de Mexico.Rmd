@@ -2373,13 +2373,6 @@ if(i == 6){
 p[[6]]
 ```
 
-```{r, eval = FALSE}
-path = paste0(here::here(),"/img/IMU_2020_geom_sf.pdf")
-ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
-```
-
-![](../img/IMU_2020_geom_sf.png){width="90%" fig-align="center"} 
-
 # Complementos {.top2-tiles .tile2-text .tabset  .tabset-pills}
 
 ## Entidad{.tabset .tabset-fade .tabset-pills} 
@@ -2388,10 +2381,12 @@ ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
 
 Se utiliza la función `coordinates()` del paquete `sp` que permite localizar los centroides de cada estado. Permitiendo de esta manera encontrar la localización para las etiquetas de cada área geográfica y utilizando la función `geom_label_repel()` mediante los atributos `mapping = aes(x = Longitude, y = Latitude)` y de esta manera no permitir que las etiquetas del mapa se sobrelapen entre sí y se alejen de los puntos de datos generados por la función `coordinates()`.          
    
-```{r}
+```{r, class.source = "fold-hide"}
 #Paquete
 require(ggrepel)
-require(viridisLite)
+#https://github.com/EmilHvitfeldt/paletteer
+#devtools::install_github("BlakeRMills/MoMAColors")
+require(MoMAColors)
 
 # "coordinates()" extrae los centroides de los polígonos, en el orden indicado en shape@data
 centroids.df <- as.data.frame(coordinates(shape_estados)) %>%
@@ -2409,31 +2404,35 @@ p <- IME_2020 %>%
                         size = 0.5) +
          geom_label_repel(aes(label = stringr::str_wrap(NOM_ENT, 15),
                                x = Longitude,
-                                y = Latitude,
-                                 color = fct_relevel(GM_2020,"Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")), 
-                           force = 0.6,
-                            box.padding = 0.25,
-                             min.segment.length = 0.5,
-                              size = 3.5, 
-                               fill = "transparent",
-                                point.padding = 0.5,
-                                 segment.size = 0.7,
-                                  segment.colour= "dark grey",
-                                   label.size = 0,
-                                    alpha = 0.8) +
+                                y = Latitude),
+                           color = "#06156e",
+                            force = 0.6,
+                             box.padding = 0.25,
+                              min.segment.length = 0.5,
+                               size = 3.5, 
+                                fill = "transparent",
+                                 point.padding = 0.5,
+                                  segment.size = 0.7,
+                                   segment.colour = "dark grey",
+                                    label.size = 0,
+                                     alpha = 0.8) +
            expand_limits(x = capas_estados$long,  
                          y = capas_estados$lat) + 
             theme_transparent() + 
-             theme(plot.title = element_text(size = 20, hjust = 0.15, family = "montserrat", face = "bold"),
-                    plot.caption = element_text(size = 9, hjust = 0.2, vjust = 1, family = "montserrat"), 
-                     legend.key.size = unit(0.5, "cm"),
-                      legend.text = element_text(size = 8, family = "montserrat"), 
-                       legend.title = element_text(size = 10, hjust = 0.5, family = "montserrat", face = "bold"),
-                        legend.position = c(0.9, 0.7)) + 
-               scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
-                scale_color_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
-                 guides(fill = guide_legend(override.aes = list(color = viridis(n = 5, option = "A", begin = 0.3, end = 0.8))),
-                         color = 'none') +
+             theme(plot.title = element_text(size = 21, hjust = 0, family = "Montserrat", face = "bold"),
+                   plot.subtitle = element_text(size = 18, hjust = 0, family = "Montserrat Medium"),
+                   plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
+                   axis.text = element_blank(),
+                   axis.title = element_blank(),
+                   axis.ticks = element_blank(),
+                   legend.key.size = unit(0.5, "cm"),
+                   legend.text = element_text(size = 10, family = "Montserrat"), 
+                   legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
+                   legend.position = c(0.9, 0.7)) + 
+              scale_fill_moma_d("Ernst", direction = -1) +
+               scale_color_moma_d("Ernst", direction = -1) +
+                guides(fill = guide_legend(override.aes = list(color = paleta)),
+                       color = 'none') +
          labs(title = "Índice de marginación a nivel estatal, 2020",
                fill = stringr::str_wrap("Grado de marginación", 10),
                 caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
@@ -2443,12 +2442,13 @@ p <- IME_2020 %>%
 
 p
 ```
+![](../img/IME_2020_geom_polygon_etiquetas.png){width="90%" fig-align="center"} 
 
 ### `Annotation_scale`  
 
 Usando las funciones `annotation_scale()` y `annotation_north_arrow()` del paquete `ggspatial` se puede agregar una barra de escala o bien una flecha de norte. El sistema de posicionamiento de estas características está controlado por el argumento de ubicación (ejemplo, location = "tl" ~ topleft). Usando los argumentos `pad_x` y `pad_y` se pueden hacer ajustes menores al posicionamiento de los iconos.     
 
-```{r}
+```{r, class.source = "fold-hide"}
 #Paquetes
 require(ggspatial)
 
@@ -2459,39 +2459,41 @@ require(ggspatial)
 #style = north_arrow_nautical
 
 p <- IME_2020 %>% 
-       ggplot() + 
-        geom_polygon(data = capas_estados,
-                      mapping = aes(x = long, 
-                                    y = lat, 
-                                    group = group,
-                                    fill = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
-                       color = "dark grey",
-                        size = 0.5) +
-         annotation_north_arrow(location = "tl", 
-                                 style = north_arrow_fancy_orienteering, 
-                                  pad_x = unit(0, "cm"), 
-                                   height = unit(1, "cm"),
-                                    width = unit(1, "cm")) +
-          annotation_scale(location = "bl", 
-                            plot_unit = "m" , 
-                             pad_y = unit(0, "cm"), 
-                              text_family = "montserrat") +
-           expand_limits(x = capas_estados$long,  
-                         y = capas_estados$lat) + 
-            theme_transparent() + 
-             theme(plot.title = element_text(size = 20, hjust = 0.15, family = "montserrat", face = "bold"),
-                    plot.caption = element_text(size = 9, hjust = 0.2, vjust = 1, family = "montserrat"), 
-                     legend.key.size = unit(0.5, "cm"),
-                      legend.text = element_text(size = 10, family = "montserrat"), 
-                       legend.title = element_text(size = 12, hjust = 0.5, family = "montserrat", face = "bold"),
-                        legend.position = c(0.8, 0.7)) + 
-              scale_fill_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
-               scale_color_viridis_d(option = "A", begin = 0.3, end = 0.8) + 
-                guides(fill = guide_legend(override.aes = list(color = viridis(n = 5, option = "A", begin = 0.3, end = 0.8))),
-                        color = 'none') +
-       labs(title = "Índice de marginación a nivel estatal, 2020",
-             fill = stringr::str_wrap("Grado de marginación", 10),
-               caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
+      ggplot() + 
+       geom_polygon(data = capas_estados,
+                     mapping = aes(x = long, 
+                                   y = lat, 
+                                   group = group,
+                                   fill = fct_relevel(GM_2020, "Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
+                      color = "dark grey",
+                       size = 0.5) +
+        annotation_north_arrow(location = "tl", 
+                               style = north_arrow_fancy_orienteering, 
+                               pad_x = unit(0, "cm"), 
+                               height = unit(1, "cm"),
+                               width = unit(1, "cm")) +
+        annotation_scale(location = "bl", 
+                         plot_unit = "m" , 
+                         pad_y = unit(0, "cm"), 
+                         text_family = "Montserrat") +
+         expand_limits(x = capas_estados$long,  
+                       y = capas_estados$lat) + 
+          theme_transparent() + 
+           theme(plot.title = element_text(size = 21, hjust = 0, family = "Montserrat", face = "bold"),
+                 plot.subtitle = element_text(size = 18, hjust = 0, family = "Montserrat Medium"),
+                 plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "Montserrat"), 
+                 axis.text = element_blank(),
+                 axis.title = element_blank(),
+                 axis.ticks = element_blank(),
+                 legend.key.size = unit(0.5, "cm"),
+                 legend.text = element_text(size = 10, family = "Montserrat"), 
+                 legend.title = element_text(size = 12, hjust = 0.5, family = "Montserrat", face = "bold"),
+                 legend.position = c(0.9, 0.7)) + 
+            scale_fill_moma_d("Kippenberger", direction = -1) +
+             scale_color_moma_d("Kippenberger", direction = -1) + 
+                labs(title = "Índice de marginación a nivel estatal, 2020",
+                     fill = stringr::str_wrap("Grado de marginación", 10),
+                     caption = expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")))
 
 #path = "Images/IME_2020_annotation.pdf"
 #ggexport (p, width = 8, height = 5, res = 400, filename = path)
@@ -2499,6 +2501,12 @@ p <- IME_2020 %>%
 p
 ```
 
+```{r, eval = FALSE}
+path = paste0(here::here(),"/img/IME_2020_annotation.pdf")
+ggexport(p, filename = path, width = 8, height = 6, res = 400, device = "cairo")
+```
+
+![](../img/IME_2020_annotation.png){width="90%" fig-align="center"} 
 
 ## Municipios{.tabset .tabset-fade .tabset-pills} 
 
