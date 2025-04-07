@@ -165,7 +165,13 @@ load(file = paste0(here::here(), "/Output/ZM_2020.RData"))
 
 # Objetivo
 
-Se presenta una metodología para el análisis cartográfico digital utilizando R, implementando diversas bibliotecas que integran funcionalidades geográficas y estadísticas. El objetivo es facilitar la visualización y el modelado de datos geoespaciales mediante software de código abierto, con énfasis en la aplicación de Sistemas de Información Geográfica (SIG) para el análisis de datos georreferenciados.
+Se presenta una metodología para el análisis cartográfico digital utilizando `R`, implementando diversas bibliotecas que integran funcionalidades geográficas y estadísticas. El objetivo es facilitar la visualización y el modelado de datos geoespaciales mediante software de código abierto, con énfasis en la aplicación de Sistemas de Información Geográfica (`SIG`) para el análisis de datos georreferenciados. 
+
+
+<p align="center">
+  <img src="../img/Mapa_Mexico.png" alt="Población con discapacidad" width="60%">
+</p>
+
 
 # Sistema de Información Geográfica
 
@@ -245,6 +251,37 @@ kable(ogrDrivers(),
     row_spec(0, color = "black", bold = TRUE) %>%
      scroll_box(width = "100%", height = "300px")
 ```
+
+### Opciones para mapas en  `ggplot2`
+
+#### **`geom_polygon()`**
+- 📦 **Datos requeridos**: `data.frame` o `tibble` **con columnas `long`, `lat`, `group` y `fill`** si quieres colores.
+- ➕ Bueno si los datos están en formato plano, por ejemplo shapefiles transformados con `fortify()` o `broom::tidy()`.
+- ➖ No es ideal para datos geográficos complejos (proyecciones, geometrías múltiples).
+
+#### **`geom_map()`**
+- 📦 **Datos requeridos**: dos `data.frame` (uno con `map_id`, otro con geometría).
+- ➕ Útil para mapas coropléticos simples.
+- ➖ Es una opción antigua y menos usada hoy. Limitada y con poca flexibilidad comparado con `geom_sf`.
+
+#### **`geom_sf()`** ⭐ **(Recomendado)**
+- 📦 **Datos requeridos**: objetos `sf` (`sf`, `sfc`, `sfg`). Estos pueden venir de shapefiles con `sf::st_read()` o conversiones desde `SpatialPolygonsDataFrame`.
+- ➕ Muestra automáticamente geometría, maneja proyecciones, coord_sf, y se integra bien con otros elementos `ggplot2`.
+- ➕ Puede mapear fácilmente con `fill = variable`, `color = variable`.
+- 🔁 Con `ggplot(data_sf) + geom_sf(aes(fill = var))`.
+
+#### **`layer_spatial()`** (de `ggspatial`)
+- 📦 **Datos requeridos**: objetos `sf` o `Spatial*` (como `SpatialPolygonsDataFrame`).
+- ➕ Permite agregar capas sin preocuparse por aes.
+- ➖ Más útil como complemento (por ejemplo, para capas de fondo como ríos o caminos), pero no suele usarse como principal.
+
+#### **`tm_shape()`** (de `tmap`, no `ggplot2`)  
+- 📦 **Datos requeridos**: `sf` o `SpatialPolygonsDataFrame`.
+- ➕ Muy poderoso para mapas temáticos, escala tipo ArcGIS.
+- ➖ No es parte de `ggplot2`, es una alternativa. Pero es excelente para producción cartográfica.
+
+
+
 
 ```{r, echo = FALSE, eval = TRUE}
 require(tidyverse)
