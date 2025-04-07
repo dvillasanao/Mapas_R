@@ -50,7 +50,7 @@ Tomando como base a el índice de marginación 2020.
 <html>
 <body>
 <a href = "https://dvillasanao.github.io/Mapas_R/R/01_Mapas-por-desagregaciones-geograficas-de-Mexico.html" target="_blank">
-<img src="img/01_img.png" width="50%"> </a>
+<img src="img/01_img.png" width="60%"> </a>
 </body>
 </html>
 
