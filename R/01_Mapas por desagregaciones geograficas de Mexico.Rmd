@@ -169,7 +169,7 @@ Se presenta una metodología para el análisis cartográfico digital utilizando 
 
 
 <p align="center">
-  <img src="../img/Mapa_Mexico.png" alt="Población con discapacidad" width="60%">
+  <img src="../img/Mapa_México.png" alt="Mapa de México" width="70%">
 </p>
 
 
