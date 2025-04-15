@@ -1,0 +1,165 @@
+---
+title: "Mapas por desagregaciones geográficas de México"
+author: "Diana Villasana Ocampo"
+date: "Actualizado el `r format(Sys.time(), '%d-%m-%Y')`"
+output:
+  html_document:
+    code_folding: show
+    highlight: tango
+    theme: flatly
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: true
+header-includes:
+  - \usepackage{amsmath}
+---
+
+\usepackage{color}
+\usepackage{amsmath} 
+\color{#B6854D}{\text{}}{-}
+
+```{=html}
+<style type="text/css">
+body {
+text-align: justify;
+font-style: normal;
+font-family: "Montserrat";
+font-size: 12px
+}
+h1.title {
+  font-size: 40px;
+  color: #1C3BA4;
+}
+h1 {
+  color: #B6854D;
+}
+h2 {
+  color: #172984;
+}
+h3 {
+  color: #172984;
+}
+h5 {
+  color: #B6854D;
+}
+</style>
+```
+
+```{=html}
+<style>
+.nav>li>a {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    color: #1C3BA4
+}
+.nav-pills>li.active>a, .nav-pills>li.active>a:hover, .nav-pills>li>a:focus {
+    color: #ffffff;
+    background-color: #09C2BC
+}
+</style>
+```
+
+```{=html}
+<style>
+.tile1-text {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    color: #0A6A87;
+    list-style: none;
+}
+.top1-tiles a:nth-of-type(1):hover, .top-tiles1 a:nth-of-type(1):focus{
+    color: #ffffff;
+    background: #0A6A87
+}
+
+.tile2-text {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    color: #0A6CC8;
+    list-style: none;
+}
+</style>
+```
+
+```{=html}
+<style>
+.math {
+  font-size: 15px;
+  color: #B6854D;
+}
+</style>
+```
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE, cache.lazy = FALSE, collapse = TRUE, 
+                      #class.source = "fold-hide",
+                      eval = FALSE
+                      )
+```
+
+```{r,echo = FALSE, eval = FALSE}
+rm(list = ls())
+```
+
+```{r, echo = FALSE, results=FALSE}
+# Se descargan las fuentes de la google fonts
+require(showtext)
+library(extrafont)
+# activar showtext
+windowsFonts()
+```
+
+
+```{r}
+# Paquetes
+require(tmap)
+require(tmaptools)
+
+paleta <- rev(colorRampPalette(pals::brewer.bupu(10))(6))
+paleta <- c("#4D004B", "#832C8E", "#8B73B4", "#9CB1D4", "#CBDCEB")
+
+p <- tm_shape(layer_municipios, id = "CVE_GEO") +
+      tm_polygons("GM_2020",
+                   title = stringr::str_wrap("Grado de marginación", 10),
+                    palette = paleta,
+                     border.col = NA
+                  ) + 
+       tm_shape(st_as_sf(layer_estados), is.master = TRUE) +
+        tm_borders(col = "grey", lwd = 1) +
+          tm_layout(title = "Índice de marginación a nivel municipal, 2020",
+                    title.fontfamily = "Montserrat",
+                    title.fontface = "bold",
+                    title.size = 2,
+                    title.position = c("center", "top"), 
+                     main.title.fontface = "bold",
+                     main.title.position = c("center", "top"),
+                     main.title.size = 7, 
+                     main.title.fontfamily = "Montserrat",
+                      legend.outside = TRUE,
+                      legend.outside.position = c("center", "right"),
+                      legend.title.fontfamily = "Montserrat",
+                      legend.na.show = FALSE,
+                      legend.title.fontface = "bold", 
+                      legend.text.fontfamily = "Montserrat",
+                      legend.title.size = 1, 
+                      legend.text.size = 0.8, 
+                      legend.frame = FALSE,
+                        fontfamily = "Montserrat",
+                        frame = FALSE) + 
+            tm_credits(expression(paste("Fuentes: Estimaciones del CONAPO con base en el INEGI, Censo de Población y Vivienda 2020")),
+                        position=c("left", "bottom"), 
+                         size = 1.1) + 
+             tmap_mode("view")
+     
+#path = "Images/IMM_2020_tmap.pdf"
+#ggexport(p, width = 8, height = 5, res = 400, filename = path)
+
+p
+```
+
