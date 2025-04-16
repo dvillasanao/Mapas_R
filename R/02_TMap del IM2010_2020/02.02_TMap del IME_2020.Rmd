@@ -139,7 +139,9 @@ require(viridisLite)    # Paleta de colores
 
 ## Objetivo   
 
+La paquetería **`tmap`** en R es una herramienta poderosa para la **visualización de datos espaciales**, tanto en mapas **estáticos** (tipo publicación) como **interactivos** (tipo web). Ofrece una gramática similar a `ggplot2`, pero especializada en datos espaciales (`sf`, `Spatial`, `stars`, etc.).
 
+![](../../img/IME_2020_tmap.png){width="90%" fig-align="center"} 
 
 ## Marco Geoestadístico Nacional (`MGN`)  
 
@@ -226,7 +228,16 @@ layer_estados <- merge(shape_estados,
                           mutate(GM_2020 = fct_relevel(.$GM_2020,"Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
                            by = c("CVE_GEO" = "CVE_ENT"))
 ```
-## Mapa 
+
+
+## Mapa   
+
+Se crea un mapa interactivo con la paquetería `tmap`, utilizando el objeto espacial `layer_estados`. Se visualizan polígonos coloreados según la variable `GM_2020` (Grado de Marginación 2020), usando una paleta de colores definida, sin bordes visibles entre polígonos (`border.col = NA`). Además:
+
+- Se define el título de la leyenda con salto de línea automático.
+- Se especifican los valores que se mostrarán en los **popups interactivos**: el nombre geográfico (`NOMGEO`) y el grado de marginación (`GM_2020`).
+- Se agregan bordes grises entre entidades con `tm_borders()`.
+
 
 ```{r, class.source = "fold-hide"}
 # Paquetes
@@ -245,7 +256,6 @@ p <- tm_shape(layer_estados, is.master = TRUE) +
                       popup.vars = c("NOMGEO", 
                                      "GM_2020")
                   ) + 
-#tm_shape(st_as_sf(layer_estados), is.master = TRUE) +
         tm_borders(col = "grey", lwd = 1) +
           tm_layout(title = "Índice de marginación a nivel estatal, 2020",
                     title.fontfamily = "Montserrat",
@@ -272,7 +282,7 @@ p <- tm_shape(layer_estados, is.master = TRUE) +
                          size = 1.1) + 
              tmap_mode("view")
      
-#path = "Images/IMM_2020_tmap.pdf"
+#path = "Images/IME_2020_tmap.pdf"
 #ggexport(p, width = 8, height = 5, res = 400, filename = path)
 
 p
