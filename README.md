@@ -71,6 +71,8 @@ Tomando como base a el índice de marginación 2020.
   Rpubs](https://rpubs.com/dvillasanao/Leaflet_por_grado_Raster)\]
 - ⚪ [Mapas con Shiny](#Shiny)
   \[[Enlace](https://dvillasanao.github.io/Mapas_R/docs/01.06_Shiny_Leaflet-2010_2020.html)\]
+- ⚫[Mapa con
+  TMap](#TMap)\[[Enlace](https://dvillasanao.github.io/Mapas_R/R/02_TMap%20del%20IM2010_2020/02.02_TMap-del-IME_2020.html)\]
 
 ### Manejo de diferentes datos en formato `JSON`
 
