@@ -143,7 +143,7 @@ require(viridisLite)    # Paleta de colores
 
 ## Marco Geoestadístico Nacional (`MGN`)  
 
-EEl **Marco Geoestadístico Nacional (MGN)** del Instituto Nacional de Estadística y Geografía (INEGI) es un **sistema único y de carácter nacional** diseñado para **referenciar geográficamente la información estadística** que se genera a través de los censos y encuestas que realiza el Instituto, así como otra información estadística de interés nacional.   
+El **Marco Geoestadístico Nacional (MGN)** del Instituto Nacional de Estadística y Geografía (INEGI) es un **sistema único y de carácter nacional** diseñado para **referenciar geográficamente la información estadística** que se genera a través de los censos y encuestas que realiza el Instituto, así como otra información estadística de interés nacional.   
 
 * **Área Geoestadística Estatal (AGEE)**
 * **Área Geoestadística Municipal (AGEM)**
@@ -183,9 +183,9 @@ shape_estados <- readOGR(dsn = "D:/MGN/MGN 2020/MGN 2020/conjunto_de_datos",
 
 shape_estados <- spTransform(shape_estados, CRSobj = CRS('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'))
 ```
-## Índice de marginación 2010 - 2020
+## Índice de marginación
 
-Se cargan las bases de datos del índice de marginación a nivel estatal para los años `2010`, `2015` y `2020`. Las cuales se encuentran en formato `.RData`.   
+Se cargan las bases de datos del índice de marginación a nivel estatal para del año `2020`. El cual se encuentra en formato `.RData`.   
 
 **Bases de datos**   
 - Nivel estatal    
@@ -212,7 +212,7 @@ load(file = paste0(here::here(), "/Output/IME_2020.RData"))
 
 Este código realiza las siguientes acciones:
 
-- Selecciona las columnas `CVE_ENT`, `NOM_ENT`, `POB_TOT`, `IM_2020`, `IMN_2020` y `GM_2020` de dataframe `IME_2020`.   
+- Selecciona las columnas `CVE_ENT` y `GM_2020` de dataframe `IME_2020`.   
 - `stringr::str_trim(.$GM_, "both")`: Elimina los espacios en blanco al principio y al final de los valores en `GM_`.   
 - `fct_relevel(..., c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo"))`: Reordena los niveles del factor `GM_` en el orden especificado.   
 - `spdplyr:::left_join.Spatial()`,  Realiza un merge entre shape_estados_ y el dataframe modificado, usando `CVE_ENT` como clave.   
@@ -222,31 +222,32 @@ El resultado es un nuevo objeto Spatial (layer_estados_2020) que combina la geom
 ```{r, class.source = "fold-show", eval = FALSE}
 layer_estados <- merge(shape_estados,
                         IME_2020 %>%
-                         dplyr::select(CVE_ENT, NOM_ENT, POB_TOT, IM_2020, IMN_2020, GM_2020) %>%
+                         dplyr::select(CVE_ENT, GM_2020) %>%
                           mutate(GM_2020 = fct_relevel(.$GM_2020,"Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")),
                            by = c("CVE_GEO" = "CVE_ENT"))
 ```
-
-
 ## Mapa 
 
 ```{r, class.source = "fold-hide"}
 # Paquetes
+require(sf)
 require(tmap)
 require(tmaptools)
 
 paleta <- rev(colorRampPalette(pals::brewer.bupu(10))(6))
 paleta <- c("#4D004B", "#832C8E", "#8B73B4", "#9CB1D4", "#CBDCEB")
 
-p <- tm_shape(layer_municipios, id = "CVE_GEO") +
+p <- tm_shape(layer_estados, is.master = TRUE) +
       tm_polygons("GM_2020",
                    title = stringr::str_wrap("Grado de marginación", 10),
                     palette = paleta,
-                     border.col = NA
+                     border.col = NA,
+                      popup.vars = c("NOMGEO", 
+                                     "GM_2020")
                   ) + 
-       tm_shape(st_as_sf(layer_estados), is.master = TRUE) +
+#tm_shape(st_as_sf(layer_estados), is.master = TRUE) +
         tm_borders(col = "grey", lwd = 1) +
-          tm_layout(title = "Índice de marginación a nivel municipal, 2020",
+          tm_layout(title = "Índice de marginación a nivel estatal, 2020",
                     title.fontfamily = "Montserrat",
                     title.fontface = "bold",
                     title.size = 2,
@@ -277,6 +278,11 @@ p <- tm_shape(layer_municipios, id = "CVE_GEO") +
 p
 ```
 
+```{r, echo = FALSE, eval = TRUE}
+#saveRDS(p, file = paste0(here::here(), "/Output/TMap_IME2020.RDS"))
+readRDS(file = paste0(here::here(), "/Output/TMap_IME2020.RDS")) + 
+    tmap_mode("view")
+```
 
 # Librerías
 
